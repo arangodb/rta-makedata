@@ -1,5 +1,24 @@
 /* global print, progress, createCollectionSafe, db, createSafe  */
+const analyzers = require("@arangodb/analyzers");
 
+function deleteAnalyzer_400(testgroup, analyzerName){
+  try {
+    const array = analyzers.toArray();
+    for (let i = 0; i < array.length; i++) {
+      const name = array[i].name().replace('_system::', '');
+      if (name === analyzerName) {
+        analyzers.remove(analyzerName);
+      }
+    }
+    // checking created text analyzer is deleted or not
+    if (analyzers.analyzer(analyzerName) != null) {
+      throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!`);
+    }
+  } catch (e) {
+    print(e);
+  }
+  progress(`${testgroup}: deleted ${analyzerName}`);
+}
 
 (function () {
 
@@ -375,7 +394,6 @@
       print(`making data ${dbCount} ${loopCount}`);
 
       // create analyzer with 'norm' feature
-      const analyzers = require("@arangodb/analyzers");
       analyzers.save("AqlAnalyzerHash", "aql", { "queryString": "return to_hex(to_string(@param))" }, ["frequency", "norm", "position"])
       analyzers.save("geo_json", "geojson", {}, ["frequency", "norm", "position"]);
       analyzers.save("geo_point", "geopoint", { "latitude": ["lat"], "longitude": ["lng"] }, ["frequency", "norm", "position"]);
@@ -534,7 +552,6 @@
 
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       print(`checking data ${dbCount} ${loopCount}`);
-
       try {
         db._dropView(`viewCache_${loopCount}`);
       } catch (e) {
@@ -556,6 +573,15 @@
       } catch (e) {
         print(e);
       }
+      deleteAnalyzer_400("", "geo_point");
+      deleteAnalyzer_400("", "geo_json");
+      testCases.forEach(test => {
+        if (test.link.hasOwnProperty('analyzers')) {
+          test.link.analyzers.forEach(analyzer => {
+            deleteAnalyzer_400(test.collectionName, analyzer);
+          });
+        }
+      });
       progress();
     }
   };

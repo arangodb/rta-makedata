@@ -99,7 +99,7 @@ function deleteAnalyzer(testgroup, analyzerName){
   try {
     const array = analyzers.toArray();
     for (let i = 0; i < array.length; i++) {
-      const name = array[i];
+      const name = array[i].name().replace('_system::', '');
       if (name === analyzerName) {
         analyzers.remove(analyzerName);
       }
