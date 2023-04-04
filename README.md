@@ -86,5 +86,5 @@ If you want to filter for the scripts you can specify a coma separated list:
 
 
 # Embeddings
-RTA Makedata is embedded into [https://github.com/arangodb/arangodb] and [https://github.com/arangodb/release-test-automation]; 
+RTA Makedata is embedded into [arangodb](https://github.com/arangodb/arangodb) and [RTA](https://github.com/arangodb/release-test-automation); 
 Hence a PR on RTA Makedata has to be sidelined by two PRs.
