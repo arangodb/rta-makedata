@@ -1,11 +1,11 @@
 /* jshint globalstrict:false, unused:false */
-/* global print, start_pretty_print, ARGUMENTS */
+/* global print, start_pretty_print, ARGUMENTS, arango */
 'use strict';
 
 const _ = require('lodash');
 const internal = require('internal');
 const platform = internal.platform;
-
+const abortSignal = 6;
 const makeDirectoryRecursive = require('fs').makeDirectoryRecursive;
 
 function killRemainingProcesses(results) {
@@ -13,26 +13,23 @@ function killRemainingProcesses(results) {
   results.status = results.status && (running.length === 0);
   let i = 0;
   for (i = 0; i < running.length; i++) {
-    let status = require("internal").statusExternal(running[i].pid, false);
+    let status = internal.statusExternal(running[i].pid, false);
     if (status.status === "TERMINATED") {
       print("process exited without us joining it (marking crashy): " + JSON.stringify(running[i]) + JSON.stringify(status));
     }
     else {
       print("Killing remaining process & marking crashy: " + JSON.stringify(running[i]));
-      print(killExternal(running[i].pid, abortSignal));
+      print(internal.killExternal(running[i].pid, abortSignal));
     }
     results.crashed = true;
   };
 }
-let SetGlobalExecutionDeadlineTo = require('internal').SetGlobalExecutionDeadlineTo;
+let SetGlobalExecutionDeadlineTo = internal.SetGlobalExecutionDeadlineTo;
 const inspect = internal.inspect;
 
 // backwartscompadummity:
 if (SetGlobalExecutionDeadlineTo === undefined) {
   SetGlobalExecutionDeadlineTo = function(){};
-}
-if (killRemainingProcesses === undefined) {
-  killRemainingProcesses = function(){};
 }
 
 const optionsDefaults = {
@@ -110,6 +107,25 @@ const optionsDefaults = {
   'sleepBeforeShutdown' : 0,
   'instanceInfo' : {}
 };
+
+function findEndpoint(options, instanceInfo) {
+  let endpoint = instanceInfo.endpoint;
+  if (options.vst) {
+    if (options.protocol === 'ssl') {
+      endpoint = endpoint.replace(/.*\/\//, 'vst+ssl://');
+    } else {
+      endpoint = endpoint.replace(/.*\/\//, 'vst://');
+    }
+  } else if (options.http2) {
+    if (options.protocol === 'ssl') {
+      endpoint = endpoint.replace(/.*\/\//, 'h2+ssl://');
+    } else {
+      endpoint = endpoint.replace(/.*\/\//, 'h2://');
+    }
+  }
+  print("using endpoint ", endpoint);
+  return endpoint;
+}
 
 // //////////////////////////////////////////////////////////////////////////////
 // / @brief runs a local unittest file in the current arangosh
@@ -249,7 +265,7 @@ function main (argv) {
     status: false,
     crashed: true
   });
-  print(result)
+  print(result);
   killRemainingProcesses(result);
 
   return result.status;

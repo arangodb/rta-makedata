@@ -1,4 +1,4 @@
-/* global print, ARGUMENTS */
+/* global print, ARGUMENTS, arango */
 //
 // Use like this:
 //   arangosh USUAL_OPTIONS_INCLUDING_AUTHENTICATION --javascript.execute cleardata.js [DATABASENAME]

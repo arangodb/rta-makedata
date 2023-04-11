@@ -11,14 +11,14 @@
       const ArangoError = require('@arangodb').ArangoError;
       print(`checking data ${dbCount} ${loopCount}`);
       try {
-        const vColName = `patents_smart_${ccount}`;
-        const gName = `G_smart_${ccount}`;
-        const mismatchedSGAPrefixDoc = {_key: 'NL:1', COUNTRY: 'DE'}
-        const missingSGAPrefixDoc = {_key: '1', COUNTRY: 'DE'}
+        const vColName = `patents_smart_${loopCount}`;
+        const gName = `G_smart_${loopCount}`;
+        const mismatchedSGAPrefixDoc = {_key: 'NL:1', COUNTRY: 'DE'};
+        const missingSGAPrefixDoc = {_key: '1', COUNTRY: 'DE'};
 
         const vCol = db._collection(vColName);
         if (!vCol) {
-          throw new Error(`The smartGraph "${gName}" was not created correctly, collection ${vColName} missing`)
+          throw new Error(`The smartGraph "${gName}" was not created correctly, collection ${vColName} missing`);
         }
 
         const testValidator = doc => {
@@ -29,13 +29,13 @@
             // We only allow the following two errors, all others should be reported.
             if (e instanceof ArangoError) {
               if (e.errorNum !== 4003 && e.errorNum !== 4001) {
-                throw new Error(`Validator of collection ${colName} on atempt to store ${doc} returned unexpected error: ${e.errorNum} - ${e.message}`)
+                throw new Error(`Validator of collection ${vColName} on atempt to store ${doc} returned unexpected error: ${e.errorNum} - ${e.message}`);
               }
             } else {
               throw(e);
             }
           }
-        }
+        };
 
         // We try to insert a document with the wrong key. This should be rejected by the internal validator.
         testValidator(mismatchedSGAPrefixDoc);

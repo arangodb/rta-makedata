@@ -39,7 +39,7 @@
             if (e instanceof ArangoError) {
               if (e.errorNum !== 1466 &&
                   e.errorNum !== 1233) {
-                throw new Error(`Validator of collection ${colName} on atempt to store ${doc} returned unexpected error: ${e.errorNum} - ${e.message}`)
+                throw new Error(`Validator of collection ${colName} on atempt to store ${doc} returned unexpected error: ${e.errorNum} - ${e.message}`);
               }
             } else {
               throw(e);

@@ -25,7 +25,7 @@ function SyncCheckSuite() {
           if (!col.allInSync) {
             print("not in sync: ");
             print(col);
-            countStillWaiting += 1
+            countStillWaiting += 1;
           } else {
             countInSync+= 1;
           }
@@ -34,7 +34,7 @@ function SyncCheckSuite() {
         print(`In Sync: ${countInSync} Still Waiting: ${countStillWaiting}`);
       } while (!colInSync);
     }
-  }
+  };
 }
 
 jsunity.run(SyncCheckSuite);

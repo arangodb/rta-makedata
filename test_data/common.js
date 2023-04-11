@@ -1,4 +1,8 @@
-/* global print, ARGUMENTS */
+/* global print, ARGUMENTS, */
+// these come from makedata.js / checkdata.js / cleardata.js:
+/* global _, fs, enterprise, db, database, isCluster, progress, time */
+// these are our state variables, we need to write them:
+/* global tStart:true, timeLine:true */
 //
 
 function isCharDigit(n){
@@ -47,7 +51,7 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
           unsupported += " ";
         }
         count += 1;
-      })
+      });
     } else {
       supported = " ";
       unsupported = " ";

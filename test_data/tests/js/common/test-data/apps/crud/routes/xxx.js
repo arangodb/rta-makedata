@@ -64,7 +64,7 @@ router.post(function (req, res) {
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
-  let xxx
+  let xxx;
   try {
     xxx = xxxItems.document(key);
   } catch (e) {
