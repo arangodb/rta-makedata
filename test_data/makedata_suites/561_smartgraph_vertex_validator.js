@@ -3,7 +3,6 @@
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
-      return false;
       let current = semver.parse(semver.coerce(currentVersion));
       return semver.gte(current, "3.10.0") && cluster && !options.readOnly;
     },
