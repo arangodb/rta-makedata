@@ -26,7 +26,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   } = require(fs.join(PWD, 'common'));
   
 
-  let testCases = [
+  let arangosearchTestCases = [
     {
       "collectionName": "no_cache",
       "link": {
@@ -237,7 +237,88 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
   ];
 
-  let simulateNormalization = function (linkDefinition) {
+  let invertedIndexTestCases = [
+    {
+      "collectionName": "no_cache",
+      "utilizeCache": false,
+      "type": "inverted",
+      "name": "inverted",
+      "inBackground": true,
+      "analyzer": "AqlAnalyzerHash",
+      "features": [],
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal"
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_true_top",
+      "utilizeCache": true,
+      "cache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal"
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_false_top",
+      "utilizeCache": false,
+      "cache": false,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal"
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_false_top",
+      "utilizeCache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": true
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+
+  ];
+
+  let arangosearchSimulateNormalization = function (linkDefinition) {
     // This function will simulate field normalization inside link definition.
     /*
     5 possible cases when we should omit 'cache' value from link definition:
@@ -286,7 +367,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return result;
   };
 
-  let removeCacheFields = function (linkDefinition) {
+  let arangosearchRemoveCacheFields = function (linkDefinition) {
     // This function will simulate field normalization when 'cache' field is not supported
     // i.e. it will be simply ommited everywhere
 
@@ -306,9 +387,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let expectedLink;
     if (cacheSizeSupported) {
-      expectedLink = simulateNormalization(expectedRawLink);
+      expectedLink = arangosearchSimulateNormalization(expectedRawLink);
     } else {
-      expectedLink = removeCacheFields(expectedRawLink);
+      expectedLink = arangosearchRemoveCacheFields(expectedRawLink);
     }
 
     // remove redundant 'utilizeCache' values. 
@@ -432,7 +513,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       }
 
-      testCases.forEach(test => {
+      arangosearchTestCases.forEach(test => {
         // create collection for each testing link
         let collectionName = `${test["collectionName"]}_${loopCount}`;
         createCollectionSafe(collectionName, 3, 1);
@@ -507,7 +588,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       [viewCache, viewNoCache].forEach(view => {
         let actualLinks = view.properties().links;
 
-        testCases.forEach(test => {
+        arangosearchTestCases.forEach(test => {
           // get link for each collection
           let collectionName = `${test["collectionName"]}_${loopCount}`;
           let linkFromView = actualLinks[collectionName];
@@ -565,7 +646,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
       progress();
       try {
-        testCases.forEach(test => {
+        arangosearchTestCases.forEach(test => {
           // get link for each collection
           let collectionName = `${test["collectionName"]}_${loopCount}`;
           db._drop(collectionName);
@@ -575,7 +656,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
       deleteAnalyzer_400("", "geo_point");
       deleteAnalyzer_400("", "geo_json");
-      testCases.forEach(test => {
+      arangosearchTestCases.forEach(test => {
         if (test.link.hasOwnProperty('analyzers')) {
           test.link.analyzers.forEach(analyzer => {
             deleteAnalyzer_400(test.collectionName, analyzer);
