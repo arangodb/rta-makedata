@@ -38,11 +38,6 @@ let resultComparision = (db, input_array, expected_output_array) =>{
   for(let i=0; i<input_array.length; i++){
     var output = db._query(input_array[i]).toArray();
     var newOuput = Number(output);
-
-    print("i: "+ i);
-    print("newOutput: "+ newOuput);
-    print("expected: "+ expected_output_array[i]);
-
     progress(``);
     if (newOuput !== expected_output_array[i]) {
       throw new Error(`Index query's ${input_array[i]}'s output didn't match with ecxpected ${expected_output_array[i]} output!`);
@@ -368,38 +363,61 @@ function viewsArray(dbCount) {
       //-------------------------------------------------------x-------------------------------------------------------------
 
       // creating indexes for the collections
+
       a1.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a1.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a1.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a2.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a2.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a2.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
-      a3.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name": "cv_field_insert"}]})
-      a3.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_insert"], "sparse": true})
+      a3.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name": "cv_field_insert"}]});
+      setTimeout(function() {
+        a3.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_insert"], "sparse": true});
+      }, 5000);
 
-      a4.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_update"}]})
-      a4.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_update"], "sparse": true})
+      a4.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_update"}]});
+      setTimeout(function() {
+        a4.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_update"], "sparse": true});
+      }, 5000);
 
-      a5.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_replace"}]})
-      a5.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_replace"], "sparse": true})
+      a5.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_replace"}]});
+      setTimeout(function() {
+        a5.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_replace"], "sparse": true});
+      }, 5000);
 
       a6.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a6.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a6.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a7.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a7.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a7.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a8.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a8.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a8.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a9.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a9.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a9.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a10.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field1"},{"name":"cv_field2"},{"name":"cv_field3"}]});
-      a10.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field1", "cv_field2", "cv_field3"], "sparse": true});
+      setTimeout(function() {
+        a10.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field1", "cv_field2", "cv_field3"], "sparse": true});
+      }, 5000);
 
       a11.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      a11.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      setTimeout(function() {
+        a11.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
+      }, 5000);
 
       a12.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field", "nested": ["from_doc"]}]});
       
