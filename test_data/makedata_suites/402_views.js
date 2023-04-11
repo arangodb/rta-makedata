@@ -21,6 +21,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 }
 
 (function () {
+  const {
+    getMetricValue
+  } = require(fs.join(PWD, 'common'));
+  
 
   let testCases = [
     {
@@ -313,10 +317,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     // actual comparison
     return _.isEqual(linkFromView, expectedLink);
   };
-
-  const {
-    getMetricValue
-  } = require(fs.join(PWD, 'common'));
 
   let jwt_key = null;
 
