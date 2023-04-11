@@ -243,12 +243,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       "utilizeCache": false,
       "type": "inverted",
       "name": "inverted",
-      "inBackground": true,
       "analyzer": "AqlAnalyzerHash",
       "features": [],
       "includeAllFields": false,
       "trackListPositions": false,
-      "searchField": false,
       "fields": [
         {
           "name": "animal"
@@ -267,7 +265,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       "analyzer": "AqlAnalyzerHash",
       "includeAllFields": false,
       "trackListPositions": false,
-      "searchField": false,
       "fields": [
         {
           "name": "animal"
@@ -286,7 +283,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       "analyzer": "AqlAnalyzerHash",
       "includeAllFields": false,
       "trackListPositions": false,
-      "searchField": false,
       "fields": [
         {
           "name": "animal"
@@ -297,7 +293,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       ]
     },
     {
-      "collectionName": "cache_false_top",
+      "collectionName": "cache_true_bottom",
       "utilizeCache": true,
       "type": "inverted",
       "name": "inverted",
@@ -315,7 +311,65 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       ]
     },
-
+    {
+      "collectionName": "cache_false_bottom",
+      "utilizeCache": false,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": false
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_true_top_true_bottom",
+      "utilizeCache": true,
+      "cache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": true
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_false_top_true_bottom",
+      "utilizeCache": true,
+      "cache": false,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": true
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
   ];
 
   let arangosearchSimulateNormalization = function (linkDefinition) {
