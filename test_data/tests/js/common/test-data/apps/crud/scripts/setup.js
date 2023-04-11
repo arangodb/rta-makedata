@@ -12,7 +12,7 @@ for (const localName of documentCollections) {
   if (!db._collection(qualifiedName)) {
     db._createDocumentCollection(qualifiedName, { replicationFactor: 2 });
   } else if (module.context.isProduction) {
-    console.debug(`collection ${qualifiedName} already exists. Leaving it untouched.`)
+    console.debug(`collection ${qualifiedName} already exists. Leaving it untouched.`);
   }
 }
 
@@ -21,6 +21,6 @@ for (const localName of edgeCollections) {
   if (!db._collection(qualifiedName)) {
     db._createEdgeCollection(qualifiedName, { replicationFactor: 2 });
   } else if (module.context.isProduction) {
-    console.debug(`collection ${qualifiedName} already exists. Leaving it untouched.`)
+    console.debug(`collection ${qualifiedName} already exists. Leaving it untouched.`);
   }
 }

@@ -1,4 +1,4 @@
-/* global print, ARGUMENTS */
+/* global print, ARGUMENTS, arango */
 //
 // Use like this:
 //   arangosh USUAL_OPTIONS_INCLUDING_AUTHENTICATION --javascript.execute cleardata.js [DATABASENAME]
@@ -66,7 +66,6 @@ const optionsDefaults = {
   oldVersion: "3.5.0",
   passvoid: '',
   bigDoc: false,
-  passvoid: '',
   test: undefined
 };
 
@@ -118,11 +117,11 @@ function getReplicationFactor (defaultReplicationFactor) {
 const fns = scanMakeDataPaths(options, PWD, dbVersion, options.oldVersion, wantFunctions, 'clearData');
 mainTestLoop(options, isCluster, enterprise, fns, function(database) {
   // Drop database:
-  if (database != "_system") {
-    print('#ix')
+  if (database !== "_system") {
+    print('#ix');
     db._useDatabase("_system");
     
-    if (database != "_system") {
+    if (database !== "_system") {
       db._dropDatabase(databaseName);
     }
     progress();

@@ -1,4 +1,7 @@
-/* global print, progress, createCollectionSafe, db, createSafe  */
+/* global print, progress, createCollectionSafe, db, createSafe, arango, semver */
+// these come from makedata.js / checkdata.js / cleardata.js:
+/* global _, fs, enterprise, db, database, isCluster, progress, time, PWD */
+
 const analyzers = require("@arangodb/analyzers");
 
 function deleteAnalyzer_400(testgroup, analyzerName){
@@ -250,9 +253,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     // remove 'cache' values from link definition
     if (result.hasOwnProperty("cache")) {
       if (result["fields"].hasOwnProperty("animal")) {
-        if (result["cache"] == false) {
+        if (result["cache"] === false) {
           if (result["fields"]["animal"].hasOwnProperty("cache")) {
-            if (result["fields"]["animal"]["cache"] == false) {
+            if (result["fields"]["animal"]["cache"] === false) {
               delete result["cache"];
               delete result["fields"]["animal"]["cache"];
             } else {
@@ -263,7 +266,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           }
         } else {
           if (result["fields"]["animal"].hasOwnProperty("cache")) {
-            if (result["fields"]["animal"]["cache"] == true) {
+            if (result["fields"]["animal"]["cache"] === true) {
               delete result["fields"]["animal"]["cache"];
             }
           }
@@ -272,7 +275,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     } else {
       if (result["fields"].hasOwnProperty("animal")) {
         if (result["fields"]["animal"].hasOwnProperty("cache")) {
-          if (result["fields"]["animal"]["cache"] == false) {
+          if (result["fields"]["animal"]["cache"] === false) {
             delete result["fields"]["animal"]["cache"];
           }
         }
@@ -360,7 +363,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let serversId = [];
     for (let [key, value] of Object.entries(clusterHealth)) {
-      if (value.Role.toLowerCase() == "dbserver") {
+      if (value.Role.toLowerCase() === "dbserver") {
         serversId.push(key);
       }
     }
@@ -394,7 +397,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       print(`making data ${dbCount} ${loopCount}`);
 
       // create analyzer with 'norm' feature
-      analyzers.save("AqlAnalyzerHash", "aql", { "queryString": "return to_hex(to_string(@param))" }, ["frequency", "norm", "position"])
+      analyzers.save("AqlAnalyzerHash", "aql", { "queryString": "return to_hex(to_string(@param))" }, ["frequency", "norm", "position"]);
       analyzers.save("geo_json", "geojson", {}, ["frequency", "norm", "position"]);
       analyzers.save("geo_point", "geopoint", { "latitude": ["lat"], "longitude": ["lng"] }, ["frequency", "norm", "position"]);
 
@@ -427,7 +430,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (cacheSizeSupported && isEnterprise) {
         cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-        if (cacheSize != 0) {
+        if (cacheSize !== 0) {
           throw new Error(`initial cache size is ${cacheSize} (not 0)`);
         }
       }
@@ -454,7 +457,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
         if (cacheSizeSupported) {
           // Should we check that current link will use cache?
-          let utilizeCache = test["link"]["utilizeCache"]
+          let utilizeCache = test["link"]["utilizeCache"];
 
           // update cacheSize
           if (isEnterprise) {
@@ -495,7 +498,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       } else {
         // current and previous versions are aware of 'cache'. 
         // Check that value is present and equal to value from previous version
-        if (viewCache.properties()["storedValues"][0]["cache"] != true) {
+        if (viewCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
         }
       }
@@ -539,7 +542,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             let expectedLink = test["link"];
             if (!compareLinks(isCacheSupported, linkFromView, expectedLink)) {
               let msg = `View: ${view.name()}: Links for collection ${collectionName} are not equal! 
-              Link from view: ${JSON.stringify(linkFromView)}, Expected link: ${JSON.stringify(expectedLink)}`
+              Link from view: ${JSON.stringify(linkFromView)}, Expected link: ${JSON.stringify(expectedLink)}`;
               throw new Error(msg);
             }
           }

@@ -1,4 +1,5 @@
 /* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD */
+/* eslint no-labels: ["error", { "allowLoop": true }] */
 const jsunity = require('jsunity');
 
 const testCollName = "ReadFromFollowerCollection";
@@ -19,7 +20,8 @@ const {
 } = require(fs.join(PWD, 'common'));
 
 let waitForStats = function (instances) {
-  outerloop: for (let instance of instances) {
+  outerloop:
+  for (let instance of instances) {
     print("Fetching statistics with the 'sync' flag from the server "
       + instance["name"] + " to force statistics processing.");
     let ex;
