@@ -16,6 +16,7 @@ function SyncCheckSuite() {
 
     testCollectionInSync: function() {
       let colInSync=true;
+      let attempts = 100;
       do {
         colInSync=true;
         let countInSync = 0;
@@ -30,9 +31,13 @@ function SyncCheckSuite() {
             countInSync+= 1;
           }
         });
-        require('internal').sleep(1);
-        print(`In Sync: ${countInSync} Still Waiting: ${countStillWaiting}`);
-      } while (!colInSync);
+        if (!colInSync) {
+          require('internal').sleep(1);
+          print(`In Sync: ${countInSync} Still Waiting: ${countStillWaiting}`);
+        }
+        attempts -= 1;
+      } while (!colInSync && (attempts > 0));
+      assertTrue(attempts > 0);
     }
   };
 }
