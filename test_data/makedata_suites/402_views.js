@@ -30,7 +30,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     {
       "collectionName": "no_cache",
       "link": {
-        "utilizeCache": false, // This value is for testing purpose. It will be ignored during link creation
+        "utilizeCache": true, // This value is for testing purpose. It will be ignored during link creation
         includeAllFields: false,
         storeValues: "none",
         trackListPositions: false,
@@ -244,7 +244,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       "type": "inverted",
       "name": "inverted",
       "analyzer": "AqlAnalyzerHash",
-      "features": [],
       "includeAllFields": false,
       "trackListPositions": false,
       "fields": [
@@ -351,6 +350,26 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       ]
     },
     {
+      "collectionName": "cache_true_top_false_bottom",
+      "utilizeCache": true,
+      "cache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": false
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
       "collectionName": "cache_false_top_true_bottom",
       "utilizeCache": true,
       "cache": false,
@@ -370,12 +389,100 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       ]
     },
+    {
+      "collectionName": "cache_false_top_false_bottom",
+      "utilizeCache": true,
+      "cache": false,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "animal",
+          "cache": false
+        },
+        {
+          "name": "name"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_top_true_geojson",
+      "utilizeCache": true,
+      "cache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "geo_location",
+          "analyzer": "geo_json"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_bottom_true_geojson",
+      "utilizeCache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "geo_location",
+          "analyzer": "geo_json",
+          "cache": true
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_top_true_geopoint",
+      "utilizeCache": true,
+      "cache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "geo_latlng",
+          "analyzer": "geo_point"
+        }
+      ]
+    },
+    {
+      "collectionName": "cache_bottom_true_geopoint",
+      "utilizeCache": true,
+      "type": "inverted",
+      "name": "inverted",
+      "analyzer": "AqlAnalyzerHash",
+      "includeAllFields": false,
+      "trackListPositions": false,
+      "searchField": false,
+      "fields": [
+        {
+          "name": "geo_latlng",
+          "analyzer": "geo_point",
+          "cache": true
+        }
+      ]
+    }
   ];
 
-  let arangosearchSimulateNormalization = function (linkDefinition) {
-    // This function will simulate field normalization inside link definition.
+  let arangosearchSimulateNormalization = function (definition, type) {
+    // This function will simulate field normalization inside link/index definition.
     /*
-    5 possible cases when we should omit 'cache' value from link definition:
+    5 possible cases when we should omit 'cache' value from link/index definition:
           1) ____                2)  ___
                  ____                  'cache': false
   
@@ -383,17 +490,32 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           3)'cache': false    4) 'cache': false     5) 'cache': true
                   ____               'cache': false         'cache': true
     */
-                  // if (result["fields"].hasOwnProperty("animal")) {
 
-    let result = linkDefinition;
-    // remove 'cache' values from link definition
+    let result = definition;
+    let has_animal = undefined;
+    let animal_field = undefined;
+    if (type == "arangosearch") {
+      has_animal = result["fields"].hasOwnProperty("animal");
+      if (has_animal) {
+        animal_field = result["fields"]["animal"];
+      }
+    } else if (type == "index") {
+      has_animal = result["fields"][0]["name"] == "animal";
+      if (has_animal) {
+        animal_field = result["fields"][0];
+      }
+    } else {
+      throw Error(`Unexpected type of definition: ${definition}`)
+    }
+
+    // remove 'cache' values from link/index definition
     if (result.hasOwnProperty("cache")) {
-      if (result["fields"].hasOwnProperty("animal")) {
+      if (has_animal) {
         if (result["cache"] == false) {
-          if (result["fields"]["animal"].hasOwnProperty("cache")) {
-            if (result["fields"]["animal"]["cache"] == false) {
+          if (animal_field.hasOwnProperty("cache")) {
+            if (animal_field["cache"] == false) {
               delete result["cache"];
-              delete result["fields"]["animal"]["cache"];
+              delete animal_field["cache"];
             } else {
               delete result["cache"];
             }
@@ -401,18 +523,18 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             delete result["cache"];
           }
         } else {
-          if (result["fields"]["animal"].hasOwnProperty("cache")) {
-            if (result["fields"]["animal"]["cache"] == true) {
-              delete result["fields"]["animal"]["cache"];
+          if (animal_field.hasOwnProperty("cache")) {
+            if (animal_field["cache"] == true) {
+              delete animal_field["cache"];
             }
           }
         }
       }
     } else {
-      if (result["fields"].hasOwnProperty("animal")) {
-        if (result["fields"]["animal"].hasOwnProperty("cache")) {
-          if (result["fields"]["animal"]["cache"] == false) {
-            delete result["fields"]["animal"]["cache"];
+      if (has_animal) {
+        if (animal_field.hasOwnProperty("cache")) {
+          if (animal_field["cache"] == false) {
+            delete animal_field["cache"];
           }
         }
       }
@@ -421,17 +543,33 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return result;
   };
 
-  let arangosearchRemoveCacheFields = function (linkDefinition) {
+  let arangosearchRemoveCacheFields = function (definition, type) {
     // This function will simulate field normalization when 'cache' field is not supported
     // i.e. it will be simply ommited everywhere
 
-    let result = linkDefinition;
+    let result = definition;
+    let has_animal = undefined;
+    let animal_field = undefined;
+    if (type == "arangosearch") {
+      has_animal = result["fields"].hasOwnProperty("animal");
+      if (has_animal) {
+        animal_field = result["fields"]["animal"];
+      }
+    } else if (type == "index") {
+      has_animal = result["fields"][0]["name"] == "animal";
+      if (has_animal) {
+        animal_field = result["fields"][0];
+      }
+    } else {
+      throw Error(`Unexpected type of definition: ${definition}`)
+    }
+
     if (result.hasOwnProperty("cache")) {
       delete result["cache"];
     }
-    if (result["fields"].hasOwnProperty("animal")) {
-      if (result["fields"]["animal"].hasOwnProperty("cache")) {
-        delete result["fields"]["animal"]["cache"];
+    if (has_animal) {
+      if (animal_field.hasOwnProperty("cache")) {
+        delete animal_field["cache"];
       }
     }
     return result;
@@ -441,9 +579,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let expectedLink;
     if (cacheSizeSupported) {
-      expectedLink = arangosearchSimulateNormalization(expectedRawLink);
+      expectedLink = arangosearchSimulateNormalization(expectedRawLink, "arangosearch");
     } else {
-      expectedLink = arangosearchRemoveCacheFields(expectedRawLink);
+      expectedLink = arangosearchRemoveCacheFields(expectedRawLink, "arangosearch");
     }
 
     // remove redundant 'utilizeCache' values. 
@@ -600,6 +738,13 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             prevCacheSize = cacheSize;
           }
         }
+      });
+
+      invertedIndexTestCases.forEach(test => {
+        // This collection was created on previous step. Just extract the name.
+        let collectionName = `${test["collectionName"]}_${loopCount}`;
+
+        db._collection(collectionName).ensureIndex(test)
       });
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
