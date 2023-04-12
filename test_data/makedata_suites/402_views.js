@@ -30,7 +30,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     {
       "collectionName": "no_cache",
       "link": {
-        "utilizeCache": true, // This value is for testing purpose. It will be ignored during link creation
+        "utilizeCache": false, // This value is for testing purpose. It will be ignored during link creation
         includeAllFields: false,
         storeValues: "none",
         trackListPositions: false,
@@ -728,12 +728,20 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         if (cacheSizeSupported) {
           // Should we check that current link will use cache?
           let utilizeCache = test["link"]["utilizeCache"]
-
+      
+          print(`LINK: ${JSON.stringify(test["link"])}`)
           // update cacheSize
           if (isEnterprise) {
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-            if ((cacheSize <= prevCacheSize) && utilizeCache) {
-              throw new Error("new cache size is wrong");
+            print(cacheSize);
+            if (utilizeCache) {
+              if (cacheSize <= prevCacheSize) {
+                throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
+              }
+            } else {
+              if (cacheSize > prevCacheSize) {
+                throw new Error(`Cache size should not be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
+              }
             }
             prevCacheSize = cacheSize;
           }
