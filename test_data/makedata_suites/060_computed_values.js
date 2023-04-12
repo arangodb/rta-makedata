@@ -33,14 +33,21 @@ let views_name_declaration = (dbCount) =>{
   return views_Name_array;
 };
 
-// This method will take input and output array and compare both's results
-let resultComparision = (db, input_array, expected_output_array) =>{
-  for(let i=0; i<input_array.length; i++){
-    var output = db._query(input_array[i]).toArray();
-    var newOuput = Number(output);
-    progress(``);
-    if (newOuput !== expected_output_array[i]) {
-      throw new Error(`Index query's ${input_array[i]}'s output didn't match with ecxpected ${expected_output_array[i]} output!`);
+// This method will take db and a tuple parameter containing one query and one expected output
+// as a touple elements and then compare both's results
+let resultComparision = (db, tuple) =>{
+  for (let i = 0; i < tuple.length; i++) {
+    for (let j = 0; j < tuple[i].length; j++) {
+      var output = db._query(tuple[i][j]).toArray();
+      var newOuput = Number(output);
+      print("newOutput: " + newOuput);
+      if (newOuput !== tuple[i][j+1]) {
+        throw new Error(`${tuple[i][j]} Query's output: ${newOuput} didn't match with ecxpected_output: ${tuple[i][j+1]}`);
+      }
+
+      if (j == 0) {
+        break;
+      }
     }
   }
 }
@@ -50,34 +57,31 @@ function indexArray(dbCount){
   // get all the collection variable name wtih dbcount
   let c = collection_declaration(dbCount);
   
-  let index_array = [
-    `for doc in ${c[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`,
-    `for doc in ${c[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`,
-    `for doc in ${c[1]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`,
-    `for doc in ${c[1]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`,
-    `for doc in ${c[2]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`,
-    `for doc in ${c[2]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`,
-    `for doc in ${c[3]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`,
-    `for doc in ${c[3]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`,
-    `for doc in ${c[4]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`,
-    `for doc in ${c[4]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`,
-    `for doc in ${c[5]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == null collect with count into c return c`,
-    `for doc in ${c[5]} OPTIONS { indexHint : 'persistent' } filter has(doc, 'cv_field') == true collect with count into c return c`,
-    `for doc in ${c[6]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == TO_HEX(123) collect with count into c return c`,
-    `for doc in ${c[6]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == TO_HEX(doc.name) collect with count into c return c`,
-    `for doc in ${c[7]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == CONCAT('42_', FIRST(for d in ${c[7]} limit 100, 1 return d.field)) collect with count into c return c`,
-    `for doc in ${c[7]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`,
-    `for doc in ${c[8]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == CONCAT('42_', FIRST(for d in ${c[8]} limit 101, 1 return d.field)) collect with count into c return c`,
-    `for doc in ${c[8]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`,
-    `for doc in ${c[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`,
-    `for doc in ${c[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${c[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`,
-    `for doc in ${c[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`,
+  let indexTuple = [
+    [`for doc in ${c[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
+    [`for doc in ${c[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
+    [`for doc in ${c[1]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
+    [`for doc in ${c[1]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
+    [`for doc in ${c[2]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
+    [`for doc in ${c[2]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
+    [`for doc in ${c[3]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
+    [`for doc in ${c[3]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
+    [`for doc in ${c[4]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
+    [`for doc in ${c[4]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
+    [`for doc in ${c[5]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == null collect with count into c return c`, 64000],
+    [`for doc in ${c[5]} OPTIONS { indexHint : 'persistent' } filter has(doc, 'cv_field') == true collect with count into c return c`, 0],
+    [`for doc in ${c[6]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == TO_HEX(123) collect with count into c return c`, 11],
+    [`for doc in ${c[6]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == TO_HEX(doc.name) collect with count into c return c`, 64000],
+    [`for doc in ${c[7]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == CONCAT('42_', FIRST(for d in ${c[7]} limit 100, 1 return d.field)) collect with count into c return c`, 17],
+    [`for doc in ${c[7]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 32000],
+    [`for doc in ${c[8]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == CONCAT('42_', FIRST(for d in ${c[8]} limit 101, 1 return d.field)) collect with count into c return c`, 33],
+    [`for doc in ${c[8]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 64000],
+    [`for doc in ${c[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 64000],
+    [`for doc in ${c[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${c[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
+    [`for doc in ${c[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
   ];
 
-  // Expected output array for the TestView query output 
-  let index_exp_output = [64000, 64000, 64000, 64000, 64000, 64000, 0, 0, 0, 0, 64000, 0, 11, 64000, 17, 32000, 33, 64000, 64000, 1, 64000];
-
-  return [index_array, index_exp_output];
+  return indexTuple;
 }
 
 // this function will provide all the queries for views
@@ -85,32 +89,28 @@ function viewsArray(dbCount) {
   // get all the view's variable name from the variable_name_declaration method globally
   let view = views_name_declaration(dbCount);
   
-  let views_array = [
-    `for doc in ${view[0]} search doc.cv_field == SOUNDEX('sky') collect with count into c return c`,
-    `for doc in ${view[0]} search doc.cv_field == SOUNDEX('dog') collect with count into c return c`,
-    `for doc in ${view[0]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`,
-    `for doc in ${view[0]} search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`,
-    `for doc in ${view[0]} search doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`,
-    `for doc in ${view[0]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`,
-    `for doc in ${view[0]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`,
-    `for doc in ${view[0]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`,
-    `for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 
-    `for doc in ${view[1]} search doc.cv_field == SOUNDEX('dog') collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field == null collect with count into c return c`,
-    `for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`,
-    `for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`,
-    `for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`,
-    `for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`
-  ];
-
-  // Expected output array for the TestView views query output
-  let views_exp_output = [64000, 64000, 64000, 0, 0, 64000, 96000, 64000, 64000, 64000, 64000, 64000, 0, 0, 64000, 64000, 96000, 64000, 64000];
-
-  return [views_array, views_exp_output];
+  let viewTuples = [
+    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
+    [`for doc in ${view[0]} search doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
+    [`for doc in ${view[0]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 96000],
+    [`for doc in ${view[0]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
+    [`for doc in ${view[1]} search doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
+    [`for doc in ${view[1]} search doc.cv_field == null collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 96000],
+    [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
+  ]
+  return viewTuples;
 }
 
 
@@ -361,8 +361,6 @@ function viewsArray(dbCount) {
       checkComValProperties(c[11], c12_exp_modification, c12_actual_modification.computedValues);
 
       //-------------------------------------------------------x-------------------------------------------------------------
-
-      // creating indexes for the collections
 
       a1.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
       setTimeout(function() {
@@ -719,24 +717,24 @@ function viewsArray(dbCount) {
       })
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let [inArray, index_exp_output] = indexArray(dbCount);
-      resultComparision(db, inArray, index_exp_output);
+      let indexTuple = indexArray(dbCount);
+      resultComparision(db, indexTuple);
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let [myArray, views_exp_output] = viewsArray(dbCount);
-      resultComparision(db, myArray, views_exp_output);
+      let viewTuple = viewsArray(dbCount);
+      resultComparision(db, viewTuple);
 
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`060: checking data ${dbCount}`);
       //execute queries which use views and verify that the proper amount of docs are returned
-      let [inArray, index_exp_output] = indexArray(dbCount);
-      resultComparision(db, inArray, index_exp_output);
+      let indexTuple = indexArray(dbCount);
+      resultComparision(db, indexTuple);
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let [myArray, views_exp_output] = viewsArray(dbCount);
-      resultComparision(db, myArray, views_exp_output);
+      let viewTuple = viewsArray(dbCount);
+      resultComparision(db, viewTuple);
 
       return 0;
     },
