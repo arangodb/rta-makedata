@@ -33,7 +33,7 @@ function SyncCheckSuite() {
         });
         if (!colInSync) {
           require('internal').sleep(1);
-          print(`In Sync: ${countInSync} Still Waiting: ${countStillWaiting}`);
+          print(`Amount of collection in sync: "${countInSync}". Still not in sync: ${countStillWaiting}`);
         }
         attempts -= 1;
       } while (!colInSync && (attempts > 0));
