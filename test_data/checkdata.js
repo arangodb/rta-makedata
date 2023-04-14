@@ -66,7 +66,8 @@ const optionsDefaults = {
   singleShard: false,
   progress: false,
   oldVersion: "3.5.0",
-  test: undefined
+  test: undefined,
+  passvoid: ''
 };
 
 let args = _.clone(ARGUMENTS);

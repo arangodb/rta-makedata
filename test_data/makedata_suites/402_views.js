@@ -16,7 +16,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
   } catch (e) {
     print(e);
-    throw e;
+    throw new e;
   }
   progress(`${testgroup}: deleted ${analyzerName}`);
 }
@@ -696,7 +696,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         delete result["primaryKeyCache"];
       }
     } else {
-      throw Error(`Unexpected type of definition: ${definition}`)
+      throw new Error(`Unexpected type of definition: ${definition}`)
     }
 
     if (result.hasOwnProperty("cache")) {
@@ -743,9 +743,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     if (jwt_key != null) {
       return;
     }
-
-    let content = `{"username": "root","password": "${options.passvoid}" }`;
     let headers = 'Content-Type: application/json';
+    let content = `{"username": "root","password": "${options.passvoid}" }`;
     let reply = arango.POST_RAW("/_open/auth", content, headers);
     let obj = reply["parsedBody"];
     jwt_key = obj["jwt"];
@@ -762,7 +761,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   let getMetricByName = function (name, tags) {
     let res = getRawMetrics(tags);
     if (res.code !== 200) {
-      throw "error fetching metric";
+      print(res);
+      return 0;
     }
     return getMetricValue(res.body, name);
   };
@@ -836,7 +836,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             ] 
           });
         }, viewNameSVCache => {
-          throw Error(`Can't create view ${viewNameSVCache}`);
+          throw new Error(`Can't create view ${viewNameSVCache}`);
         }
       );
 
@@ -852,7 +852,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       //         "primaryKeyCache": true
       //       });
       //     }, viewNamePKCache => {
-      //       throw Error(`Can't create view ${viewNamePKCache}`);
+      //       throw new Error(`Can't create view ${viewNamePKCache}`);
       //     }
       //   );
       // }
@@ -871,7 +871,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       //       "primarySortCache": true 
       //     });
       //   }, viewNamePSCache => {
-      //     throw Error(`Can't create view ${viewNamePSCache}`);
+      //     throw new Error(`Can't create view ${viewNamePSCache}`);
       //   }
       // );
 
@@ -891,7 +891,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             "primarySortCache": false 
           });
         }, viewNameNoCache => {
-          throw Error(`Can't create view ${viewNameNoCache}`);
+          throw new Error(`Can't create view ${viewNameNoCache}`);
         }
       );
 
@@ -968,7 +968,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   
           let status = db._collection(collectionName).ensureIndex(test);
           if (status["code"] != 201) {
-            throw Error(`Failed to create index for collection ${$test["collectionName"]}. Status: ${status}`);
+            throw new Error(`Failed to create index for collection ${$test["collectionName"]}. Status: ${status}`);
           }
 
           if (cacheSizeSupported && isEnterprise) {
@@ -1004,6 +1004,13 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let currVersion = db._version();
       let isCacheSupportedOld = isCacheSizeSupported(oldVersion);
       let isCacheSupported = isCacheSizeSupported(currVersion);
+
+      if (isCacheSupported && isEnterprise) {
+        cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        if (cacheSize == 0) {
+          throw new Error("cache size is equal to zero in checkData");
+        }
+      }
 
       let viewSVCache = db._view(`viewSVCache_${loopCount}`);
       // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
