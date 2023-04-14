@@ -1,4 +1,7 @@
-/* global print, progress, createCollectionSafe, db, createSafe  */
+/* global print, progress, createCollectionSafe, db, createSafe, arango, semver */
+// these come from makedata.js / checkdata.js / cleardata.js:
+/* global _, fs, enterprise, db, database, isCluster, progress, time, PWD */
+
 const analyzers = require("@arangodb/analyzers");
 
 function deleteAnalyzer_400(testgroup, analyzerName){
@@ -632,10 +635,17 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     // remove 'cache' values from link/index definition
     if (result.hasOwnProperty("cache")) {
+<<<<<<< HEAD
       if (has_animal) {
         if (result["cache"] == false) {
           if (animal_field.hasOwnProperty("cache")) {
             if (animal_field["cache"] == false) {
+=======
+      if (result["fields"].hasOwnProperty("animal")) {
+        if (result["cache"] === false) {
+          if (result["fields"]["animal"].hasOwnProperty("cache")) {
+            if (result["fields"]["animal"]["cache"] === false) {
+>>>>>>> main
               delete result["cache"];
               delete animal_field["cache"];
             } else {
@@ -645,18 +655,31 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             delete result["cache"];
           }
         } else {
+<<<<<<< HEAD
           if (animal_field.hasOwnProperty("cache")) {
             if (animal_field["cache"] == true) {
               delete animal_field["cache"];
+=======
+          if (result["fields"]["animal"].hasOwnProperty("cache")) {
+            if (result["fields"]["animal"]["cache"] === true) {
+              delete result["fields"]["animal"]["cache"];
+>>>>>>> main
             }
           }
         }
       }
     } else {
+<<<<<<< HEAD
       if (has_animal) {
         if (animal_field.hasOwnProperty("cache")) {
           if (animal_field["cache"] == false) {
             delete animal_field["cache"];
+=======
+      if (result["fields"].hasOwnProperty("animal")) {
+        if (result["fields"]["animal"].hasOwnProperty("cache")) {
+          if (result["fields"]["animal"]["cache"] === false) {
+            delete result["fields"]["animal"]["cache"];
+>>>>>>> main
           }
         }
       }
@@ -785,7 +808,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let serversId = [];
     for (let [key, value] of Object.entries(clusterHealth)) {
-      if (value.Role.toLowerCase() == "dbserver") {
+      if (value.Role.toLowerCase() === "dbserver") {
         serversId.push(key);
       }
     }
@@ -821,7 +844,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let currVersion = db._version();
 
       // create analyzer with 'norm' feature
-      analyzers.save("AqlAnalyzerHash", "aql", { "queryString": "return to_hex(to_string(@param))" }, ["frequency", "norm", "position"])
+      analyzers.save("AqlAnalyzerHash", "aql", { "queryString": "return to_hex(to_string(@param))" }, ["frequency", "norm", "position"]);
       analyzers.save("geo_json", "geojson", {}, ["frequency", "norm", "position"]);
       analyzers.save("geo_point", "geopoint", { "latitude": ["lat"], "longitude": ["lng"] }, ["frequency", "norm", "position"]);
 
@@ -902,7 +925,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (cacheSizeSupported && isEnterprise) {
         cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-        if (cacheSize != 0) {
+        if (cacheSize !== 0) {
           throw new Error(`initial cache size is ${cacheSize} (not 0)`);
         }
       }
@@ -924,12 +947,21 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           links: {}
         };
         meta.links[collectionName] = test["link"];
+<<<<<<< HEAD
         [[viewSVCache, true], /*[viewPSCache, true], [viewPKCache, true]*/, [viewNoCache, false]].forEach(viewTest => {
           let view = viewTest[0];
           if (view == undefined) {
             return;
           }
           view.properties(meta);
+=======
+        viewCache.properties(meta);
+        viewNoCache.properties(meta);
+
+        if (cacheSizeSupported) {
+          // Should we check that current link will use cache?
+          let utilizeCache = test["link"]["utilizeCache"];
+>>>>>>> main
 
           if (cacheSizeSupported && isEnterprise) {
             let utilizeCache = test["link"]["utilizeCache"]; // is cache utilized by link?
@@ -1036,7 +1068,11 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       } else {
         // current and previous versions are aware of 'cache'. 
         // Check that value is present and equal to value from previous version
+<<<<<<< HEAD
         if (viewSVCache.properties()["storedValues"][0]["cache"] != true) {
+=======
+        if (viewCache.properties()["storedValues"][0]["cache"] !== true) {
+>>>>>>> main
           throw new Error("cache value for storedValues is not 'true'!");
         }
         // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
