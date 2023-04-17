@@ -779,7 +779,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       // trigger cluster metrics
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=write_global", {accept: "application/json"});
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=trigger_global", {accept: "application/json"});
-      require("internal").sleep(0.2);
+      require("internal").sleep(0.1);
     }
     let headers = {};
     headers['accept'] = 'application/json';
@@ -843,40 +843,38 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       );
 
-      // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-      // let viewPKCache = undefined;
-      // if (semver.gte(currVersion, "3.9.6")) {
-      //   // create view with cache in 'primaryKeyCache'
-      //   progress('createViewPKCache');
-      //   viewNamePKCache = `viewPKCache_${loopCount}`;
-      //   viewPKCache = createSafe(viewNamePKCache,
-      //     viewNamePKCache => {
-      //       return db._createView(viewNamePKCache, "arangosearch", { 
-      //         "primaryKeyCache": true
-      //       });
-      //     }, viewNamePKCache => {
-      //       throw new Error(`Can't create view ${viewNamePKCache}`);
-      //     }
-      //   );
-      // }
+      let viewPKCache;
+      if (semver.gte(currVersion, "3.9.6")) {
+        // create view with cache in 'primaryKeyCache'
+        progress('createViewPKCache');
+        viewNamePKCache = `viewPKCache_${loopCount}`;
+        viewPKCache = createSafe(viewNamePKCache,
+          viewNamePKCache => {
+            return db._createView(viewNamePKCache, "arangosearch", { 
+              "primaryKeyCache": true
+            });
+          }, viewNamePKCache => {
+            throw new Error(`Can't create view ${viewNamePKCache}`);
+          }
+        );
+      }
 
       // create view with cache in 'primarySort'
-      // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-      // progress('createViewPSCache');
-      // let viewNamePSCache = `viewPSCache_${loopCount}`;
-      // let viewPSCache = createSafe(viewNamePSCache,
-      //   viewNamePSCache => {
-      //     return db._createView(viewNamePSCache, "arangosearch", { 
-      //       "primarySort": [ 
-      //         { "field": "animal", "direction": "desc" }, 
-      //         { "field": "name", "direction": "asc" }
-      //       ],  
-      //       "primarySortCache": true 
-      //     });
-      //   }, viewNamePSCache => {
-      //     throw new Error(`Can't create view ${viewNamePSCache}`);
-      //   }
-      // );
+      progress('createViewPSCache');
+      let viewNamePSCache = `viewPSCache_${loopCount}`;
+      let viewPSCache = createSafe(viewNamePSCache,
+        viewNamePSCache => {
+          return db._createView(viewNamePSCache, "arangosearch", { 
+            "primarySort": [ 
+              { "field": "animal", "direction": "desc" }, 
+              { "field": "name", "direction": "asc" }
+            ],  
+            "primarySortCache": true 
+          });
+        }, viewNamePSCache => {
+          throw new Error(`Can't create view ${viewNamePSCache}`);
+        }
+      );
 
       // create view with without utilizing cache
       progress('createViewNoCache');
@@ -927,7 +925,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           links: {}
         };
         meta.links[collectionName] = test["link"];
-        [[viewSVCache, true], /*[viewPSCache, true], [viewPKCache, true],*/ [viewNoCache, false]].forEach(viewTest => {
+        [[viewSVCache, true], [viewPSCache, true], [viewPKCache, true], [viewNoCache, false]].forEach(viewTest => {
           let view = viewTest[0];
           if (view === undefined) {
             return;
@@ -1050,9 +1048,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       let viewSVCache = db._view(`viewSVCache_${loopCount}`);
-      // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-      // let viewPSCache = db._view(`viewPSCache_${loopCount}`);
-      // let viewPKCache = db._view(`viewPKCache_${loopCount}`);
+      let viewPSCache = db._view(`viewPSCache_${loopCount}`);
+      let viewPKCache = db._view(`viewPKCache_${loopCount}`);
       let viewNoCache = db._view(`viewNoCache_${loopCount}`);
 
       // for 3.10.0 and 3.10.1 we should verify that no cache is present
@@ -1063,26 +1060,24 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         if (viewSVCache.properties()["storedValues"][0].hasOwnProperty("cache")) {
           throw new Error(`viewSVCache: cache value for storedValues is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
         }
-        // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-        // if (viewPKCache.properties().hasOwnProperty("primaryKeyCache")) {
-        //   throw new Error(`viewSVCache: cache value for storedValues is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
-        // }
-        // if (viewPSCache.properties().hasOwnProperty("primarySortCache")) {
-        //   throw new Error(`viewPSCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
-        // }
+        if (viewPKCache.properties().hasOwnProperty("primaryKeyCache")) {
+          throw new Error(`viewSVCache: cache value for storedValues is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
+        }
+        if (viewPSCache.properties().hasOwnProperty("primarySortCache")) {
+          throw new Error(`viewPSCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
+        }
       } else {
         // current and previous versions are aware of 'cache'. 
         // Check that value is present and equal to value from previous version
         if (viewSVCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
         }
-        // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-        // if (viewPKCache.properties()["primaryKeyCache"] != true) {
-        //   throw new Error("cache value for primaryKeyCache is not 'true'!");
-        // }
-        // if (viewPSCache.properties()["primarySortCache"] != true) {
-        //   throw new Error("cache value for primarySort is not 'true'!");
-        // }
+        if (viewPKCache.properties()["primaryKeyCache"] != true) {
+          throw new Error("cache value for primaryKeyCache is not 'true'!");
+        }
+        if (viewPSCache.properties()["primarySortCache"] != true) {
+          throw new Error("cache value for primarySort is not 'true'!");
+        }
       }
 
       if (viewNoCache.properties()["storedValues"][0].hasOwnProperty("cache")) {
@@ -1095,7 +1090,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         throw new Error(`viewNoCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
       }
 
-      [viewSVCache, /*viewPSCache, viewPKCache,*/ viewNoCache].forEach(view => {
+      [viewSVCache, viewPSCache, viewPKCache, viewNoCache].forEach(view => {
         if (view === undefined) {
           return;
         }
@@ -1174,19 +1169,18 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         print(e);
         throw e;
       }
-      // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
-      // try {
-      //   db._dropView(`viewPKCache_${loopCount}`);
-      // } catch (e) {
-      //   print(e);
-      //   throw e;
-      // }
-      // try {
-      //   db._dropView(`viewPSCache_${loopCount}`);
-      // } catch (e) {
-      //   print(e);
-      //   throw e;
-      // }
+      try {
+        db._dropView(`viewPKCache_${loopCount}`);
+      } catch (e) {
+        print(e);
+        throw e;
+      }
+      try {
+        db._dropView(`viewPSCache_${loopCount}`);
+      } catch (e) {
+        print(e);
+        throw e;
+      }
       try {
         db._dropView(`viewNoCache_${loopCount}`);
       } catch (e) {
