@@ -19,7 +19,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
   } catch (e) {
     print(e);
-    throw new e;
+    throw e;
   }
   progress(`${testgroup}: deleted ${analyzerName}`);
 }
@@ -598,47 +598,47 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     */
 
     let result = definition;
-    let has_animal = undefined;
-    let animal_field = undefined;
-    if (type == "arangosearch") {
+    let has_animal;
+    let animal_field;
+    if (type === "arangosearch") {
       has_animal = result["fields"].hasOwnProperty("animal");
       if (has_animal) {
         animal_field = result["fields"]["animal"];
       }
-    } else if (type == "index") {
-      has_animal = result["fields"][0]["name"] == "animal";
+    } else if (type === "index") {
+      has_animal = result["fields"][0]["name"] === "animal";
       if (has_animal) {
         animal_field = result["fields"][0];
       }
       if (result.hasOwnProperty("primarySort")) {
         if (result["primarySort"].hasOwnProperty("cache")) {
-          if (result["primarySort"]["cache"] == false) {
+          if (result["primarySort"]["cache"] === false) {
             delete result["primarySort"]["cache"];
           }
         }
       }
       if (result.hasOwnProperty("storedValues")) {
         if (result["storedValues"][0].hasOwnProperty("cache")) {
-          if (result["storedValues"][0]["cache"] == false) {
+          if (result["storedValues"][0]["cache"] === false) {
             delete result["storedValues"][0]["cache"];
           }
         }
       }
       if (result.hasOwnProperty("primaryKeyCache")) {
-        if (result["primaryKeyCache"] == false) {
+        if (result["primaryKeyCache"] === false) {
           delete result["primaryKeyCache"];
         }
       }
     } else {
-      throw Error(`Unexpected type of definition: ${definition}`)
+      throw Error(`Unexpected type of definition: ${definition}`);
     }
 
     // remove 'cache' values from link/index definition
     if (result.hasOwnProperty("cache")) {
       if (has_animal) {
-        if (result["cache"] == false) {
+        if (result["cache"] === false) {
           if (animal_field.hasOwnProperty("cache")) {
-            if (animal_field["cache"] == false) {
+            if (animal_field["cache"] === false) {
               delete result["cache"];
               delete animal_field["cache"];
             } else {
@@ -649,7 +649,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           }
         } else {
           if (animal_field.hasOwnProperty("cache")) {
-            if (animal_field["cache"] == true) {
+            if (animal_field["cache"] === true) {
               delete animal_field["cache"];
             }
           }
@@ -658,7 +658,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     } else {
       if (has_animal) {
         if (animal_field.hasOwnProperty("cache")) {
-          if (animal_field["cache"] == false) {
+          if (animal_field["cache"] === false) {
             delete animal_field["cache"];
           }
         }
@@ -673,15 +673,15 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     // i.e. it will be simply ommited everywhere
 
     let result = definition;
-    let has_animal = undefined;
-    let animal_field = undefined;
-    if (type == "arangosearch") {
+    let has_animal;
+    let animal_field;
+    if (type === "arangosearch") {
       has_animal = result["fields"].hasOwnProperty("animal");
       if (has_animal) {
         animal_field = result["fields"]["animal"];
       }
-    } else if (type == "index") {
-      has_animal = result["fields"][0]["name"] == "animal";
+    } else if (type === "index") {
+      has_animal = result["fields"][0]["name"] === "animal";
       if (has_animal) {
         animal_field = result["fields"][0];
       }
@@ -699,7 +699,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         delete result["primaryKeyCache"];
       }
     } else {
-      throw new Error(`Unexpected type of definition: ${definition}`)
+      throw new Error(`Unexpected type of definition: ${definition}`);
     }
 
     if (result.hasOwnProperty("cache")) {
@@ -729,9 +729,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
 
     // actual comparison
-    if (type == "arangosearch") {
+    if (type === "arangosearch") {
       return _.isEqual(actual, expected);
-    } else if (type == "index") {
+    } else if (type === "index") {
       // We want to be sure that 'cache' fields are exist or not exist simultaneously for 'actual' and 'expected' 
       let res = actual.hasOwnProperty("cache") ^ expected.hasOwnProperty("cache");
       return !res && _.isMatch(actual, expected);
@@ -927,9 +927,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           links: {}
         };
         meta.links[collectionName] = test["link"];
-        [[viewSVCache, true], /*[viewPSCache, true], [viewPKCache, true]*/, [viewNoCache, false]].forEach(viewTest => {
+        [[viewSVCache, true], /*[viewPSCache, true], [viewPKCache, true],*/ [viewNoCache, false]].forEach(viewTest => {
           let view = viewTest[0];
-          if (view == undefined) {
+          if (view === undefined) {
             return;
           }
           view.properties(meta);
@@ -979,15 +979,15 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           ]);
   
           let status = db._collection(collectionName).ensureIndex(test);
-          if (status["code"] != 201) {
-            throw new Error(`Failed to create index for collection ${$test["collectionName"]}. Status: ${status}`);
+          if (status["code"] !== 201) {
+            throw new Error(`Failed to create index for collection ${test["collectionName"]}. Status: ${status}`);
           }
 
           if (cacheSizeSupported && isEnterprise) {
             let utilizeCache = test["utilizeCache"]; // is cache utilized by index?
 
             // Sync inverted index
-            let query = undefined;
+            let query;
             if (collectionName.includes("geojson")) {
               query = `LET lines = GEO_MULTILINESTRING([
                 [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
@@ -1043,8 +1043,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let isCacheSupported = isCacheSizeSupported(currVersion);
 
       if (isCacheSupported && isEnterprise) {
-        cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-        if (cacheSize == 0) {
+        let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        if (cacheSize === 0) {
           throw new Error("cache size is equal to zero in checkData");
         }
       }
@@ -1073,7 +1073,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       } else {
         // current and previous versions are aware of 'cache'. 
         // Check that value is present and equal to value from previous version
-        if (viewSVCache.properties()["storedValues"][0]["cache"] != true) {
+        if (viewSVCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
         }
         // SHOULD BE UNCOMMENTED AFTER FIXING SEARCH-466
@@ -1096,7 +1096,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       [viewSVCache, /*viewPSCache, viewPKCache,*/ viewNoCache].forEach(view => {
-        if (view == undefined) {
+        if (view === undefined) {
           return;
         }
         let actualLinks = view.properties().links;
