@@ -917,8 +917,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         // insert some test data. Also insert version, on which 'make_data' was called
         db._collection(collectionName).insert([
           { "animal": "cat", "name": "tom", "geo_location": { "type": "Point", "coordinates": [0.937, 50.932] }, "geo_latlng": { "lat": 50.932, "lng": 6.937 } },
-          { "animal": "mouse", "name": "jerry", "location": { "type": "Point", "coordinates": [12.7, 3.93] }, "geo_latlng": { "lat": 50.941, "lng": 6.956 } },
-          { "animal": "dog", "name": "harry", "location": { "type": "Point", "coordinates": [-6.27, 51.81] }, "geo_latlng": { "lat": 50.932, "lng": 6.962 } },
+          { "animal": "mouse", "name": "jerry", "geo_location": { "type": "Point", "coordinates": [12.7, 3.93] }, "geo_latlng": { "lat": 50.941, "lng": 6.956 } },
+          { "animal": "dog", "name": "harry", "geo_location": { "type": "Point", "coordinates": [-6.27, 51.81] }, "geo_latlng": { "lat": 50.932, "lng": 6.962 } },
           { "version": currVersion }
         ]);
 
@@ -937,7 +937,16 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           if (cacheSizeSupported && isEnterprise) {
             let utilizeCache = test["link"]["utilizeCache"]; // is cache utilized by link?
             let viewUtilizeCache = viewTest[1]; // is cache utilized by view?
-        
+            
+            // sync view
+            db._query(`
+            let lines = GEO_MULTILINESTRING([
+              [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
+              [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]])
+            for d in ${view.name()} search d.animal == "cat" OR 
+            ANALYZER(GEO_DISTANCE(d.geo_location, lines) < 100, "geo_json") OR
+            ANALYZER(GEO_DISTANCE(d.geo_latlng, lines) < 100, "geo_point")
+            OPTIONS {waitForSync: true} return d`);
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             print(cacheSize);
@@ -964,8 +973,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
           db._collection(collectionName).insert([
             { "animal": "cat1", "name": "tom2", "geo_location": { "type": "Point", "coordinates": [1.937, 40.932] }, "geo_latlng": { "lat": 40.932, "lng": 8 } },
-            { "animal": "mouse1", "name": "jerry2", "location": { "type": "Point", "coordinates": [22.7, 4.93] }, "geo_latlng": { "lat": 51.941, "lng": 7 } },
-            { "animal": "dog1", "name": "harry2", "location": { "type": "Point", "coordinates": [6.27, 55.81] }, "geo_latlng": { "lat": 50.9, "lng": 7 } },
+            { "animal": "mouse1", "name": "jerry2", "geo_location": { "type": "Point", "coordinates": [22.7, 4.93] }, "geo_latlng": { "lat": 51.941, "lng": 7 } },
+            { "animal": "dog1", "name": "harry2", "geo_location": { "type": "Point", "coordinates": [6.27, 55.81] }, "geo_latlng": { "lat": 50.9, "lng": 7 } },
             { "version": currVersion }
           ]);
   
@@ -976,6 +985,31 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
           if (cacheSizeSupported && isEnterprise) {
             let utilizeCache = test["utilizeCache"]; // is cache utilized by index?
+
+            // Sync inverted index
+            let query = undefined;
+            if (collectionName.includes("geojson")) {
+              query = `LET lines = GEO_MULTILINESTRING([
+                [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
+                [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]
+              ])
+              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              filter GEO_DISTANCE(d.geo_location, lines) < 3000
+              return d`;
+            } else if (collectionName.includes("geopoint")) {
+              query = `LET lines = GEO_MULTILINESTRING([
+                [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
+                [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]
+              ])
+              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              filter GEO_DISTANCE(d.geo_latlng, lines) < 3000
+              return d`;
+            } else {
+              query = `for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              filter d.animal == "cat"
+              return d`;
+            }
+            db._query(query);
         
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
