@@ -83,17 +83,30 @@ class testCursor {
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      let collName = `citations_naive_${dbCount}`;
       // check per DB
       let cursors = [];
       try {
-        for (let i=0; i < 10; i++) {
+        let i=0;
+        for (; i < 10; i++) {
+          let collName = `citations_naive_${dbCount}`;
           cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
                                       {
                                         "@coll": collName
                                       });
           
           if (! cursors[i].runQuery()) {
+          }
+        }
+        if (isEnterprise) {
+          for (;i < 20; i++) {
+            let collName = `citations_smart_${dbCount}`;
+            cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
+                                        {
+                                          "@coll": collName
+                                        });
+            
+            if (! cursors[i].runQuery()) {
+            }
           }
         }
         while (cursors.length > 0) {
