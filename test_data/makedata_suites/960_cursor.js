@@ -1,7 +1,5 @@
 /* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD */
 
-const jsunity = require('jsunity');
-
 class testCursor {
   constructor(query, bindvars) {
     this.cursorId = null;
@@ -19,8 +17,6 @@ class testCursor {
     return ret;
   }
   runQuery() {
-    // print(db._collections())
-    //print(this.query)
     let ret = arango.POST_RAW('/_api/cursor', {
       "query": this.query,
       "batchSize": this.batchSize,
@@ -35,33 +31,29 @@ class testCursor {
     this.currentBatchId = 1;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
-    //assertTrue(ret.parsedBody['hasMore'], ret) 
     this.nextBatchId = ret.parsedBody['nextBatchId'];
-    // print(this.resultChunks)
     return this.hasMore;
   }
   getNext() {
-    //print('zzzzz')
-    // 
-    let ret = arango.POST_RAW(`/_api/cursor/${this.cursorId}/${this.nextBatchId}`, "");
+    let url = `/_api/cursor/${this.cursorId}/${this.nextBatchId}`;
+    let ret = arango.POST_RAW(url, "");
     //print(ret)
     if (ret.code !== 200) {
-      throw new Error(`Cursor could not be read: ${JSON.stringify(ret)}`);
+      throw new Error(`Cursor could not be read from ${url} : ${JSON.stringify(ret)}`);
     }
     this.currentBatchId = this.nextBatchId;
-    //print(this.resultChunks)
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.nextBatchId = ret.parsedBody['nextBatchId'];
-    // print(this.resultChunks)
     this.hasMore = ret.parsedBody.hasMore;
     return this.hasMore;
   }
 
   getLast() {
-    let ret = arango.POST_RAW(`/_api/cursor/${this.cursorId}/${this.currentBatchId}`, "");
+    let url = `/_api/cursor/${this.cursorId}/${this.currentBatchId}`;
+    let ret = arango.POST_RAW(url, "");
     //print(ret)
     if (ret.code !== 200) {
-      throw new Error(`Cursor could not be read: ${JSON.stringify(ret)}`);
+      throw new Error(`Cursor could not be read from ${url}: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     this.hasMore = ret.parsedBody.hasMore;
@@ -71,11 +63,10 @@ class testCursor {
       print(this.currentBatchId)
       print(this.resultChunks[this.currentBatchId])
       print(reGotChunk)
-      throw new Error("Chunks weren't as expected!");
+      throw new Error("Chunks weren't as expected: " + url);
     }
     this.currentBatchId = this.nextBatchId;
     this.resultChunks[this.currentBatchId] = reGotChunk;
-    // print(this.resultChunks)
     return this.hasMore;
   }
 };
@@ -95,27 +86,32 @@ class testCursor {
       let collName = `citations_naive_${dbCount}`;
       // check per DB
       let cursors = [];
-      for (let i=0; i < 10; i++) {
-        cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
-                              {
-                                "@coll": collName
-                              });
-        
-        if (! cursors[i].runQuery()) {
+      try {
+        for (let i=0; i < 10; i++) {
+          cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
+                                      {
+                                        "@coll": collName
+                                      });
+          
+          if (! cursors[i].runQuery()) {
+          }
         }
-      }
-      while (cursors.length > 0) {
-        print(cursors.length)
-        let c = Math.floor(Math.random() * cursors.length)
-        print('c: ' + c)
-        cursors[c].getLast();
-        if (!cursors[c].getNext()) {
-          print('regetting last')
+        while (cursors.length > 0) {
+          // print(cursors.length)
+          let c = Math.floor(Math.random() * cursors.length)
+          //print('c: ' + c)
           cursors[c].getLast();
-          print('done with ' + c);
-          cursors = cursors.splice(c, 1)
+          if (!cursors[c].getNext()) {
+            print('regetting last')
+            cursors[c].getLast();
+            print('done with ' + c);
+            cursors = cursors.splice(c + 1, 1);
+          }
         }
-        
+      } catch (ex) {
+        print(ex);
+        print(ex.stack);
+        throw ex;
       }
       return 0;
     },
