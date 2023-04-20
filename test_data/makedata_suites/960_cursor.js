@@ -1,7 +1,7 @@
 /* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD */
 
 class testCursor {
-  constructor(query, bindvars) {
+  constructor(query, bindvars, batchSize) {
     this.cursorId = null;
     this.nextBatchId = null;
     this.currentBatchId = null;
@@ -9,7 +9,7 @@ class testCursor {
     this.bindvars = bindvars;
     this.resultChunks = {};
     this.hasMore = true;
-    this.batchSize = 2;
+    this.batchSize = batchSize;
   }
   compressDocuments(docs) {
     let ret = [];
@@ -92,18 +92,31 @@ class testCursor {
           cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
                                       {
                                         "@coll": collName
-                                      });
+                                      },
+                                     i+2);
+          
+          if (! cursors[i].runQuery()) {
+          }
+        }
+        for (; i < 20; i++) {
+          let viewName = `test_view2_${dbCount}`;
+          cursors[i] = new testCursor("for doc in @@view search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c",
+                                      {
+                                        "@view": viewName
+                                      },
+                                     i-8);
           
           if (! cursors[i].runQuery()) {
           }
         }
         if (isEnterprise) {
-          for (;i < 20; i++) {
+          for (;i < 30; i++) {
             let collName = `citations_smart_${dbCount}`;
             cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
                                         {
                                           "@coll": collName
-                                        });
+                                        },
+                                        i-18);
             
             if (! cursors[i].runQuery()) {
             }
