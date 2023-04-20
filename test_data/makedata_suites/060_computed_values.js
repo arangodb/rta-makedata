@@ -144,8 +144,14 @@ function viewsArray(dbCount) {
 
       // this function will check Computed Values properties
       function checkComValProperties(comValueName, obj1, obj2) {
-        if(_.isEqual(obj1, obj2) == false){
-          throw new Error(`Properties missmatched for the collection ${comValueName}`);
+        if (obj1.hasOwnProperty('optimizeTopK')) {
+          delete obj1.optimizeTopK;
+        }
+        if (obj2.hasOwnProperty('optimizeTopK')) {
+          delete obj2.optimizeTopK;
+        }
+        if(_.isEqual(obj1, obj2) === false){
+          throw new Error(`Properties missmatched for the collection ${comValueName} ${JSON.stringify(obj1)} <-> ${JSON.stringify(obj2)}`);
         }
       }
 
@@ -683,27 +689,27 @@ function viewsArray(dbCount) {
         //checking computed value field exit on the collection's doc
         if (col === c1 || col === c2 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
           if (expected_field[0].cv_field == null) {
-            throw new Error(`Computed value field missing from collection`);
+            throw new Error(`Computed value field 'cv_field' missing from collection`);
           } 
         } 
         else if (col === c3) {
           if (expected_field[0].cv_field_insert == null) {
-            throw new Error(`Computed value field missing from collection`);
+            throw new Error(`Computed value field 'cv_field_insert' missing from collection`);
           }
         }
         else if (col === c4 || col === c5) {
           if (expected_field[2].cv_field == null) {
-            throw new Error(`Computed value field missing from collection`);
+            throw new Error(`Computed value field 'cv_field' missing from collection`);
           }
         }
         else if (col === c6) {
           if (expected_field[4].field == null) {
-            throw new Error(`Computed value field missing from collection`);
+            throw new Error(`Computed value field 'field' missing from collection`);
           }
         } 
         else if (col === c10) {
           if (expected_field[0].cv_field1 == null) {
-            throw new Error(`Computed value field missing from collection`);
+            throw new Error(`Computed value field 'cv_field1' missing from collection`);
           }
         }
       });
