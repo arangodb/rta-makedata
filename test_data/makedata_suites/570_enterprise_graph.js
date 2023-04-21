@@ -121,6 +121,7 @@
         baseName = "system";
       }
       const databaseName = `${baseName}_${dbCount}_entGraph`;
+      print(databaseName)
       db._useDatabase(databaseName);
       // Drop graph:
       let egm = require("@arangodb/enterprise-graph");

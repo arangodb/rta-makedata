@@ -31,6 +31,9 @@ class testCursor {
     this.currentBatchId = 1;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
+    if (this.cursorId === undefined) {
+      throw new Error("failed to create a query with cursor: " + JSON.stringify(ret));
+    }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     return this.hasMore;
   }
