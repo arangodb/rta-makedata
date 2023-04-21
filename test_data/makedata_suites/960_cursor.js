@@ -103,7 +103,7 @@ class testCursor {
         }
         for (; i < 20; i++) {
           let viewName = `test_view2_${dbCount}`;
-          cursors[i] = new testCursor("for doc in @@view search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c",
+          cursors[i] = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
                                       {
                                         "@view": viewName
                                       },
