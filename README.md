@@ -84,6 +84,40 @@ If you want to filter for the scripts you can specify a coma separated list:
 ./scripts/unittest rta_makedata --extremeVerbosity true --cluster true --makedata_args:bigDoc true --test '010,020,050'
 ```
 
+# test output
+It should be obvious whether a test is run in a scenario or not. Hence the list of executed tests is output:
+
+```
+[DL]   .../000_dummy.js
+[ ]    .../010_disabled_uuid_check.js
+[ ]    .../015_cluster_wait.js
+[D]    .../020_foxx.js
+[D]    .../050_database.js
+[D]    .../051_database_extended_names.js
+[D]    .../060_computed_values.js
+[L]    .../100_collections.js
+[L]    .../400_views.js
+[L]    .../401_views.js
+[L]    .../402_views.js
+[L]    .../500_community_graph.js
+[L]    .../550_smart_graph.js
+[ ]    .../560_smartgraph_edge_validator.js
+[ ]    .../561_smartgraph_vertex_validator.js
+[D]    .../570_enterprise_graph.js
+[D]    .../607_analyzers.js
+[D]    .../608_analyzers.js
+[D]    .../609_analyzers.js
+[D]    .../610_analyzers.js
+[D]    .../900_oneshard.js
+[ ]    .../950_read_from_follower.js
+[]     .../960_cursor.js
+```
+with the following meanings:
+- `[ ]`: this test is not applicable for the current environment and will be skipped
+- `[D]`: This test has database level functionality
+- `[L]`: This test has loop-level functionality
+- `[LD`: This test has both.
+
 
 # Embeddings
 RTA Makedata is embedded into [arangodb](https://github.com/arangodb/arangodb) and [RTA](https://github.com/arangodb/release-test-automation); 
