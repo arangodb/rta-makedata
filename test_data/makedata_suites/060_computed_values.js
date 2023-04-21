@@ -117,7 +117,7 @@ function viewsArray(dbCount) {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return semver.gte(oldVersionSemver, "3.10.0");
+      return enterprise && semver.gte(oldVersionSemver, "3.10.0");
     },
 
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {

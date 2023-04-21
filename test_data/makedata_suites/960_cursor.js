@@ -101,18 +101,18 @@ class testCursor {
           if (! cursors[i].runQuery()) {
           }
         }
-        for (; i < 20; i++) {
-          let viewName = `test_view2_${dbCount}`;
-          cursors[i] = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
-                                      {
-                                        "@view": viewName
-                                      },
-                                     i-8);
-          
-          if (! cursors[i].runQuery()) {
-          }
-        }
         if (isEnterprise) {
+          for (; i < 20; i++) {
+            let viewName = `test_view2_${dbCount}`;
+            cursors[i] = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
+                                        {
+                                          "@view": viewName
+                                        },
+                                        i-8);
+            
+            if (! cursors[i].runQuery()) {
+            }
+          }
           for (;i < 30; i++) {
             let collName = `citations_smart_${dbCount}`;
             cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
@@ -120,7 +120,7 @@ class testCursor {
                                           "@coll": collName
                                         },
                                         i-18);
-            
+
             if (! cursors[i].runQuery()) {
             }
           }
