@@ -30,15 +30,15 @@
       progress('createCollection2');
       let cskip = createCollectionSafe(`cskip_${loopCount}${extendedNames[2]}`, 1, 1);
       progress('createCollection3');
-      let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[2]}`, 3, 1);
+      let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[3]}`, 3, 1);
       progress('createCollection4');
-      let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[3]}`, 3, 2);
+      let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[4]}`, 3, 2);
       progress('createCollectionGeo5');
-      let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[4]}`, 1, 1);
+      let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[5]}`, 1, 1);
       progress('createCollection6');
-      let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[5]}`, 3, 2);
+      let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[6]}`, 3, 2);
       progress('createCollection7');
-      let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[6]}`, 3, 1);
+      let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
 
       // Create some indexes:
       progress('createCollection8');
@@ -154,6 +154,7 @@
       if (baseName === "_system") {
         baseName = "system";
       }
+      print(`M${baseName}_${dbCount}_${extendedNames[3]}`)
       db._useDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
       let cols = db._collections();
       let cnames = [];
@@ -223,19 +224,19 @@
 
       // Check a few queries:
       progress();
-      if (db._query(aql`FOR x IN ${c.name()} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
+      if (db._query(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
       progress();
-      if (db._query(aql`FOR x IN ${chash.name()} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
+      if (db._query(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
       progress();
-      if (db._query(aql`FOR x IN ${cskip.name()} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
+      if (db._query(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
       progress();
-      if (db._query(aql`FOR x IN ${cempty.name()} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
+      if (db._query(aql`FOR x IN ${cempty} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
       progress();
-      if (db._query(`FOR x IN ${cgeo.name()} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
+      if (db._query(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
       progress();
-      if (db._query(`FOR x IN ${cunique.name()} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
+      if (db._query(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
       progress();
-      if (db._query(`FOR x IN ${cmulti.name()} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
+      if (db._query(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
       progress();
       db._useDatabase('_system');
     },
@@ -248,6 +249,7 @@
       db._dropDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      /*
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -288,6 +290,7 @@
       } catch (e) {}
       progress();
       db._useDatabase('_system');
+      */
     }
   };
 }());
