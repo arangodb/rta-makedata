@@ -36,19 +36,22 @@
         let collectionName0 = `collection_wand_0${loopCount}`;
         let collectionName1 = `collection_wand_1${loopCount}`;
 
+
         let c0 = db._create(collectionName0, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
         let c1 = db._create(collectionName1, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
 
-        let as_view = db._createView(asViewWandName, "arangosearch", {
-          'links': {
-            collectionName0: {
-              'fields': {
-                'a': {}
-              }
-            }
-          },
+        let meta0 = {
+          'links': { },
           'optimizeTopK': scorers
-        });
+        };
+        meta0["links"][collectionName0] = {
+          'fields': {
+            'a': {}
+          }
+        };
+
+        let as_view = db._createView(asViewWandName, "arangosearch", meta0);
+
         c0.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["a"], "optimizeTopK": scorers});
 
         let docs = [];
@@ -60,18 +63,22 @@
         c1.save(docs);
 
         c1.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["a"], "optimizeTopK": scorers});
-        as_view.properties({'links': {
-          collectionName1: {
-            'fields': {
-              'b': {}
-            }
+
+        let meta1 = {
+          "links": {}
+        };
+        meta1["links"][collectionName1] = {
+          'fields': {
+            'b': {}
           }
-        }}, true);
+        };
+
+        as_view.properties(meta1, true);
 
         let sa_view = db._createView(saViewWandName, 'search-alias', {
           'indexes': [
-            {'collection': collectionName0, 'index': inverted},
-            {'collection': collectionName1, 'index': inverted}
+            {'collection': collectionName0.valueOf(), 'index': 'inverted'},
+            {'collection': collectionName1.valueOf(), 'index': 'inverted'}
           ]
         });
 
@@ -90,19 +97,22 @@
         let c0 = db._collection(collectionName0);
         let c1 = db._collection(collectionName1);
 
-        if (asView.properties()["optimizeTopK"] != scorers) {
+        let actual = asView.properties()["optimizeTopK"];
+        if (!_.isEqual(actual, scorers)) {
           throw new Error(`${asViewWandName}: 'optimizeTopK' array is not correct.
           Actual: ${asView.properties()["optimizeTopK"]},
           Expected: ${scorers}`);
         }
 
-        if (c0.index("inverted")["optimizeTopK"] != scorers) {
+        actual = c0.index("inverted")["optimizeTopK"];
+        if (!_.isEqual(actual, scorers)) {
           throw new Error(`${collectionName0}: 'optimizeTopK' array is not correct.
           Actual: ${c0.index("inverted")["optimizeTopK"]},
           Expected: ${scorers}`);
         }
 
-        if (c1.index("inverted")["optimizeTopK"] != scorers) {
+        actual = c1.index("inverted")["optimizeTopK"];
+        if (!_.isEqual(actual, scorers)) {
           throw new Error(`${collectionName1}: 'optimizeTopK' array is not correct.
           Actual: ${c1.index("inverted")["optimizeTopK"]},
           Expected: ${scorers}`);
