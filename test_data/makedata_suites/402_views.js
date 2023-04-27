@@ -941,7 +941,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             let lines = GEO_MULTILINESTRING([
               [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
               [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]])
-            for d in ${view.name()} search d.animal == "cat" OR 
+            for d in ${view.name()} search ANALYZER(d.animal == tokens("cat", "AqlAnalyzerHash")[0], "AqlAnalyzerHash") OR 
             ANALYZER(GEO_DISTANCE(d.geo_location, lines) < 100, "geo_json") OR
             ANALYZER(GEO_DISTANCE(d.geo_latlng, lines) < 100, "geo_point")
             OPTIONS {waitForSync: true} return d`);
@@ -1029,6 +1029,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       print(`checking data ${dbCount} ${loopCount}`);
 
+      require("internal").sleep(60000);
       let oldVersion = db._query(`for d in version_collection_${loopCount} filter HAS(d, 'version') return d.version`).toArray()[0];
       if (semver.lt(oldVersion, '3.9.5')) {
         // old version doesn't support column cache.
