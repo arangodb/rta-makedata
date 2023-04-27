@@ -26,7 +26,7 @@
 
     return {
       isSupported: function (version, oldVersion, enterprise, cluster) {
-        return semver.gte(version, '3.10.999');
+        return semver.gte(version, '3.10.999') && semver.gte(oldVersion, '3.10.999') ;;
       },
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
         // All items created must contain dbCount and loopCount
