@@ -1027,7 +1027,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       print(`checking data ${dbCount} ${loopCount}`);
 
-      require("internal").sleep(60000);
       let oldVersion = db._query(`for d in version_collection_${loopCount} filter HAS(d, 'version') return d.version`).toArray()[0];
       if (semver.lt(oldVersion, '3.9.5')) {
         // old version doesn't support column cache.
