@@ -947,7 +947,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             OPTIONS {waitForSync: true} return d`);
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-            print(cacheSize);
             if (utilizeCache || viewUtilizeCache) {
               if (cacheSize <= prevCacheSize) {
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
@@ -1011,7 +1010,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-            print(cacheSize);
             if (utilizeCache) {
               if (cacheSize <= prevCacheSize) {
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
