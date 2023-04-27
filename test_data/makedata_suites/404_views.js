@@ -26,7 +26,7 @@
 
     return {
       isSupported: function (version, oldVersion, enterprise, cluster) {
-        return semver.gte(version, '3.10.15');
+        return semver.gte(version, '3.10.999');
       },
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
         // All items created must contain dbCount and loopCount
@@ -97,25 +97,46 @@
         let c0 = db._collection(collectionName0);
         let c1 = db._collection(collectionName1);
 
-        let actual = asView.properties()["optimizeTopK"];
-        if (!_.isEqual(actual, scorers)) {
-          throw new Error(`${asViewWandName}: 'optimizeTopK' array is not correct.
-          Actual: ${asView.properties()["optimizeTopK"]},
-          Expected: ${scorers}`);
-        }
+        let actual_view = asView.properties()["optimizeTopK"];
+        let actual_i0 = c0.index("inverted")["optimizeTopK"];
+        let actual_i1 = c1.index("inverted")["optimizeTopK"];
 
-        actual = c0.index("inverted")["optimizeTopK"];
-        if (!_.isEqual(actual, scorers)) {
-          throw new Error(`${collectionName0}: 'optimizeTopK' array is not correct.
-          Actual: ${c0.index("inverted")["optimizeTopK"]},
-          Expected: ${scorers}`);
-        }
-
-        actual = c1.index("inverted")["optimizeTopK"];
-        if (!_.isEqual(actual, scorers)) {
-          throw new Error(`${collectionName1}: 'optimizeTopK' array is not correct.
-          Actual: ${c1.index("inverted")["optimizeTopK"]},
-          Expected: ${scorers}`);
+        if (isEnterprise) {
+          if (!_.isEqual(actual_view, scorers)) {
+            throw new Error(`${asViewWandName}: 'optimizeTopK' array is not correct.
+            Actual: ${actual_view},
+            Expected: ${scorers}`);
+          }
+  
+          if (!_.isEqual(actual_i0, scorers)) {
+            throw new Error(`${collectionName0}: 'optimizeTopK' array is not correct.
+            Actual: ${actual_i0},
+            Expected: ${scorers}`);
+          }
+  
+          if (!_.isEqual(actual_i1, scorers)) {
+            throw new Error(`${collectionName1}: 'optimizeTopK' array is not correct.
+            Actual: ${actual_i1},
+            Expected: ${scorers}`);
+          }
+        } else {
+          if (!_.isEqual(actual_view, undefined)) {
+            throw new Error(`${asViewWandName}: 'optimizeTopK' array is not empty.
+            Actual: ${actual_view},
+            Expected: ${undefined}`);
+          }
+  
+          if (!_.isEqual(actual_i0, undefined)) {
+            throw new Error(`${collectionName0}: 'optimizeTopK' array is not empty.
+            Actual: ${actual_i0},
+            Expected: ${undefined}`);
+          }
+  
+          if (!_.isEqual(actual_i1, undefined)) {
+            throw new Error(`${collectionName1}: 'optimizeTopK' array is not empty.
+            Actual: ${actual_i1},
+            Expected: ${undefined}`);
+          }
         }
 
         for (const v of [asViewWandName, saViewWandName]) {
