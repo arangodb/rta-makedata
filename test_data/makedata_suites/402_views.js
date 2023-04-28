@@ -847,7 +847,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       if (semver.gte(currVersion, "3.9.6")) {
         // create view with cache in 'primaryKeyCache'
         progress('createViewPKCache');
-        viewNamePKCache = `viewPKCache_${loopCount}`;
+        let viewNamePKCache = `viewPKCache_${loopCount}`;
         viewPKCache = createSafe(viewNamePKCache,
           viewNamePKCache => {
             return db._createView(viewNamePKCache, "arangosearch", { 
@@ -1070,10 +1070,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         if (viewSVCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
         }
-        if (viewPKCache.properties()["primaryKeyCache"] != true) {
+        if (viewPKCache.properties()["primaryKeyCache"] !== true) {
           throw new Error("cache value for primaryKeyCache is not 'true'!");
         }
-        if (viewPSCache.properties()["primarySortCache"] != true) {
+        if (viewPSCache.properties()["primarySortCache"] !== true) {
           throw new Error("cache value for primarySort is not 'true'!");
         }
       }

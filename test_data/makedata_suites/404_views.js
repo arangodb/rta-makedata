@@ -1,4 +1,4 @@
-/* global print, progress, createCollectionSafe, db, createSafe  */
+/* global print, progress, createCollectionSafe, db, createSafe, assertEqual, semver, _ */
 
 (function () {
 
@@ -26,7 +26,9 @@
 
     return {
       isSupported: function (version, oldVersion, enterprise, cluster) {
-        return semver.gte(version, '3.10.999') && semver.gte(oldVersion, '3.10.999') ;;
+        let currentVersionSemver = semver.parse(semver.coerce(version));
+        let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
+        return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
       },
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
         // All items created must contain dbCount and loopCount
@@ -35,7 +37,6 @@
         let saViewWandName = `sa_view_wand_${loopCount}`;
         let collectionName0 = `collection_wand_0${loopCount}`;
         let collectionName1 = `collection_wand_1${loopCount}`;
-
 
         let c0 = db._create(collectionName0, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
         let c1 = db._create(collectionName1, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
