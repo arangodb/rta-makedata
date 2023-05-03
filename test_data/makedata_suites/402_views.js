@@ -924,12 +924,14 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         let meta = {
           links: {}
         };
+        progress(`creating links for collection : ${collectionName}`);
         meta.links[collectionName] = test["link"];
         [[viewSVCache, true], [viewPSCache, true], [viewPKCache, true], [viewNoCache, false]].forEach(viewTest => {
           let view = viewTest[0];
           if (view === undefined) {
             return;
           }
+
           view.properties(meta);
 
           if (cacheSizeSupported && isEnterprise) {
@@ -975,6 +977,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             { "version": currVersion }
           ]);
   
+          progress(`ensuring index for collection : ${collectionName}`);
+
           let status = db._collection(collectionName).ensureIndex(test);
           if (status["code"] !== 201) {
             throw new Error(`Failed to create index for collection ${test["collectionName"]}. Status: ${status}`);
