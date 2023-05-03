@@ -779,7 +779,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       // trigger cluster metrics
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=write_global", {accept: "application/json"});
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=trigger_global", {accept: "application/json"});
-      require("internal").sleep(0.1);
+      require("internal").sleep(0.2);
     }
     let headers = {};
     headers['accept'] = 'application/json';
