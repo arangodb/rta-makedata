@@ -722,10 +722,21 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       expected = removeCacheFields(expectedRaw, type);
     }
 
-    // remove redundant 'utilizeCache' values. 
+    // remove redundant 'utilizeCache' values.
     delete expected["utilizeCache"];
     if (expected.hasOwnProperty("collectionName")) {
       delete expected["collectionName"];
+    }
+
+    let version = db._version();
+    if (semver.lt(version, "3.9.11") || semver.lt(version, "3.10.6")) {
+      // until versions above, we have bug SEARCH-466
+      if (actual.hasOwnProperty("primarySortCache")) {
+        delete actual["primarySortCache"];
+      }
+      if (actual.hasOwnProperty("primaryKeyCache")) {
+        delete actual["primaryKeyCache"];
+      }
     }
 
     // actual comparison
@@ -833,7 +844,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let viewNameSVCache = `viewSVCache_${loopCount}`;
       let viewSVCache = createSafe(viewNameSVCache,
         viewNameSVCache => {
-          return db._createView(viewNameSVCache, "arangosearch", { 
+          return db._createView(viewNameSVCache, "arangosearch", {
             "storedValues": [
               { "fields": ["animal", "name"], "cache": true }
             ] 
@@ -844,7 +855,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       );
 
       let viewPKCache;
-      if (semver.gte(currVersion, "3.9.6")) {
+      let viewPSCache;
+      if (semver.gte(currVersion, "3.9.6") || semver.gte(currVersion, "3.10.2")) {
+
         // create view with cache in 'primaryKeyCache'
         progress('createViewPKCache');
         let viewNamePKCache = `viewPKCache_${loopCount}`;
@@ -857,24 +870,24 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             throw new Error(`Can't create view ${viewNamePKCache}`);
           }
         );
-      }
 
-      // create view with cache in 'primarySort'
-      progress('createViewPSCache');
-      let viewNamePSCache = `viewPSCache_${loopCount}`;
-      let viewPSCache = createSafe(viewNamePSCache,
-        viewNamePSCache => {
-          return db._createView(viewNamePSCache, "arangosearch", { 
-            "primarySort": [ 
-              { "field": "animal", "direction": "desc" }, 
-              { "field": "name", "direction": "asc" }
-            ],  
-            "primarySortCache": true 
-          });
-        }, viewNamePSCache => {
-          throw new Error(`Can't create view ${viewNamePSCache}`);
-        }
-      );
+        // create view with cache in 'primarySort'
+        progress('createViewPSCache');
+        let viewNamePSCache = `viewPSCache_${loopCount}`;
+        viewPSCache = createSafe(viewNamePSCache,
+          viewNamePSCache => {
+            return db._createView(viewNamePSCache, "arangosearch", { 
+              "primarySort": [ 
+                { "field": "animal", "direction": "desc" }, 
+                { "field": "name", "direction": "asc" }
+              ],  
+              "primarySortCache": true 
+            });
+          }, viewNamePSCache => {
+            throw new Error(`Can't create view ${viewNamePSCache}`);
+          }
+        );
+      }
 
       // create view with without utilizing cache
       progress('createViewNoCache');
@@ -889,7 +902,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
               { "field": "animal", "direction": "desc" }, 
               { "field": "name", "direction": "asc" }
             ],  
-            "primarySortCache": false 
+            "primarySortCache": false,
+            "primaryKeyCache": false
           });
         }, viewNameNoCache => {
           throw new Error(`Can't create view ${viewNameNoCache}`);
