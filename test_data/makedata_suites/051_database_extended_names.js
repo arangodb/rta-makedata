@@ -41,6 +41,18 @@
         baseName = "system";
       }
       progress("051: Test databases with extended unicode symbols in the name");
+      
+      // Wait until db array will be available after hotbackup
+      let timeout = 15;
+      while (db._databases().length == 0) {
+        if (timeout == 0) {
+          throw new Error("Databases array is still empty after 15s!");
+        }
+        
+        require("internal").sleep(1);
+        timeout -= 1;
+      };
+
       print(db._databases());
       for (let i in extendedDbNames) {
         let unicodeName = extendedDbNames[i];
