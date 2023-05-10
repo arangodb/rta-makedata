@@ -713,7 +713,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return result;
   };
 
-  let compare = function (cacheSizeSupported, type, actual, expectedRaw) {
+  let compare = function (cacheSizeSupported, type, actual, expectedRaw, oldVersion) {
     let expected;
 
     if (cacheSizeSupported) {
@@ -729,8 +729,15 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
 
     let version = db._version();
-    if (semver.lt(version, "3.9.11") || semver.lt(version, "3.10.6")) {
-      // until versions above, we have bug SEARCH-466
+
+    if(semver.satisfies(version, '>=3.9.6 || <=3.9.10') || semver.satisfies(version, '>=3.10.2 || <=3.10.6') ||
+      semver.satisfies(oldVersion, '>=3.9.6 || <=3.9.10') || semver.satisfies(oldVersion, '>=3.10.2 || <=3.10.6')) {     
+      if (expected.hasOwnProperty("primarySortCache")) {
+        delete expected["primarySortCache"];
+      }
+      if (expected.hasOwnProperty("primaryKeyCache")) {
+        delete expected["primaryKeyCache"];
+      }
       if (actual.hasOwnProperty("primarySortCache")) {
         delete actual["primarySortCache"];
       }
@@ -847,7 +854,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           return db._createView(viewNameSVCache, "arangosearch", {
             "storedValues": [
               { "fields": ["animal", "name"], "cache": true }
-            ] 
+            ]
           });
         }, viewNameSVCache => {
           throw new Error(`Can't create view ${viewNameSVCache}`);
@@ -856,6 +863,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       let viewPKCache;
       let viewPSCache;
+      // In this versions 'primaryKeyCache' and 'primarySortCache' were introduced
       if (semver.gte(currVersion, "3.9.6") || semver.gte(currVersion, "3.10.2")) {
 
         // create view with cache in 'primaryKeyCache'
@@ -1056,7 +1064,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let isCacheSupportedOld = isCacheSizeSupported(oldVersion);
       let isCacheSupported = isCacheSizeSupported(currVersion);
 
-      if (isCacheSupported && isEnterprise) {
+      if (isCacheSupported && isCacheSupportedOld && isEnterprise) {
         let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
         if (cacheSize === 0) {
           throw new Error("cache size is equal to zero in checkData");
@@ -1064,8 +1072,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       let viewSVCache = db._view(`viewSVCache_${loopCount}`);
-      let viewPSCache = db._view(`viewPSCache_${loopCount}`);
       let viewPKCache = db._view(`viewPKCache_${loopCount}`);
+      let viewPSCache = db._view(`viewPSCache_${loopCount}`);
       let viewNoCache = db._view(`viewNoCache_${loopCount}`);
 
       // for 3.10.0 and 3.10.1 we should verify that no cache is present
@@ -1076,10 +1084,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         if (viewSVCache.properties()["storedValues"][0].hasOwnProperty("cache")) {
           throw new Error(`viewSVCache: cache value for storedValues is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
         }
-        if (viewPKCache.properties().hasOwnProperty("primaryKeyCache")) {
+        if (viewPKCache !== null && viewPKCache.properties().hasOwnProperty("primaryKeyCache")) {
           throw new Error(`viewSVCache: cache value for storedValues is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
         }
-        if (viewPSCache.properties().hasOwnProperty("primarySortCache")) {
+        if (viewPSCache !== null && viewPSCache.properties().hasOwnProperty("primarySortCache")) {
           throw new Error(`viewPSCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
         }
       } else {
@@ -1088,10 +1096,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         if (viewSVCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
         }
-        if (viewPKCache.properties()["primaryKeyCache"] !== true) {
+        if (viewPKCache !== null && viewPKCache.properties()["primaryKeyCache"] !== true) {
           throw new Error("cache value for primaryKeyCache is not 'true'!");
         }
-        if (viewPSCache.properties()["primarySortCache"] !== true) {
+        if (viewPSCache !== null && viewPSCache.properties()["primarySortCache"] !== true) {
           throw new Error("cache value for primarySort is not 'true'!");
         }
       }
@@ -1107,7 +1115,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       [viewSVCache, viewPSCache, viewPKCache, viewNoCache].forEach(view => {
-        if (view === undefined) {
+        if (view === null) {
           return;
         }
         let actualLinks = view.properties().links;
@@ -1146,7 +1154,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // current and previous versions are aware of 'cache'. 
             // Check that value is present and equal to value from previous version
             let expectedLink = test["link"];
-            if (!compare(isCacheSupported, "arangosearch", linkFromView, expectedLink)) {
+            if (!compare(isCacheSupported, "arangosearch", linkFromView, expectedLink, oldVersion)) {
               let msg = `View: ${view.name()}: Links for collection ${collectionName} are not equal! 
               Link from view: ${JSON.stringify(linkFromView)}, Expected link: ${JSON.stringify(expectedLink)}`;
               throw new Error(msg);
@@ -1167,7 +1175,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // So it means that in current version there should be NO 'cache' fields
 
           } else {
-            if (!compare(isCacheSupported, "index", actualIndex, expectedIndex)) {
+            if (!compare(isCacheSupported, "index", actualIndex, expectedIndex, oldVersion)) {
               let msg = `Indexes for collection ${collectionName} are not equal! 
               Index from collection: ${JSON.stringify(actualIndex)}, Expected index: ${JSON.stringify(expectedIndex)}`;
               throw new Error(msg);
