@@ -713,6 +713,14 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return result;
   };
 
+  let isPKAndPSNotSupported = function(version, oldVersion) {
+    return ((semver.gte(version, "3.9.6") && semver.lte(version, "3.9.10")) ||
+      (semver.gte(version, "3.10.2") && semver.lte(version, "3.10.6")))
+      ||
+      ((semver.gte(oldVersion, "3.9.6") && semver.lte(oldVersion, "3.9.10")) ||
+      (semver.gte(oldVersion, "3.10.2") && semver.lte(oldVersion, "3.10.6")));
+  };
+
   let compare = function (cacheSizeSupported, type, actual, expectedRaw, oldVersion) {
     let expected;
 
@@ -730,8 +738,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let version = db._version();
 
-    if(semver.satisfies(version, '>=3.9.6 || <=3.9.10') || semver.satisfies(version, '>=3.10.2 || <=3.10.6') ||
-      semver.satisfies(oldVersion, '>=3.9.6 || <=3.9.10') || semver.satisfies(oldVersion, '>=3.10.2 || <=3.10.6')) {     
+    if (isPKAndPSNotSupported(version, oldVersion)) {
+      // Bug SEARCH-466 is not fixed until versions 3.9.11 and 3.10.7. 
+      // So we will delete these fields manualy
+
       if (expected.hasOwnProperty("primarySortCache")) {
         delete expected["primarySortCache"];
       }
@@ -863,8 +873,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       let viewPKCache;
       let viewPSCache;
-      // In this versions 'primaryKeyCache' and 'primarySortCache' were introduced
-      if (semver.gte(currVersion, "3.9.6") || semver.gte(currVersion, "3.10.2")) {
+      // In versions 3.9.6 and 3.10.2 'primaryKeyCache' and 'primarySortCache' were introduced
+      if (semver.gte(currVersion, "3.9.6") && semver.neq(currVersion, '3.10.0') && semver.neq(currVersion, '3.10.1')) {
+
+        print(`Making PKCache and PSCache. version: ${currVersion}`);
 
         // create view with cache in 'primaryKeyCache'
         progress('createViewPKCache');
@@ -1112,6 +1124,11 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
       if (viewNoCache.properties().hasOwnProperty("primarySortCache")) {
         throw new Error(`viewNoCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
+      }
+
+      if (isPKAndPSNotSupported(currVersion, oldVersion)) {
+        // Put this message in log for debugging purposes.
+        print(`removing PK and PS cache fields. currVersion: ${currVersion}. oldVersion: ${oldVersion}`);
       }
 
       [viewSVCache, viewPSCache, viewPKCache, viewNoCache].forEach(view => {
