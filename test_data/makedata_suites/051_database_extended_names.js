@@ -40,7 +40,7 @@
       if (baseName === "_system") {
         baseName = "system";
       }
-      progress("051: Test databases with extended unicode symbols in the name");      
+      progress("051: Test databases with extended unicode symbols in the name");
       print(db._databases());
       for (let i in extendedDbNames) {
         let unicodeName = extendedDbNames[i];
