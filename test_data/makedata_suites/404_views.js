@@ -3,12 +3,12 @@
 (function () {
 
     let scorers = [
-      'BM25(@doc) DESC', 
-      'BM25(@doc, 1.2) DESC',
-      'BM25(@doc, 1.2, 0.75) DESC',
-      'BM25(@doc, 1.20000, 0.7500000) DESC',
-      'TFIDF(@doc, true) DESC', 
-      'TFIDF(@doc, false) DESC'
+      'BM25(@doc) DESC'
+      // 'BM25(@doc, 1.2) DESC',
+      // 'BM25(@doc, 1.2, 0.75) DESC',
+      // 'BM25(@doc, 1.20000, 0.7500000) DESC',
+      // 'TFIDF(@doc, true) DESC', 
+      // 'TFIDF(@doc, false) DESC'
     ];
 
     let launchQueries = function(viewName) {
