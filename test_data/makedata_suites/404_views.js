@@ -26,9 +26,10 @@
 
     return {
       isSupported: function (version, oldVersion, enterprise, cluster) {
-        let currentVersionSemver = semver.parse(semver.coerce(version));
-        let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-        return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
+        // let currentVersionSemver = semver.parse(semver.coerce(version));
+        // let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
+        // return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
+        return false;
       },
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
         // All items created must contain dbCount and loopCount
