@@ -1,4 +1,4 @@
-/* global print, db, assertTrue, semver */
+/* global print, db, assertTrue, semver, createSafe, zeroPad */
 
 (function () {
   return {
@@ -31,7 +31,7 @@
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       if(!(semver.gt(db._version(), "3.11.0"))){
-        print("Current version doesn't support pregel system collection. Skipping test.")
+        print("Current version doesn't support pregel system collection. Skipping test.");
         return 0;
       }
       const dbNameSuffix = "_testPregelSysCol";
@@ -54,7 +54,7 @@
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       if(!(semver.gt(db._version(), "3.11.0"))){
-        print("Current version doesn't support pregel system collection. Skipping test.")
+        print("Current version doesn't support pregel system collection. Skipping test.");
         return;
       }
       const pregelSystemCollectionName = '_pregel_queries';
@@ -68,6 +68,7 @@
       return;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      const dbNameSuffix = "_testPregelSysCol";
       print(`clearing per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
