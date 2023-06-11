@@ -36,20 +36,16 @@ let views_name_declaration = (dbCount) =>{
 // as a touple elements and then compare both's results
 let resultComparision = (db, tuple) =>{
   for (let i = 0; i < tuple.length; i++) {
-    for (let j = 0; j < tuple[i].length; j++) {
-      var output = db._query(tuple[i][j]).toArray();
-      var newOuput = Number(output);
-      progress(``);
-      if (newOuput !== tuple[i][j+1]) {
-        throw new Error(`${tuple[i][j]} Query's output: ${newOuput} didn't match with ecxpected_output: ${tuple[i][j+1]}`);
+    let query_str = tuple[i][0];
+    let expected_output =  tuple[i][1];
+    var output = db._query(query_str).toArray();
+    var newOuput = Number(output);
+      if (newOuput !== expected_output) {
+        throw new Error(`${query_str} query_str's output: ${newOuput} didn't match with ecxpected_output: ${expected_output}`);
       }
-
-      if (j == 0) {
-        break;
-      }
-    }
   }
 }
+
 
 //execute queries which use indexes and verify that the proper amount of docs are returned
 function indexArray(dbCount){
