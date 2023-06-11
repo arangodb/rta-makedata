@@ -730,8 +730,9 @@ function views_array(dbCount) {
       try {
         db._dropView(`${view[0]}`);
         db._dropView(`${view[1]}`);
-      } catch (e) {
-        print(e);
+      } catch (error) {
+        console.log('Deleting view failed with :', error.message);
+        throw error;
       }
       progress();
 
