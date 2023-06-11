@@ -34,7 +34,7 @@ let views_name_declaration = (dbCount) =>{
 
 // This method will take db and a tuple parameter containing one query and one expected output
 // as a touple elements and then compare both's results
-let resultComparision = (db, tuple) =>{
+let result_comparision = (db, tuple) =>{
   for (let i = 0; i < tuple.length; i++) {
     let query_str = tuple[i][0];
     let expected_output =  tuple[i][1];
@@ -48,11 +48,11 @@ let resultComparision = (db, tuple) =>{
 
 
 //execute queries which use indexes and verify that the proper amount of docs are returned
-function indexArray(dbCount){
+function index_array(dbCount){
   // get all the collection variable name wtih dbcount
   let c = collection_declaration(dbCount);
   
-  let indexTuple = [
+  let index_tuple = [
     [`for doc in ${c[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
     [`for doc in ${c[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
     [`for doc in ${c[1]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
@@ -75,15 +75,15 @@ function indexArray(dbCount){
     [`for doc in ${c[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${c[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
     [`for doc in ${c[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
   ];
-  return indexTuple;
+  return index_tuple;
 }
 
 // this function will provide all the queries for views
-function viewsArray(dbCount) {
+function views_array(dbCount) {
   // get all the view's variable name from the variable_name_declaration method globally
   let view = views_name_declaration(dbCount);
   
-  let viewTuples = [
+  let view_tuples = [
     [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
     [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
     [`for doc in ${view[0]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
@@ -104,7 +104,7 @@ function viewsArray(dbCount) {
     [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`, 64000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
   ]
-  return viewTuples;
+  return view_tuples;
 }
 
 
@@ -711,24 +711,24 @@ function viewsArray(dbCount) {
       });
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let indexTuple = indexArray(dbCount);
-      resultComparision(db, indexTuple);
+      let index_tuple = index_array(dbCount);
+      result_comparision(db, index_tuple);
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let viewTuple = viewsArray(dbCount);
-      resultComparision(db, viewTuple);
+      let viewTuple = views_array(dbCount);
+      result_comparision(db, viewTuple);
 
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`060: checking data ${dbCount}`);
       //execute queries which use views and verify that the proper amount of docs are returned
-      let indexTuple = indexArray(dbCount);
-      resultComparision(db, indexTuple);
+      let index_tuple = index_array(dbCount);
+      result_comparision(db, index_tuple);
 
       //execute queries which use views and verify that the proper amount of docs are returned
-      let viewTuple = viewsArray(dbCount);
-      resultComparision(db, viewTuple);
+      let viewTuple = views_array(dbCount);
+      result_comparision(db, viewTuple);
 
       return 0;
     },
