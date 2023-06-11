@@ -363,59 +363,48 @@ function views_array(dbCount) {
       //-------------------------------------------------------x-------------------------------------------------------------
 
       c1.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c1.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c1.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c2.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c2.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c2.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c3.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name": "cv_field_insert"}]});
-      setTimeout(function() {
-        c3.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_insert"], "sparse": true});
-      }, 5000);
+       
+      c3.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_insert"], "sparse": true});  
 
       c4.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_update"}]});
-      setTimeout(function() {
-        c4.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_update"], "sparse": true});
-      }, 5000);
+       
+      c4.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_update"], "sparse": true});  
 
       c5.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field_replace"}]});
-      setTimeout(function() {
-        c5.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_replace"], "sparse": true});
-      }, 5000);
+       
+      c5.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field_replace"], "sparse": true});  
 
       c6.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c6.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c6.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c7.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c7.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c7.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c8.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c8.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c8.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c9.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c9.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c9.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});  
 
       c10.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field1"},{"name":"cv_field2"},{"name":"cv_field3"}]});
-      setTimeout(function() {
-        c10.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field1", "cv_field2", "cv_field3"], "sparse": true});
-      }, 5000);
+       
+      c10.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field1", "cv_field2", "cv_field3"], "sparse": true});
 
       c11.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field"}]});
-      setTimeout(function() {
-        c11.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
-      }, 5000);
+       
+      c11.ensureIndex({"type":"persistent","name":"persistent","fields":["cv_field"], "sparse": true});
 
       c12.ensureIndex({"type":"inverted","name":"inverted","fields":[{"name":"cv_field", "nested": ["from_doc"]}]});
       
