@@ -31,38 +31,34 @@
                                 );
       return 0;
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-        return;
-    },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      const dbNameSuffix = "_testPregelSysCol";
       print(`checking per database data ${dbCount}`);
-      let baseName = database;
-      if (baseName === "_system") {
-        baseName = "system";
+      const dbNameSuffix = "_testPregelSysCol";
+      const pregelSystemCollectionName = '_pregel_queries';
+      {
+        print(`Checking availablitty of system collection: ${pregelSystemCollectionName} in database _system`);
+        db._useDatabase("_system");
+        assertTrue(db[pregelSystemCollectionName]);
+        const properties = db[pregelSystemCollectionName].properties();
+        assertTrue(properties.isSystem);
+        print(`Verified availability of system collection ${pregelSystemCollectionName} in database _system`);
       }
-      const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
-      const pregelSystemCollectionName = '_pregel_queries';
-      let c = zeroPad(dbCount + options.countOffset);
-      db._useDatabase(databaseName);
 
-      print(`Checking availablitty of system collection: ${pregelSystemCollectionName} in database ${databaseName}`);
-      assertTrue(db[pregelSystemCollectionName]);
-      const properties = db[pregelSystemCollectionName].properties();
-      assertTrue(properties.isSystem);
-      print(`Verified availability of system collection ${pregelSystemCollectionName} in database ${databaseName}`);
+      {
+        let baseName = database;
+        if (baseName === "_system") {
+          baseName = "system";
+        }
+        const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
+        let c = zeroPad(dbCount + options.countOffset);
+        db._useDatabase(databaseName);
+        print(`Checking availablitty of system collection: ${pregelSystemCollectionName} in database ${databaseName}`);
+        assertTrue(db[pregelSystemCollectionName]);
+        const properties = db[pregelSystemCollectionName].properties();
+        assertTrue(properties.isSystem);
+        print(`Verified availability of system collection ${pregelSystemCollectionName} in database ${databaseName}`);
+      }
       return 0;
-    },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      const pregelSystemCollectionName = '_pregel_queries';
-      let databaseName = "_system";
-      db._useDatabase(databaseName);
-      print(`Checking availablitty of system collection: ${pregelSystemCollectionName} in database ${databaseName}`);
-      assertTrue(db[pregelSystemCollectionName]);
-      const properties = db[pregelSystemCollectionName].properties();
-      assertTrue(properties.isSystem);
-      print(`Verified availability of system collection ${pregelSystemCollectionName} in database ${databaseName}`);
-      return;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       const dbNameSuffix = "_testPregelSysCol";
@@ -76,9 +72,6 @@
       print(`005: dropping ${databaseName}`);
       db._dropDatabase(databaseName);
       return 0;
-    },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      return;
     }
   };
 
