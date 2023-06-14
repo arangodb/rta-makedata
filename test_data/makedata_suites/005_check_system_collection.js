@@ -2,8 +2,13 @@
 
 (function () {
   return {
-    isSupported: function (version, oldVersion, options, enterprise, cluster) {
-      return true;
+    isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if(currentVersion.includes("nightly")){
+        let version = semver.parse(currentVersion.split('-')[0]);
+        return semver.satisfies(currentVersion, '>3.11.2 <3.12.0 || >=3.12.1');
+      } else {
+        return semver.satisfies(currentVersion, '>3.11.1 <3.12.0 || >=3.12.0');
+      }
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
@@ -30,10 +35,6 @@
         return;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      if(!(semver.gt(db._version(), "3.11.0"))){
-        print("Current version doesn't support pregel system collection. Skipping test.");
-        return 0;
-      }
       const dbNameSuffix = "_testPregelSysCol";
       print(`checking per database data ${dbCount}`);
       let baseName = database;
@@ -53,10 +54,6 @@
       return 0;
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      if(!(semver.gt(db._version(), "3.11.0"))){
-        print("Current version doesn't support pregel system collection. Skipping test.");
-        return;
-      }
       const pregelSystemCollectionName = '_pregel_queries';
       let databaseName = "_system";
       db._useDatabase(databaseName);
