@@ -51,7 +51,7 @@ let result_comparision = (db, tuple) =>{
 function index_array(dbCount){
   // get all the collection variable name wtih dbcount
   let c = collection_declaration(dbCount);
-  
+
   let index_tuple = [
     [`for doc in ${c[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
     [`for doc in ${c[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
@@ -721,8 +721,8 @@ function views_array(dbCount) {
 
       return 0;
     },
-    clearDataDB: function (options, isCluster, isEnterprise, dbCount, database) {
-      print(`060: checking data ${dbCount}`);
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`060: clearing data ${dbCount}`);
 
       // get all the view's variable name from the variable_name_declaration method globally
       let view = views_name_declaration(dbCount);
@@ -738,11 +738,10 @@ function views_array(dbCount) {
 
       // getting all the collection name with dbcount
       let c = collection_declaration(dbCount);
-
       c.forEach(col => {
-        db.col.properties({computedValues: []})
+        db[col].properties({computedValues: []})
         //checking the properties set to null properly
-        if (db.col.properties()["computedValues"] == null) {
+        if (db[col].properties()["computedValues"] == null) {
           //drop the collection after check
           db._drop(col);
           progress(`deleting ${col} collection`);
