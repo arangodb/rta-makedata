@@ -857,7 +857,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       analyzers.save("geo_point", "geopoint", { "latitude": ["lat"], "longitude": ["lng"] }, ["frequency", "norm", "position"]);
 
       // create view with cache in 'storedValues'
-      progress('createViewSVCache');
+      progress('402: createViewSVCache');
       let viewNameSVCache = `viewSVCache_${loopCount}`;
       let viewSVCache = createSafe(viewNameSVCache,
         viewNameSVCache => {
@@ -879,7 +879,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         print(`402: Making PKCache and PSCache. version: ${currVersion}`);
 
         // create view with cache in 'primaryKeyCache'
-        progress('createViewPKCache');
+        progress('402: createViewPKCache');
         let viewNamePKCache = `viewPKCache_${loopCount}`;
         viewPKCache = createSafe(viewNamePKCache,
           viewNamePKCache => {
@@ -892,7 +892,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         );
 
         // create view with cache in 'primarySort'
-        progress('createViewPSCache');
+        progress('402: 402: createViewPSCache');
         let viewNamePSCache = `viewPSCache_${loopCount}`;
         viewPSCache = createSafe(viewNamePSCache,
           viewNamePSCache => {
@@ -910,7 +910,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       // create view with without utilizing cache
-      progress('createViewNoCache');
+      progress('402: createViewNoCache');
       let viewNameNoCache = `viewNoCache_${loopCount}`;
       let viewNoCache = createSafe(viewNameNoCache,
         viewNameNoCache => {
