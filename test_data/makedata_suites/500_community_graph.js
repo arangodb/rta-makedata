@@ -37,12 +37,12 @@
       progress("500: Checking patents naive");
       let patentsNaive = db._collection(`patents_naive_${loopCount}`);
       if (patentsNaive.count() !== 761) {
-        throw new Error("patents naive count failed: want 761 have " + patentsNaive.count());
+        throw new Error("500: patents naive count failed: want 761 have " + patentsNaive.count());
       }
       progress("500: Creating citations");
       let citationsNaive = db._collection(`citations_naive_${loopCount}`);
       if (citationsNaive.count() !== 1000) {
-        throw new Error("Citations naive count incomplete: want 1000 have: " + citationsNaive.count());
+        throw new Error("500: Citations naive count incomplete: want 1000 have: " + citationsNaive.count());
       }
       progress("500: testing graph query");
       if (db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/US:3858245${loopCount}"
