@@ -10,19 +10,19 @@ let rand = require("internal").rand;
       // All items created must contain dbCount and loopCount
       // Create a few collections:
       let c = createCollectionSafe(`c_${loopCount}`, 3, 2);
-      progress('createCollection1');
+      progress('100: createCollection1');
       let chash = createCollectionSafe(`chash_${loopCount}`, 3, 2);
-      progress('createCollection2');
+      progress('100: createCollection2');
       let cskip = createCollectionSafe(`cskip_${loopCount}`, 1, 1);
-      progress('createCollection3');
+      progress('100: createCollection3');
       let cfull = createCollectionSafe(`cfull_${loopCount}`, 3, 1);
-      progress('createCollection4');
+      progress('100: createCollection4');
       let cgeo = createCollectionSafe(`cgeo_${loopCount}`, 3, 2);
-      progress('createCollectionGeo5');
+      progress('100: createCollectionGeo5');
       let cunique = createCollectionSafe(`cunique_${loopCount}`, 1, 1);
-      progress('createCollection6');
+      progress('100: createCollection6');
       let cmulti = createCollectionSafe(`cmulti_${loopCount}`, 3, 2);
-      progress('createCollection7');
+      progress('100: createCollection7');
       let cempty = createCollectionSafe(`cempty_${loopCount}`, 3, 1);
 
       // create a special collection, which will store only one document - current arangodb version
@@ -31,25 +31,25 @@ let rand = require("internal").rand;
       version_coll.insert({"version": db._version()});
 
       // Create some indexes:
-      progress('createCollection8');
+      progress('100: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
-      progress('createIndexHash1');
+      progress('100: createIndexHash1');
       createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
-      progress('createIndexSkiplist2');
+      progress('100: createIndexSkiplist2');
       createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
-      progress('createIndexFulltext3');
+      progress('100: createIndexFulltext3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
-      progress('createIndexGeo4');
+      progress('100: createIndexGeo4');
       createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
-      progress('createIndex5');
+      progress('100: createIndex5');
       createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false});
-      progress('createIndex6');
+      progress('100: createIndex6');
       createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"]});
-      progress('createIndex7');
+      progress('100: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
-      progress('createIndexGeo8');
+      progress('100: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
-      progress('createIndexFulltext9');
+      progress('100: createIndexFulltext9');
 
       let makeRandomString = function (l) {
         var r = rand();
@@ -123,19 +123,19 @@ let rand = require("internal").rand;
 
       // Now the actual data writing:
       writeData(c, 1000);
-      progress('writeData1');
+      progress('100: writeData1');
       writeData(chash, 12345);
-      progress('writeData2');
+      progress('100: writeData2');
       writeData(cskip, 2176);
-      progress('writeData3');
+      progress('100: writeData3');
       writeData(cgeo, 5245);
-      progress('writeData4');
+      progress('100: writeData4');
       writeData(cfull, 6253);
-      progress('writeData5');
+      progress('100: writeData5');
       writeData(cunique, 5362);
-      progress('writeData6');
+      progress('100: writeData6');
       writeData(cmulti, 12346);
-      progress('writeData7');
+      progress('100: writeData7');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       print(`checking data ${dbCount} ${loopCount}`);
