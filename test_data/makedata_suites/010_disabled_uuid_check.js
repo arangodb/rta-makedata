@@ -25,7 +25,11 @@
           });
         });
         if (found > 0) {
-          print('010: ' + found + ' found - Waiting - ' + JSON.stringify(collections));
+          let coldump = ".";
+          if ((count  + 1 % 25 === 0) || (collections.length < 10)) {
+            coldump = " - " + JSON.stringify(collections);
+          }
+          print('010: ' + found + ' found - Waiting' + coldump);
           internal.sleep(1);
           count += 1;
         } else {
