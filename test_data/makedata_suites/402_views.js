@@ -21,7 +21,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     print(e);
     throw e;
   }
-  progress(`${testgroup}: deleted ${analyzerName}`);
+  progress(`402: ${testgroup}: deleted ${analyzerName}`);
 }
 
 (function () {
@@ -792,7 +792,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   let getMetricByName = function (name, tags) {
     let res = getRawMetrics(tags);
     if (res.code !== 200) {
-      print(res);
+      print(`402: http result: ${JSON.stringify(res)}`);
       return 0;
     }
     return getMetricValue(res.body, name);
@@ -847,7 +847,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`making data ${dbCount} ${loopCount}`);
+      print(`402: making data ${dbCount} ${loopCount}`);
 
       let currVersion = db._version();
 
@@ -857,7 +857,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       analyzers.save("geo_point", "geopoint", { "latitude": ["lat"], "longitude": ["lng"] }, ["frequency", "norm", "position"]);
 
       // create view with cache in 'storedValues'
-      progress('createViewSVCache');
+      progress('402: createViewSVCache');
       let viewNameSVCache = `viewSVCache_${loopCount}`;
       let viewSVCache = createSafe(viewNameSVCache,
         viewNameSVCache => {
@@ -876,10 +876,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       // In versions 3.9.6 and 3.10.2 'primaryKeyCache' and 'primarySortCache' were introduced
       if (semver.gte(currVersion, "3.9.6") && semver.neq(currVersion, '3.10.0') && semver.neq(currVersion, '3.10.1')) {
 
-        print(`Making PKCache and PSCache. version: ${currVersion}`);
+        print(`402: Making PKCache and PSCache. version: ${currVersion}`);
 
         // create view with cache in 'primaryKeyCache'
-        progress('createViewPKCache');
+        progress('402: createViewPKCache');
         let viewNamePKCache = `viewPKCache_${loopCount}`;
         viewPKCache = createSafe(viewNamePKCache,
           viewNamePKCache => {
@@ -892,7 +892,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         );
 
         // create view with cache in 'primarySort'
-        progress('createViewPSCache');
+        progress('402: 402: createViewPSCache');
         let viewNamePSCache = `viewPSCache_${loopCount}`;
         viewPSCache = createSafe(viewNamePSCache,
           viewNamePSCache => {
@@ -910,7 +910,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       // create view with without utilizing cache
-      progress('createViewNoCache');
+      progress('402: createViewNoCache');
       let viewNameNoCache = `viewNoCache_${loopCount}`;
       let viewNoCache = createSafe(viewNameNoCache,
         viewNameNoCache => {
@@ -958,7 +958,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         let meta = {
           links: {}
         };
-        progress(`creating links for collection : ${collectionName}`);
+        progress(`402: creating links for collection : ${collectionName}`);
         meta.links[collectionName] = test["link"];
         [[viewSVCache, true], [viewPSCache, true], [viewPKCache, true], [viewNoCache, false]].forEach(viewTest => {
           let view = viewTest[0];
@@ -1011,7 +1011,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             { "version": currVersion }
           ]);
   
-          progress(`ensuring index for collection : ${collectionName}`);
+          progress(`402: ensuring index for collection : ${collectionName}`);
 
           let status = db._collection(collectionName).ensureIndex(test);
           if (status["code"] !== 201) {
@@ -1063,7 +1063,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`402: checking data ${dbCount} ${loopCount}`);
 
       let oldVersion = db._query(`for d in version_collection_${loopCount} filter HAS(d, 'version') return d.version`).toArray()[0];
       if (semver.lt(oldVersion, '3.9.5')) {
@@ -1128,7 +1128,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (isPKAndPSNotSupported(currVersion, oldVersion)) {
         // Put this message in log for debugging purposes.
-        print(`removing PK and PS cache fields. currVersion: ${currVersion}. oldVersion: ${oldVersion}`);
+        print(`402: removing PK and PS cache fields. currVersion: ${currVersion}. oldVersion: ${oldVersion}`);
       }
 
       [viewSVCache, viewPSCache, viewPKCache, viewNoCache].forEach(view => {
@@ -1203,7 +1203,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     },
 
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`removing data ${dbCount} ${loopCount}`);
+      print(`402: removing data ${dbCount} ${loopCount}`);
       try {
         db._dropView(`viewSVCache_${loopCount}`);
       } catch (e) {

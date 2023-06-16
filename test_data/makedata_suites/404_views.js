@@ -33,7 +33,7 @@
       },
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
         // All items created must contain dbCount and loopCount
-        print(`making data ${dbCount} ${loopCount}`);
+        print(`404: making data ${dbCount} ${loopCount}`);
         let asViewWandName = `as_view_wand_${loopCount}`;
         let saViewWandName = `sa_view_wand_${loopCount}`;
         let collectionName0 = `collection_wand_0${loopCount}`;
@@ -89,7 +89,7 @@
         }
       },
       checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-        print(`checking data ${dbCount} ${loopCount}`);
+        print(`404: checking data ${dbCount} ${loopCount}`);
         let asViewWandName = `as_view_wand_${loopCount}`;
         let saViewWandName = `sa_view_wand_${loopCount}`;
         let collectionName0 = `collection_wand_0${loopCount}`;
@@ -146,7 +146,7 @@
         }
       },
       clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-        print(`removing data ${dbCount} ${loopCount}`);
+        print(`404: removing data ${dbCount} ${loopCount}`);
         let asViewWandName = `as_view_wand_${loopCount}`;
         let saViewWandName = `sa_view_wand_${loopCount}`;
         let collectionName0 = `collection_wand_0${loopCount}`;
