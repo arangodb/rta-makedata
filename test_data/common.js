@@ -77,7 +77,7 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
 
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
-      progress();
+      progress('inner Loop start');
       fns[1].forEach(func => {
         func(options,
              isCluster,
@@ -86,13 +86,15 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
              loopCount);
       });
 
-      progress();
+      progress('inner Loop End');
       loopCount ++;
     }
-    progress();
+    progress('outer loop end');
 
     endOfLoopFN(database);
-    print(timeLine.join());
+    if (options.printTimeMeasurement) {
+      print(timeLine.join());
+    }
     dbCount++;
   }
 }

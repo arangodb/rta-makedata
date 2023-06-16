@@ -67,7 +67,8 @@ const optionsDefaults = {
   progress: false,
   oldVersion: "3.5.0",
   test: undefined,
-  passvoid: ''
+  passvoid: '',
+  printTimeMeasurement: false,
 };
 
 let args = _.clone(ARGUMENTS);
@@ -87,11 +88,18 @@ const zeroPad = (num) => String(num).padStart(numberLength, '0');
 let tStart = 0;
 let timeLine = [];
 function progress (gaugeName) {
+  if (gaugeName === undefined) {
+    throw new Error("gauge name must be defined");
+  }
   let now = time();
   let delta = now - tStart;
   timeLine.push(delta);
   if (options.progress) {
-    print(`# - ${gaugeName},${tStart},${delta}`);
+    if (options.printTimeMeasurement) {
+      print(`# - ${gaugeName},${tStart},${delta}`);
+    } else {
+      print(`# - ${gaugeName}`);
+    }
   }
   tStart = now;
 }
@@ -115,5 +123,7 @@ function getReplicationFactor (defaultReplicationFactor) {
 
 const fns = scanMakeDataPaths(options, PWD, dbVersion, options.oldVersion, wantFunctions, 'checkData');
 mainTestLoop(options, isCluster, enterprise, fns, function(database) {
-  console.error(timeLine.join());
+  if (options.printTimeMeasurement) {
+    console.error(timeLine.join());
+  }
 });

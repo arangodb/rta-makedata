@@ -17,7 +17,7 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`making data ${dbCount} ${loopCount}`);
+      print(`550: making data ${dbCount} ${loopCount}`);
       // And now a smart graph (if enterprise):
       createSafe(`G_smart_${loopCount}`, graphName => {
         return gsm._create(graphName,
@@ -42,7 +42,7 @@
       progress('writeEGraph2');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`550: checking data ${dbCount} ${loopCount}`);
       const vColName = `patents_smart_${loopCount}`;
       let patentsSmart = db._collection(vColName);
       if (patentsSmart.count() !== 761) {
@@ -65,7 +65,7 @@
       progress();
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`550: checking data ${dbCount} ${loopCount}`);
     // Drop graph:
       let gsm = require("@arangodb/smart-graph");
       progress();

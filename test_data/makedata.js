@@ -63,6 +63,7 @@ const optionsDefaults = {
   progress: false,
   newVersion: "3.5.0",
   passvoid: '',
+  printTimeMeasurement: false,
   bigDoc: false,
   test: undefined
 };
@@ -84,11 +85,18 @@ const zeroPad = (num) => String(num).padStart(numberLength, '0');
 let tStart = 0;
 let timeLine = [];
 function progress (gaugeName) {
+  if (gaugeName === undefined) {
+    throw new Error("gauge name must be defined");
+  }
   let now = time();
   let delta = now - tStart;
   timeLine.push(delta);
   if (options.progress) {
-    print(`# - ${gaugeName},${tStart},${delta}`);
+    if (options.printTimeMeasurement) {
+      print(`# - ${gaugeName},${tStart},${delta}`);
+    } else {
+      print(`# - ${gaugeName}`);
+    }
   }
   tStart = now;
 }
@@ -196,5 +204,3 @@ mainTestLoop(options, isCluster, enterprise, fns, function(database) {
     });
   } catch (err) {}
 });
-print('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY');
-print(db._databases());

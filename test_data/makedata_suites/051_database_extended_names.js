@@ -19,10 +19,10 @@
       for (let i in extendedDbNames) {
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
-        progress('Start creating database ' + databaseName);
+        progress('051: Start creating database ' + databaseName);
         if (db._databases().includes(databaseName)) {
         // its already there - skip this one.
-          print(`skipping ${databaseName} - its already there.`);
+          print(`051: skipping ${databaseName} - its already there.`);
           break;
         }
         createSafe(databaseName,
@@ -41,13 +41,12 @@
         baseName = "system";
       }
       progress("051: Test databases with extended unicode symbols in the name");
-      print(db._databases());
       for (let i in extendedDbNames) {
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
-        progress('Checking the existence of the database: ' + databaseName);
+        progress('051: Checking the existence of the database: ' + databaseName);
         if (!(db._databases().includes(databaseName))) {
-            throw new Error("Database does not exist: " + databaseName);
+          throw new Error("051: Database does not exist: " + databaseName + "have: " + db._databases());
         }
       }
       db._useDatabase('_system');

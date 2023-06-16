@@ -176,7 +176,7 @@ let rand = require("internal").rand;
       let version_collection = db._collection(`version_collection_${loopCount}`);
 
       // Check indexes:
-      progress();
+      progress("100: checking indices");
 
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
@@ -193,7 +193,7 @@ let rand = require("internal").rand;
       if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
-      progress();
+      progress("100: checking data");
       if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
       if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
       if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
@@ -205,60 +205,61 @@ let rand = require("internal").rand;
       if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
 
       // Check a few queries:
-      progress();
+      progress("100: Query 1");
       if (db._query(`FOR x IN ${c.name()} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
-      progress();
+      progress("100: Query 2");
       if (db._query(`FOR x IN ${chash.name()} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
-      progress();
+      progress("100: Query 3");
       if (db._query(`FOR x IN ${cskip.name()} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
-      progress();
+      progress("100: Query 4");
       if (db._query(`FOR x IN ${cempty.name()} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
-      progress();
+      progress("100: Query 5");
       if (db._query(`FOR x IN ${cgeo.name()} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
-      progress();
+      progress("100: Query 6");
       if (db._query(`FOR x IN ${cunique.name()} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress();
+      progress("100: Query 7");
       if (db._query(`FOR x IN ${cmulti.name()} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
-      progress();
+      progress("100: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`clearing data ${dbCount} ${loopCount}`);
+      progress("100: drop 1");
       try {
         db._drop(`c_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 2");
       try {
         db._drop(`chash_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 3");
       try {
         db._drop(`cskip_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 4");
       try {
         db._drop(`cfull_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 5");
       try {
         db._drop(`cgeo_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 6");
       try {
         db._drop(`cunique_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 7");
       try {
         db._drop(`cmulti_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 8");
       try {
         db._drop(`cempty_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 9");
       try {
         db._drop(`version_collection_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop done");
     }
   };
 }());
