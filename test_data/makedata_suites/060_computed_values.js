@@ -734,7 +734,7 @@ function views_array(dbCount) {
         console.log('Deleting view failed with :', error.message);
         throw error;
       }
-      progress();
+      progress("060: deleted views");
 
       // getting all the collection name with dbcount
       let c = collection_declaration(dbCount);
