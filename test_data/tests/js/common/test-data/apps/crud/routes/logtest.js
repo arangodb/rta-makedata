@@ -58,11 +58,11 @@ router.post(function (req, res) {
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
-  let logtest
+  let logtest;
   try {
-    console.log("ng 🐻🧸🐻‍❄️🐼 Hongkong, \n\t\b\cgColin Au, und der 	💔 😺😸🐱   	🤒😷🤢 ヽ༼ຈل͜ຈ༽ﾉ ")
+    console.log("ng 🐻🧸🐻‍❄️🐼 Hongkong, \n\t\b\cgColin Au, und der 	💔 😺😸🐱   	🤒😷🤢 ヽ༼ຈل͜ຈ༽ﾉ ");
   } catch (e) {
-    console.log(e)
+    console.log(e);
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
     }

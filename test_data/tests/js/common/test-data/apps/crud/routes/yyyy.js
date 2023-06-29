@@ -72,7 +72,7 @@ router.post(function (req, res) {
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
-  let yyyy
+  let yyyy;
   try {
     yyyy = yyyyItems.document(key);
   } catch (e) {

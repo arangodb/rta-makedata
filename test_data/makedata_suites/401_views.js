@@ -7,7 +7,7 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`making data ${dbCount} ${loopCount}`);
+      print(`401: making data ${dbCount} ${loopCount}`);
       let viewCollectionName = `cview1_${loopCount}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
       progress('createView1');
@@ -37,32 +37,32 @@
         {"animal": "mouse", "name": "jerry"},
         {"animal": "dog", "name": "harry"}
       ]);
-      progress('createView3');
+      progress('401: createView3');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`401: checking data ${dbCount} ${loopCount}`);
       // Check view:
       let view1 = db._view(`view1_${loopCount}`);
       if (!view1.properties().links.hasOwnProperty(`cview1_${loopCount}`)) {
         throw new Error("Hass");
       }
-      progress();
+      progress("401: check view");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`401: checking data ${dbCount} ${loopCount}`);
 
       try {
         db._dropView(`view1_${loopCount}`);
       } catch (e) {
         print(e);
       }
-      progress();
+      progress("401: drop view 1");
       try {
         db._drop(`cview1_${loopCount}`);
       } catch (e) {
         print(e);
       }
-      progress();
+      progress("401: drop view 2");
     }
   };
 }());

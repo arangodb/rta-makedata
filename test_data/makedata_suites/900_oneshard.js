@@ -14,7 +14,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      print(`oneShard making per database data ${dbCount}`);
+      print(`900: oneShard making per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -25,7 +25,7 @@
       const databaseName = `${baseName}_${dbCount}_oneShard`;
       if (db._databases().includes(databaseName)) {
         // its already there - skip this one.
-        print(`skipping ${databaseName} - its already there.`);
+        print(`900: skipping ${databaseName} - its already there.`);
         return 0;
       }
       const created = createSafe(databaseName,
@@ -41,7 +41,7 @@
                                 );
       if (!created) {
         // its already wrongly there - skip this one.
-        print(`skipping ${databaseName} - it failed to be created, but it is no one-shard.`);
+        print(`900: skipping ${databaseName} - it failed to be created, but it is no one-shard.`);
         return 0;
       }
       progress(`created OneShard DB '${databaseName}'`);
@@ -68,7 +68,7 @@
       }
       progress("Test OneShard setup");
       const databaseName = `${baseName}_${dbCount}_oneShard`;
-      print('oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
+      print('900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
       print(db._databases());
       db._useDatabase(databaseName);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
@@ -87,7 +87,7 @@
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // check per DB
-      progress("Test OneShard teardown");
+      progress("900: Test OneShard teardown");
       if (database === "_system") {
         database = "system";
       }

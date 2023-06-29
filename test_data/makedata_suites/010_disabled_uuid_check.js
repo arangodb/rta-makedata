@@ -8,10 +8,10 @@
       return (options.disabledDbserverUUID !== "");
     },
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
-      print(`checking data ${dbCount}`);
+      print(`010: checking data ${dbCount}`);
       let count = 0;
       let collections = [];
-      print("waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
+      print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -25,7 +25,11 @@
           });
         });
         if (found > 0) {
-          print(found + ' found - Waiting - ' + JSON.stringify(collections));
+          let coldump = ".";
+          if ((count  + 1 % 25 === 0) || (collections.length < 10)) {
+            coldump = " - " + JSON.stringify(collections);
+          }
+          print('010: ' + found + ' found - Waiting' + coldump);
           internal.sleep(1);
           count += 1;
         } else {
@@ -41,11 +45,11 @@
             JSON.stringify(db[col].properties());
         });
         print(collectionData);
-        throw("Still have collections bound to the failed server: " + JSON.stringify(collections));
+        throw("010: Still have collections bound to the failed server: " + JSON.stringify(collections));
       }
       let shardDist = {};
       count = 0;
-      print("waiting for all new leaders to assume leadership");
+      print("010: waiting for all new leaders to assume leadership");
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -59,7 +63,7 @@
           let shards = Object.keys(col.Plan);
           shards.forEach((s) => {
             try {
-              if (col.Plan[s].leader !== col.Current[s].leader) {
+              if (col.Current.hasOwnProperty(s) && (col.Plan[s].leader !== col.Current[s].leader)) {
                 ++found;
                 collections.push([c, s]);
               }
@@ -71,7 +75,7 @@
           });
         });
         if (found > 0) {
-          print(found + ' found - Waiting - ' + JSON.stringify(collections));
+          print('010: ' + found + ' found - Waiting - ' + JSON.stringify(collections));
           internal.sleep(1);
           count += 1;
         } else {
@@ -93,10 +97,10 @@
             shardDistInfoForCol;
         });
         print(collectionData);
-        throw new Error("Still have collections with incomplete failover: " + JSON.stringify(collections));
+        throw new Error("010: Still have collections with incomplete failover: " + JSON.stringify(collections));
       }
 
-      print("done - continuing test.");
+      print("010: done - continuing test.");
       return 0;
     }
   };

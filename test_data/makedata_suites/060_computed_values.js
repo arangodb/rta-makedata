@@ -674,27 +674,27 @@ function views_array(dbCount) {
         //checking computed value field exit on the collection's doc
         if (col === c1 || col === c2 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
           if (expected_field[0].cv_field == null) {
-            throw new Error(`Computed value field 'cv_field' missing from collection`);
+            throw new Error(`060: Computed value field 'cv_field' missing from collection`);
           } 
         } 
         else if (col === c3) {
           if (expected_field[0].cv_field_insert == null) {
-            throw new Error(`Computed value field 'cv_field_insert' missing from collection`);
+            throw new Error(`060: Computed value field 'cv_field_insert' missing from collection`);
           }
         }
         else if (col === c4 || col === c5) {
           if (expected_field[2].cv_field == null) {
-            throw new Error(`Computed value field 'cv_field' missing from collection`);
+            throw new Error(`060: Computed value field 'cv_field' missing from collection`);
           }
         }
         else if (col === c6) {
           if (expected_field[4].field == null) {
-            throw new Error(`Computed value field 'field' missing from collection`);
+            throw new Error(`060: Computed value field 'field' missing from collection`);
           }
         } 
         else if (col === c10) {
           if (expected_field[0].cv_field1 == null) {
-            throw new Error(`Computed value field 'cv_field1' missing from collection`);
+            throw new Error(`060: Computed value field 'cv_field1' missing from collection`);
           }
         }
       });
@@ -731,10 +731,10 @@ function views_array(dbCount) {
         db._dropView(`${view[0]}`);
         db._dropView(`${view[1]}`);
       } catch (error) {
-        console.log('Deleting view failed with :', error.message);
+        console.log('060: Deleting view failed with :', error.message);
         throw error;
       }
-      progress();
+      progress("060: deleted views");
 
       // getting all the collection name with dbcount
       let c = collection_declaration(dbCount);
@@ -744,9 +744,9 @@ function views_array(dbCount) {
         if (db[col].properties()["computedValues"] == null) {
           //drop the collection after check
           db._drop(col);
-          progress(`deleting ${col} collection`);
+          progress(`060: deleting ${col} collection`);
         } else {
-          throw new Error(`${col} deletion failed!`);
+          throw new Error(`060: ${col} deletion failed!`);
         }
       })
       

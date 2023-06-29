@@ -67,10 +67,10 @@ function getCollectionChecksum(baseUrl, jwt, database, colName) {
          bearer: jwt,
        },
        timeout: 300
-    }
+    };
     res = request.get(args);
   } catch (x) {
-    print('can not get collection checksum' + x)
+    print('can not get collection checksum' + x);
     throw x;
   }
   return JSON.parse(res.body).checksum;
@@ -490,7 +490,7 @@ function ReplicationSuite() {
             pickDatabase();
             let name = db._name();
             db._useDatabase('_system');
-            print("dropping Database " + name)
+            print("dropping Database " + name);
             db._dropDatabase(name);
           };
 
@@ -521,7 +521,7 @@ function ReplicationSuite() {
             ops.push({ name: "renameCollection", func: renameCollection });
           }
 
-          const jwtExist = options.hasOwnProperty('jwt1') && options.hasOwnProperty('jwt2')
+          const jwtExist = options.hasOwnProperty('jwt1') && options.hasOwnProperty('jwt2');
           for (let i = 0; i < 3000; ++i) {
             pickDatabase();
             let op = ops[Math.floor(Math.random() * ops.length)];
@@ -536,7 +536,7 @@ function ReplicationSuite() {
                 if (leaderChecksum !== followerChecksum) {
                   print('C');
                   if (checksumCount > 20) {
-                    throw Exception("_users collection isn't getting in sync!")
+                    throw new Error("_users collection isn't getting in sync!");
                   }
                   internal.wait(1);
                   checksumCount += 1;
