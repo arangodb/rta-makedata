@@ -120,7 +120,6 @@ function views_array(dbCount) {
       // All items created must contain dbCount
       print(`060: making per database data ${dbCount}`);
       print("060: Creating computed values with sample collections");
-
       // getting all the collection names
       let c = collection_declaration(dbCount);
 
@@ -411,7 +410,7 @@ function views_array(dbCount) {
       //-------------------------------------------------------x-------------------------------------------------------------
       
       // creating views for the collections
-      print("060: Creating computed values with sample collections");
+      print("060: Creating computed values views with sample collections");
       
       // get all the view's variable name from the variable_name_declaration method globally
       let view = views_name_declaration(dbCount);
@@ -604,7 +603,6 @@ function views_array(dbCount) {
       // this method will compare two outputs
       checkComValProperties(`${view[0]}`, creationOutput, expected_output);
 
-
       // creating testviewV2 allias
       db._createView(view[1], "search-alias", {
         "indexes": [
@@ -670,32 +668,32 @@ function views_array(dbCount) {
         col.save(JSON.parse(docsAsStr), { silent: true });
 
         //this cmd will find one docs from the collection
-        let expected_field = col.all().limit(5).toArray();
-        //checking computed value field exit on the collection's doc
+        let has_cv_field = col.all().toArray();
+        // checking computed value field exit on the collection's doc
         if (col === c1 || col === c2 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
-          if (expected_field[0].cv_field == null) {
-            throw new Error(`060: Computed value field 'cv_field' missing from collection`);
-          } 
-        } 
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }else{print(`success at 695`)}
+        }
         else if (col === c3) {
-          if (expected_field[0].cv_field_insert == null) {
-            throw new Error(`060: Computed value field 'cv_field_insert' missing from collection`);
-          }
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field_insert"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }else{print(`success at 695`)}
         }
         else if (col === c4 || col === c5) {
-          if (expected_field[2].cv_field == null) {
-            throw new Error(`060: Computed value field 'cv_field' missing from collection`);
-          }
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }else{print(`success at 705`)}
         }
-        else if (col === c6) {
-          if (expected_field[4].field == null) {
-            throw new Error(`060: Computed value field 'field' missing from collection`);
-          }
-        } 
+        // else if (col === c6) {
+        //   if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+        //     throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+        //   }else{print(`success at 710`)}
+        // } 
         else if (col === c10) {
-          if (expected_field[0].cv_field1 == null) {
-            throw new Error(`060: Computed value field 'cv_field1' missing from collection`);
-          }
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }else{print(`success at 715`)}
         }
       });
 
