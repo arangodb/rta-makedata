@@ -673,27 +673,27 @@ function views_array(dbCount) {
         if (col === c1 || col === c2 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
-          }else{print(`success at 695`)}
+          }
         }
         else if (col === c3) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field_insert"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
-          }else{print(`success at 695`)}
+          }
         }
         else if (col === c4 || col === c5) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
-          }else{print(`success at 705`)}
+          }
         }
         // else if (col === c6) {
         //   if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
         //     throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
-        //   }else{print(`success at 710`)}
+        //   }
         // } 
         else if (col === c10) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
-          }else{print(`success at 715`)}
+          }
         }
       });
 
