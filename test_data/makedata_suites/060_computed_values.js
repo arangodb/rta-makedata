@@ -670,9 +670,25 @@ function views_array(dbCount) {
         //this cmd will find one docs from the collection
         let has_cv_field = col.all().toArray();
         // checking computed value field exit on the collection's doc
-        const field_name = (col === c3) ? "cv_field_insert" : "cv_field";
-        if (!has_cv_field.some(obj => obj.hasOwnProperty(field_name))) {
-          throw new Error(`060: Computed value field '${field_name}' missing from collection ${col.name}`);
+        if (col === c1 || col === c2 || col === c6 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }
+        }
+        else if (col === c3) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field_insert"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }
+        }
+        else if (col === c4 || col === c5) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }
+        }
+        else if (col === c10) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+            throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+          }
         }
       });
 
