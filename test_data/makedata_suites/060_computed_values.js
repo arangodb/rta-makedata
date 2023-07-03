@@ -63,8 +63,8 @@ function index_array(dbCount){
     [`for doc in ${c[3]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
     [`for doc in ${c[4]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
     [`for doc in ${c[4]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
-    [`for doc in ${c[5]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == not null collect with count into c return c`, 64000],
-    [`for doc in ${c[5]} OPTIONS { indexHint : 'persistent' } filter has(doc, 'cv_field') == true collect with count into c return c`, 64000],
+    [`for doc in ${c[5]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == null collect with count into c return c`, 64000],
+    [`for doc in ${c[5]} OPTIONS { indexHint : 'persistent' } filter has(doc, 'cv_field') == true collect with count into c return c`, 0],
     [`for doc in ${c[6]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == TO_HEX(123) collect with count into c return c`, 11],
     [`for doc in ${c[6]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == TO_HEX(doc.name) collect with count into c return c`, 64000],
     [`for doc in ${c[7]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == CONCAT('42_', FIRST(for d in ${c[7]} limit 100, 1 return d.field)) collect with count into c return c`, 17],
@@ -98,7 +98,7 @@ function views_array(dbCount) {
     [`for doc in ${view[1]} search doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
     [`for doc in ${view[1]} search doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 0],
     [`for doc in ${view[1]} search doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 0],
-    [`for doc in ${view[1]} search doc.cv_field == not null collect with count into c return c`, 64000],
+    [`for doc in ${view[1]} search doc.cv_field == null collect with count into c return c`, 64000],
     [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 64000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 96000],
     [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' collect with count into c return c`, 64000],
@@ -235,7 +235,7 @@ function views_array(dbCount) {
       let c6_exp_modification = [
         {
           name: 'cv_field',
-          expression: 'RETURN not null',
+          expression: 'RETURN null',
           computeOn: [ 'insert', 'update', 'replace' ],
           overwrite: true,
           failOnWarning: false,
@@ -243,7 +243,7 @@ function views_array(dbCount) {
         }
       ];
 
-      let c6_actual_modification = c6.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN not null", "overwrite": true, "keepNull": false }] });
+      let c6_actual_modification = c6.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN null", "overwrite": true, "keepNull": false }] });
 
       checkComValProperties(c[5], c6_exp_modification, c6_actual_modification.computedValues);
 
@@ -670,7 +670,7 @@ function views_array(dbCount) {
         //this cmd will find one docs from the collection
         let has_cv_field = col.all().toArray();
         // checking computed value field exit on the collection's doc
-        if (col === c1 || col === c2 || col === c6 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
+        if (col === c1 || col === c2 || col === c7 || col === c8 || col === c9 || col === c11 || col === c12) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
           }
@@ -685,6 +685,11 @@ function views_array(dbCount) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
           }
         }
+        // else if (col === c6) {
+        //   if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+        //     throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
+        //   }
+        // } 
         else if (col === c10) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
             throw new Error(`060: Computed value field 'cv_field' missing from collection ${col.name}`);
