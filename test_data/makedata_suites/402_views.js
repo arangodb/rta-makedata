@@ -812,8 +812,20 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     let headers = {};
     headers['accept'] = 'application/json';
     headers["Authorization"] = `Bearer ${jwt_key}`;
-    let clusterHealth = arango.GET_RAW("/_admin/cluster/health", headers)["parsedBody"]["Health"];
-
+    let clusterHealth = undefined;
+    let count = 0;
+    while (clusterHealth === undefined && count < 5) {
+      let ret = arango.GET_RAW("/_admin/cluster/health", headers);
+      if (ret["parsedBody"].hasOwnProperty("Health")) {
+        clusterHealth = ret["parsedBody"]["Health"];
+      } else {
+        print(`402: Cluster health did not return, retrying: ${ret['parsedBody']}`);
+        require("internal").sleep(0.2);
+      }
+    }
+    if (clusterHealth === undefined) {
+      throw new Error("402: getMetricCluster: couldn't get results in 5 retries");
+    }
     let serversId = [];
     for (let [key, value] of Object.entries(clusterHealth)) {
       if (value.Role.toLowerCase() === "dbserver") {
