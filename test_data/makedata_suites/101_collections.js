@@ -45,38 +45,38 @@ function queries_for_collections(dbCount){
   let collections_names = collections_names_declaration(dbCount);
 
   return [
-    [`for doc in ${collections_names[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[0]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[0]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('sky') collect with count into c return c`, 16000],
 
-    [`for doc in ${collections_names[1]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[1]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[1]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[1]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == SOUNDEX('dog') collect with count into c return c`, 16000],
     
-    [`for doc in ${collections_names[2]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[2]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[2]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[2]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_insert == SOUNDEX('frog') collect with count into c return c`, 16000],
     
-    [`for doc in ${collections_names[3]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[3]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[3]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[3]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_update == SOUNDEX('beer') collect with count into c return c`, 16000],
     
-    [`for doc in ${collections_names[4]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[4]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[4]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[4]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field_replace == SOUNDEX('water') collect with count into c return c`, 16000],
     
     [`for doc in ${collections_names[5]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field != null collect with count into c return c`, 0],
     [`for doc in ${collections_names[5]} OPTIONS { indexHint : 'persistent' } filter has(doc, 'cv_field') == true collect with count into c return c`, 0],
     
-    [`for doc in ${collections_names[6]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == TO_HEX(123) collect with count into c return c`, 11],
-    [`for doc in ${collections_names[6]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == TO_HEX(doc.name) collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[6]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == TO_HEX(293) or doc.cv_field == TO_HEX(-293) collect with count into c return c`, 12],
+    [`for doc in ${collections_names[6]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == TO_HEX(doc.name) collect with count into c return c`, 16000],
     
-    [`let str = CONCAT('42_', "nxovgpexzq") for doc in ${collections_names[7]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == str collect with count into c return c`, 17],
-    [`let str = CONCAT('42_', "nxovgpexzq") for doc in ${collections_names[7]} OPTIONS { indexHint : 'persistent'} filter doc.cv_field == str collect with count into c return c`, 17],
+    [`let str = CONCAT('42_', "wsmcbzkhkl") for doc in ${collections_names[7]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == str collect with count into c return c`, 18],
+    [`let str = CONCAT('42_', "wsmcbzkhkl") for doc in ${collections_names[7]} OPTIONS { indexHint : 'persistent'} filter doc.cv_field == str collect with count into c return c`, 18],
     
-    [`let str = CONCAT('42_', "hcolvwqabt") for doc in ${collections_names[8]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == str collect with count into c return c`, 32],
-    [`let str = CONCAT('42_', "hcolvwqabt") for doc in ${collections_names[8]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == str collect with count into c return c`, 32],
+    [`let str = CONCAT('42_', "bkatoehjob") for doc in ${collections_names[8]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == str collect with count into c return c`, 32],
+    [`let str = CONCAT('42_', "bkatoehjob") for doc in ${collections_names[8]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == str collect with count into c return c`, 32],
     
-    [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 64000],
-    [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 64000],
+    [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 16000],
+    [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 16000],
     
     [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${collections_names[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
-    [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
+    [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
 
@@ -87,26 +87,26 @@ function queries_for_views(dbCount) {
       // require("internal").sleep(120)
   
   return [
-    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('sky') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('dog') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} search doc.cv_field_insert == SOUNDEX('frog') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} search doc.cv_field_update == SOUNDEX('beer') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} search doc.cv_field_replace == SOUNDEX('water') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 96000],
-    [`for doc in ${view[0]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000],
+    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('sky') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} search doc.cv_field == SOUNDEX('dog') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} search doc.cv_field_insert == SOUNDEX('frog') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} search doc.cv_field_update == SOUNDEX('beer') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} search doc.cv_field_replace == SOUNDEX('water') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
+    [`for doc in ${view[0]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000],
     
-    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('sky') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('dog') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} search doc.cv_field_insert == SOUNDEX('frog') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} search doc.cv_field_update == SOUNDEX('beer') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} search doc.cv_field_replace == SOUNDEX('water') OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} search doc.cv_field == null OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 96000],
-    [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 64000],
-    [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 64000]
+    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('sky') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('dog') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field_insert == SOUNDEX('frog') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field_update == SOUNDEX('beer') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field_replace == SOUNDEX('water') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field == null OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
+    [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
 
@@ -631,14 +631,14 @@ function compareProperties(name, obj1, obj2) {
       assertTrue(c3_count_before == 0);
       db._query(`FOR doc IN ${collections_names[3]} UPDATE doc WITH { cv_field_update: 'update' } IN ${collections_names[3]}`);
       let c3_count_after =  Number(db._query(`for doc in ${collections_names[3]} filter doc.cv_field_update == soundex('beer') collect with count into c return c`).toArray());
-      assertTrue(c3_count_after == 64000);
+      assertTrue(c3_count_after == 16000);
 
       // Perform 'replace' operation for collection c4
       let c4_count_before = Number(db._query(`for doc in ${collections_names[4]} filter has(doc, 'cv_field_replace') == true collect with count into c return c`).toArray());
       assertTrue(c4_count_before == 0);
       db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`)
       let c4_count_after =  Number(db._query(`for doc in ${collections_names[4]} filter doc.cv_field_replace == soundex('water') collect with count into c return c`).toArray());
-      assertTrue(c4_count_after == 64000);
+      assertTrue(c4_count_after == 16000);
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
