@@ -20,8 +20,8 @@ let collections_names_declaration = (dbCount) =>{
 // this method will declare all the views name with proper dbCount
 let views_names_declaration = (dbCount) =>{
   return [
-    `test_view_${dbCount}`,
-    `test_view2_${dbCount}`
+    `view_101_${dbCount}`,
+    `view2_101_${dbCount}`
   ];
 };
 
@@ -34,7 +34,7 @@ let result_comparison = (db, tuple) =>{
     var output = db._query(query_str).toArray();
     var newOuput = Number(output);
     if (newOuput !== expected_output) {
-      throw new Error(`${query_str} query_str's output: ${newOuput} didn't match with ecxpected_output: ${expected_output}`);
+      throw new Error(`101: ${query_str} query_str's output: ${newOuput} didn't match with ecxpected_output: ${expected_output}`);
     }
   }
 }
@@ -119,7 +119,7 @@ function compareProperties(name, obj1, obj2) {
     delete obj2.optimizeTopK;
   }
   if(_.isEqual(obj1, obj2) === false){
-    throw new Error(`Properties missmatched for the collection/view ${name} ${JSON.stringify(obj1)} <-> ${JSON.stringify(obj2)}`);
+    throw new Error(`101: Properties missmatched for the collection/view ${name} ${JSON.stringify(obj1)} <-> ${JSON.stringify(obj2)}`);
   }
 };
 
