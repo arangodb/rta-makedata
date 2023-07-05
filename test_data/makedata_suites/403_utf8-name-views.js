@@ -10,11 +10,11 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`making data ${dbCount} ${loopCount}`);
+      print(`403: making data ${dbCount} ${loopCount}`);
       let viewCollectionName = `old_cview1_${loopCount}${extendedNames[3]}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
-      progress('createView1');
-      let viewName1 = `old_view1_${loopCount}${extendedNames[6]}`;
+      progress('403: createView1');
+      let viewName1 = `old_view1_403_${loopCount}${extendedNames[6]}`;
       let view1 = createSafe(viewName1,
                              viewname => {
                                return db._createView(viewname, "arangosearch", {});
@@ -36,32 +36,32 @@
         {"animal": "mouse", "name": "jerry"},
         {"animal": "dog", "name": "harry"}
       ]);
-      progress('createView3');
+      progress('403: createView3');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`403: checking data ${dbCount} ${loopCount}`);
       // Check view:
-      let view1 = db._view(`old_view1_${loopCount}${extendedNames[6]}`);
+      let view1 = db._view(`old_view1_403_${loopCount}${extendedNames[6]}`);
       if (!view1.properties().links.hasOwnProperty(`old_cview1_${loopCount}${extendedNames[3]}`)) {
-        throw new Error("Hass");
+        throw new Error("403: Hass");
       }
-      progress();
+      progress(`403: checkdata done`);
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`403: checking data ${dbCount} ${loopCount}`);
 
       try {
-        db._dropView(`old_view1_${loopCount}${extendedNames[6]}`);
+        db._dropView(`old_view1_403_${loopCount}${extendedNames[6]}`);
       } catch (e) {
         print(e);
       }
-      progress();
+      progress("403: dropping view");
       try {
         db._drop(`old_cview1_${loopCount}${extendedNames[3]}`);
       } catch (e) {
-        print(e);
+        print(`403: cleanup caught ${e}`);
       }
-      progress();
+      progress('403: cleanup done');
     }
   };
 }());

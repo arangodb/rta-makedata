@@ -195,7 +195,7 @@
       let cempty = db._collection(`cempty_${loopCount}${extendedNames[7]}`);
 
       // Check indexes:
-      progress();
+      progress("102: checking indices");
 
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
@@ -212,7 +212,7 @@
       if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
-      progress();
+      progress("102: checking counts");
       if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
       if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
       if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
@@ -223,21 +223,21 @@
       if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
 
       // Check a few queries:
-      progress();
+      progress("102: query 1");
       if (db._query(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
-      progress();
+      progress("102: query 3");
       if (db._query(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
-      progress();
+      progress("102: query 3");
       if (db._query(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
-      progress();
+      progress("102: query 4");
       if (db._query(aql`FOR x IN ${cempty} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
-      progress();
+      progress("102: query 5");
       if (db._query(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
-      progress();
+      progress("102: query 6");
       if (db._query(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress();
+      progress("102: query 6");
       if (db._query(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
-      progress();
+      progress("102: queries done");
       db._useDatabase('_system');
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
