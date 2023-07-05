@@ -25,14 +25,14 @@ class testCursor {
     });
     //print(ret)
     if (ret.code !== 201) {
-      throw new Error(`Cursor could not be created: ${JSON.stringify(ret)}`);
+      throw new Error(`960: Cursor could not be created: ${JSON.stringify(ret)}`);
     }
     this.hasMore = ret.parsedBody.hasMore;
     this.currentBatchId = 1;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
     if (this.cursorId === undefined) {
-      throw new Error("failed to create a query with cursor: " + JSON.stringify(ret));
+      throw new Error("960: failed to create a query with cursor: " + JSON.stringify(ret));
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     return this.hasMore;
@@ -42,7 +42,7 @@ class testCursor {
     let ret = arango.POST_RAW(url, "");
     //print(ret)
     if (ret.code !== 200) {
-      throw new Error(`Cursor could not be read from ${url} : ${JSON.stringify(ret)}`);
+      throw new Error(`960: Cursor could not be read from ${url} : ${JSON.stringify(ret)}`);
     }
     this.currentBatchId = this.nextBatchId;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
@@ -56,7 +56,7 @@ class testCursor {
     let ret = arango.POST_RAW(url, "");
     //print(ret)
     if (ret.code !== 200) {
-      throw new Error(`Cursor could not be read from ${url}: ${JSON.stringify(ret)}`);
+      throw new Error(`960: Cursor could not be read from ${url}: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     this.hasMore = ret.parsedBody.hasMore;
@@ -66,7 +66,7 @@ class testCursor {
       print(this.currentBatchId)
       print(this.resultChunks[this.currentBatchId])
       print(reGotChunk)
-      throw new Error("Chunks weren't as expected: " + url);
+      throw new Error("960: Chunks weren't as expected: " + url);
     }
     this.currentBatchId = this.nextBatchId;
     this.resultChunks[this.currentBatchId] = reGotChunk;
@@ -103,7 +103,7 @@ class testCursor {
         }
         if (isEnterprise) {
           for (; i < 20; i++) {
-            let viewName = `test_view2_${dbCount}`;
+            let viewName = `view2_101_${dbCount}`;
             cursors[i] = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
                                         {
                                           "@view": viewName
@@ -131,9 +131,9 @@ class testCursor {
           //print('c: ' + c)
           cursors[c].getLast();
           if (!cursors[c].getNext()) {
-            print('regetting last')
+            print('960: regetting last')
             cursors[c].getLast();
-            print('done with ' + c);
+            print('960: done with ' + c);
             cursors = cursors.splice(c + 1, 1);
           }
         }
