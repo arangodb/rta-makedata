@@ -84,6 +84,24 @@ If you want to filter for the scripts you can specify a coma separated list:
 ./scripts/unittest rta_makedata --extremeVerbosity true --cluster true --makedata_args:bigDoc true --test '010,020,050'
 ```
 
+# test output
+It should be obvious whether a test is run in a scenario or not. Hence the list of executed tests is output:
+
+```
+.------------------------------------------------.
+| DB | loop |              testname              |
+|----|------|------------------------------------|
+|  X |  X   | 000_dummy.js                       |
+|    |      | 005_check_system_collection.js     |
+|  X |      | 020_foxx.js                        |
+|    |  X   | 100_collections.js                 |
+'------------------------------------------------'
+```
+with the following meanings:
+- no `X`: this test is not applicable for the current environment and will be skipped
+- `X` in `DB`-column: This test has database level functionality
+- `X` in `loop`-column: This test has loop-level functionality
+
 
 # Embeddings
 RTA Makedata is embedded into [arangodb](https://github.com/arangodb/arangodb) and [RTA](https://github.com/arangodb/release-test-automation); 
