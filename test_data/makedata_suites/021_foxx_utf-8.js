@@ -1,5 +1,5 @@
 /* global print, fs, db, internal, arango, assertTrue */
-/* global loadFoxxIntoZip, installFoxx, deleteFoxx, itzpapalotlZip, minimalWorkingZip, */
+/* global loadFoxxIntoZip, installFoxx, deleteFoxx, itzpapalotlZip, minimalWorkingZip, assertEqual */
 
 
 (function () {

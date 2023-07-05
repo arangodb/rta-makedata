@@ -1,4 +1,4 @@
-/* global print, progress, createCollectionSafe, db, createSafe  */
+/* global print, progress, createCollectionSafe, db, createSafe, semver  */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];

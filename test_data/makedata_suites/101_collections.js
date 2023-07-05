@@ -1,7 +1,7 @@
-/* global print, semver, progress, createCollectionSafe, db, fs, PWD */
+/* global print, semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual */
 
 // this method will declare all the collection name with proper dbCount
-let collections_names_declaration = (dbCount) =>{
+let collections_names_declaration = (dbCount) => {
   return [
     `c0_101_${dbCount}`,
     `c1_101_${dbCount}`,
@@ -18,7 +18,7 @@ let collections_names_declaration = (dbCount) =>{
 };
 
 // this method will declare all the views name with proper dbCount
-let views_names_declaration = (dbCount) =>{
+let views_names_declaration = (dbCount) => {
   return [
     `view_101_${dbCount}`,
     `view2_101_${dbCount}`
@@ -27,7 +27,7 @@ let views_names_declaration = (dbCount) =>{
 
 // This method will take db and a tuple parameter containing one query and one expected output
 // as a tuple elements and then compare both's results
-let result_comparison = (db, tuple) =>{
+let result_comparison = (db, tuple) => {
   for (let i = 0; i < tuple.length; i++) {
     let query_str = tuple[i][0];
     let expected_output =  tuple[i][1];
@@ -37,7 +37,7 @@ let result_comparison = (db, tuple) =>{
       throw new Error(`101: ${query_str} query_str's output: ${newOuput} didn't match with ecxpected_output: ${expected_output}`);
     }
   }
-}
+};
 
 // execute queries which use indexes and verify that the proper amount of docs are returned
 function queries_for_collections(dbCount){
@@ -105,7 +105,7 @@ function queries_for_views(dbCount) {
     [`for doc in ${view[1]} search doc.cv_field == null OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
-    [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field1 =='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
@@ -176,7 +176,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c1_actual = c1.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('dog')", "overwrite": true }] })
+      let c1_actual = c1.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('dog')", "overwrite": true }] });
       compareProperties(collections_names[1], c1_expected, c1_actual.computedValues);
 
       let c2_expected = [
@@ -189,7 +189,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c2_actual = c2.properties({ computedValues: [{ "name": "cv_field_insert", "expression": "RETURN SOUNDEX('frog')", "computeOn": ["insert"], "overwrite": true }] })
+      let c2_actual = c2.properties({ computedValues: [{ "name": "cv_field_insert", "expression": "RETURN SOUNDEX('frog')", "computeOn": ["insert"], "overwrite": true }] });
       compareProperties(collections_names[2], c2_expected, c2_actual.computedValues);
 
       let c3_expected = [
@@ -215,7 +215,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c4_actual = c4.properties({ computedValues: [{ "name": "cv_field_replace", "expression": "RETURN SOUNDEX('water')", "computeOn": ["replace"], "overwrite": true }] })
+      let c4_actual = c4.properties({ computedValues: [{ "name": "cv_field_replace", "expression": "RETURN SOUNDEX('water')", "computeOn": ["replace"], "overwrite": true }] });
       compareProperties(collections_names[4], c4_expected, c4_actual.computedValues);
 
       let c5_expected = [
@@ -296,7 +296,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c9_actual = c9.properties({ computedValues: [{ "name": "cv_field1", "expression": "RETURN 'foo'", "overwrite": true }, { "name": "cv_field2", "expression": "RETURN 'bar'", "overwrite": true }, { "name": "cv_field3", "expression": "RETURN 'baz'", "overwrite": true }] })
+      let c9_actual = c9.properties({ computedValues: [{ "name": "cv_field1", "expression": "RETURN 'foo'", "overwrite": true }, { "name": "cv_field2", "expression": "RETURN 'bar'", "overwrite": true }, { "name": "cv_field3", "expression": "RETURN 'baz'", "overwrite": true }] });
       compareProperties(collections_names[9], c9_expected, c9_actual.computedValues);
 
       let c10_expected = [
@@ -531,7 +531,7 @@ function compareProperties(name, obj1, obj2) {
             "trackListPositions" : false
           }
         }
-      }
+      };
 
       // this method will compare two outputs
       compareProperties(`${views[0]}`, creationOutput, expected_output);
@@ -702,9 +702,9 @@ function compareProperties(name, obj1, obj2) {
       // getting all the collection name with dbcount
       let c = collections_names_declaration(dbCount);
       c.forEach(col => {
-        db[col].properties({computedValues: []})
+        db[col].properties({computedValues: []});
         //checking the properties set to null properly
-        if (db[col].properties()["computedValues"] == null) {
+        if (db[col].properties()["computedValues"] === null) {
           //drop the collection after check
           db._drop(col);
           progress(`101: deleting ${col} collection`);

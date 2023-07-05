@@ -1,7 +1,8 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
+  let baseName;
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
@@ -10,20 +11,19 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       db._useDatabase('_system');
-      let baseName = database;
+      baseName = database;
       if (baseName === "_system") {
         baseName = "system";
       }
-      db._createDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
+      baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
+      print(`102: creating ${baseName}`);
+      db._createDatabase(baseName);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
       // Create a few collections:
-      let baseName = database;
-      if (baseName === "_system") {
-        baseName = "system";
-      }
-      db._useDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
+      print(`102: using ${baseName}`);
+      db._useDatabase(baseName);
       let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
       progress('createCollection1');
       let chash = createCollectionSafe(`chash_${loopCount}${extendedNames[1]}`, 3, 2);
@@ -148,17 +148,22 @@
       progress('writeData7');
       db._useDatabase('_system');
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
-      let baseName = database;
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      db._useDatabase('_system');
+      baseName = database;
       if (baseName === "_system") {
         baseName = "system";
       }
-      print(`M${baseName}_${dbCount}_${extendedNames[3]}`)
-      db._useDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
+      baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
+      print(`102: using ${baseName}`);
+    },
+    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      print(`102: checking data ${dbCount} ${loopCount}`);
+      print(`102: using ${baseName}`);
+      db._useDatabase(baseName);
       let cols = db._collections();
       let cnames = [];
-      db._collections().forEach(col => { cnames.push(col.name())})
+      db._collections().forEach(col => { cnames.push(col.name());});
       let allFound = true;
       let notFound = [];
       [`c_${loopCount}${extendedNames[0]}`,
@@ -242,7 +247,7 @@
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       db._useDatabase('_system');
-      let baseName = database;
+      baseName = database;
       if (baseName === "_system") {
         baseName = "system";
       }
