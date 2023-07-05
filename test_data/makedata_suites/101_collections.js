@@ -628,37 +628,37 @@ function compareProperties(name, obj1, obj2) {
 
       // Verify collection c3
       let c3_count_before = db._query(`for doc in ${collections_names[3]} filter has(doc, 'cv_field_update') == true collect with count into c return c`).toArray();
-      if (Number(c3_count_before) == NaN) {
+      if (isNaN(Number(c3_count_before))) {
         throw new Error(`101: Can't get number during quering ${collections_names[3]}: Got ${c3_count_before}`);
       }
       c3_count_before = Number(c3_count_before);
-      assertTrue(c3_count_before == 0); // Check that we have no computed values
+      assertEqual(c3_count_before, 0); // Check that we have no computed values
 
       // Perform UPDATE operation
       db._query(`FOR doc IN ${collections_names[3]} UPDATE doc WITH { cv_field_update: 'update' } IN ${collections_names[3]}`);
       let c3_count_after = db._query(`for doc in ${collections_names[3]} filter doc.cv_field_update == soundex('beer') collect with count into c return c`).toArray();
-      if (Number(c3_count_after) == NaN) {
+      if (isNaN(Number(c3_count_after))) {
         throw new Error(`101: Can't get number during quering ${collections_names[3]}: Got ${c3_count_after}`);
       }
       c3_count_after = Number(c3_count_after);
-      assertTrue(c3_count_after == 16000); // Check that Computed Values are created
+      assertEqual(c3_count_after, 16000); // Check that Computed Values are created
 
       // Verify collection c4
       let c4_count_before = db._query(`for doc in ${collections_names[4]} filter has(doc, 'cv_field_replace') == true collect with count into c return c`).toArray();
-      if (Number(c4_count_before) == NaN) {
+      if (isNaN(Number(c4_count_before))) {
         throw new Error(`101: Can't get number during quering ${collections_names[4]}: Got ${c4_count_before}`);
       }
       c4_count_before = Number(c4_count_before);
-      assertTrue(c4_count_before == 0); // Check that we have no computed values
+      assertEqual(c4_count_before, 0); // Check that we have no computed values
 
       // Perform REPLACE operation
-      db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`)
+      db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`);
       let c4_count_after = db._query(`for doc in ${collections_names[4]} filter doc.cv_field_replace == soundex('water') collect with count into c return c`).toArray();
-      if (Number(c4_count_after) == NaN) {
+      if (isNaN(Number(c4_count_after))) {
         throw new Error(`101: Can't get number during quering ${collections_names[4]}: Got ${c4_count_after}`);
       }
       c4_count_after = Number(c4_count_after);
-      assertTrue(c4_count_after == 16000); // Check that Computed Values are created
+      assertEqual(c4_count_after, 16000); // Check that Computed Values are created
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
