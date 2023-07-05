@@ -15,12 +15,12 @@
       try {
         let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
         if (reply.code === 404) {
-          print("selfHeal was already executed - Foxx is ready!");
+          print("021: selfHeal was already executed - Foxx is ready!");
           return 0;
         }
-        print(" Not yet ready, retrying: " + reply.parsedBody);
+        print("021: Not yet ready, retrying: " + reply.parsedBody);
       } catch (e) {
-        print(" Caught - need to retry. " + JSON.stringify(e));
+        print("021: Caught - need to retry. " + JSON.stringify(e));
       }
       internal.sleep(3);
     }
@@ -59,13 +59,13 @@
       // All items created must contain dbCount
       testFoxxRoutingReady();
       testFoxxReady(aardvarkRoute);
-      print(`making per database data ${dbCount}`);
-      print("installing Itzpapalotl");
+      print(`021: making per database data ${dbCount}`);
+      print("021: installing Itzpapalotl");
       // installFoxx('/itz', itzpapalotlZip, "install", options);
 
       installFoxx(`/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
-      print("installing crud");
+      print("021: installing crud");
       installFoxx(`/crud_${dbCount}`, minimalWorkingZip, "install", options);
       db._useDatabase('_system');
       return 0;
@@ -73,7 +73,7 @@
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       let dbName = `${extendedNames[0]}FoxxTest${extendedNames[3]}_${dbCount}`;
       db._useDatabase(dbName);
-      print(`checking data ${dbCount} ${dbName}`);
+      print(`021: checking data ${dbCount} ${dbName}`);
       let reply;
 
       [
@@ -82,28 +82,28 @@
         `/_db/_system/crud_${dbCount}/xxx`
       ].forEach(route => testFoxxReady(route));
 
-      print("Foxx: Itzpapalotl getting the root of the gods");
+      print("021: Foxx: Itzpapalotl getting the root of the gods");
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}`);
       assertEqual(reply.code, "307", JSON.stringify(reply));
 
-      print('Foxx: Itzpapalotl getting index html with list of gods');
+      print('021: Foxx: Itzpapalotl getting index html with list of gods');
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}/index`);
       assertEqual(reply.code, "200", JSON.stringify(reply));
 
-      print("Foxx: Itzpapalotl summoning Chalchihuitlicue");
+      print("021: Foxx: Itzpapalotl summoning Chalchihuitlicue");
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}/Chalchihuitlicue/summon`, onlyJson);
       assertEqual(reply.code, "200", JSON.stringify(reply));
       let parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody.name, "Chalchihuitlicue");
       assertTrue(parsedBody.summoned);
 
-      print("Foxx: crud testing get xxx");
+      print("021: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/_system/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody, []);
 
-      print("Foxx: crud testing POST xxx");
+      print("021: Foxx: crud testing POST xxx");
 
       reply = arango.POST_RAW(`/_db/_system/crud_${dbCount}/xxx`, {_key: "test"});
       if (options.readOnly) {
@@ -112,7 +112,7 @@
         assertEqual(reply.code, "201");
       }
 
-      print("Foxx: crud testing get xxx");
+      print("021: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/_system/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
@@ -122,7 +122,7 @@
         assertEqual(parsedBody.length, 1);
       }
 
-      print('Foxx: crud testing delete document');
+      print('021: Foxx: crud testing delete document');
       reply = arango.DELETE_RAW(`/_db/_system/crud_${dbCount}/xxx/` + 'test');
       if (options.readOnly) {
         assertEqual(reply.code, "400");

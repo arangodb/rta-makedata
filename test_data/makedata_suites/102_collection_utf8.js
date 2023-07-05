@@ -252,50 +252,7 @@
         baseName = "system";
       }
       db._dropDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
-    },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      /*
-      let baseName = database;
-      if (baseName === "_system") {
-        baseName = "system";
-      }
-      db._useDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
-
-      print(`checking data ${dbCount} ${loopCount}`);
-      try {
-        db._drop(`c_${loopCount}${extendedNames[0]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`chash_${loopCount}${extendedNames[1]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cskip_${loopCount}${extendedNames[2]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cfull_${loopCount}${extendedNames[3]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cgeo_${loopCount}${extendedNames[4]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cunique_${loopCount}${extendedNames[5]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cmulti_${loopCount}${extendedNames[6]}`);
-      } catch (e) {}
-      progress();
-      try {
-        db._drop(`cempty_${loopCount}${extendedNames[7]}`);
-      } catch (e) {}
-      progress();
-      db._useDatabase('_system');
-      */
     }
+    // we drop the whole db, so no further cleanup needed
   };
 }());

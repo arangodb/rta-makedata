@@ -821,7 +821,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       } else {
         print(`402: Cluster health did not return, retrying: ${ret['parsedBody']}`);
         require("internal").sleep(0.2);
-        count -= 1;
+        count += 1;
       }
     }
     if (clusterHealth === undefined) {

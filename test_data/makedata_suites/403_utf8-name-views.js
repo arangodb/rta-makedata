@@ -22,7 +22,7 @@
                                return db._view(viewname);
                              }
                             );
-      progress('createView2');
+      progress('403: createView1 done');
       let meta = {
         links: {}
       };
@@ -53,13 +53,15 @@
       try {
         db._dropView(`old_view1_403_${loopCount}${extendedNames[6]}`);
       } catch (e) {
-        print(e);
+        print(`403: dropping view didn't work: ${e}`);
+        throw e;
       }
       progress("403: dropping view");
       try {
         db._drop(`old_cview1_${loopCount}${extendedNames[3]}`);
       } catch (e) {
         print(`403: cleanup caught ${e}`);
+        throw e;
       }
       progress('403: cleanup done');
     }
