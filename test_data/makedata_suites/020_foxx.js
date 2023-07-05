@@ -53,7 +53,7 @@ function installFoxx (mountpoint, which, mode, options) {
     crudResp = arango.PUT('/_api/foxx/service?mount=' + mountpoint + devmode, content, headers);
   } else {
     let reply = download(arango.getEndpoint().replace(/^tcp:/, 'http:').replace(/^ssl:/, 'https:') +
-                         '/_api/foxx?mount=' + mountpoint + devmode,
+                         '/_db/' + arango.getDatabaseName() + '/_api/foxx?mount=' + mountpoint + devmode,
                          content,
                          {
                            method: 'POST',

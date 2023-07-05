@@ -812,7 +812,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     let headers = {};
     headers['accept'] = 'application/json';
     headers["Authorization"] = `Bearer ${jwt_key}`;
-    let clusterHealth = undefined;
+    let clusterHealth;
     let count = 0;
     while (clusterHealth === undefined && count < 5) {
       let ret = arango.GET_RAW("/_admin/cluster/health", headers);
@@ -821,6 +821,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       } else {
         print(`402: Cluster health did not return, retrying: ${ret['parsedBody']}`);
         require("internal").sleep(0.2);
+        count += 1;
       }
     }
     if (clusterHealth === undefined) {

@@ -1,7 +1,7 @@
-/* global print, semver, progress, createCollectionSafe, db, fs, PWD */
+/* global print, semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual */
 
 // this method will declare all the collection name with proper dbCount
-let collections_names_declaration = (dbCount) =>{
+let collections_names_declaration = (dbCount) => {
   return [
     `c0_101_${dbCount}`,
     `c1_101_${dbCount}`,
@@ -18,7 +18,7 @@ let collections_names_declaration = (dbCount) =>{
 };
 
 // this method will declare all the views name with proper dbCount
-let views_names_declaration = (dbCount) =>{
+let views_names_declaration = (dbCount) => {
   return [
     `view_101_${dbCount}`,
     `view2_101_${dbCount}`
@@ -27,7 +27,7 @@ let views_names_declaration = (dbCount) =>{
 
 // This method will take db and a tuple parameter containing one query and one expected output
 // as a tuple elements and then compare both's results
-let result_comparison = (db, tuple) =>{
+let result_comparison = (db, tuple) => {
   for (let i = 0; i < tuple.length; i++) {
     let query_str = tuple[i][0];
     let expected_output =  tuple[i][1];
@@ -37,7 +37,7 @@ let result_comparison = (db, tuple) =>{
       throw new Error(`101: ${query_str} query_str's output: ${newOuput} didn't match with ecxpected_output: ${expected_output}`);
     }
   }
-}
+};
 
 // execute queries which use indexes and verify that the proper amount of docs are returned
 function queries_for_collections(dbCount){
@@ -105,7 +105,7 @@ function queries_for_views(dbCount) {
     [`for doc in ${view[1]} search doc.cv_field == null OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
-    [`for doc in ${view[1]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
+    [`for doc in ${view[1]} search doc.cv_field1 =='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
@@ -176,7 +176,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c1_actual = c1.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('dog')", "overwrite": true }] })
+      let c1_actual = c1.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('dog')", "overwrite": true }] });
       compareProperties(collections_names[1], c1_expected, c1_actual.computedValues);
 
       let c2_expected = [
@@ -189,7 +189,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c2_actual = c2.properties({ computedValues: [{ "name": "cv_field_insert", "expression": "RETURN SOUNDEX('frog')", "computeOn": ["insert"], "overwrite": true }] })
+      let c2_actual = c2.properties({ computedValues: [{ "name": "cv_field_insert", "expression": "RETURN SOUNDEX('frog')", "computeOn": ["insert"], "overwrite": true }] });
       compareProperties(collections_names[2], c2_expected, c2_actual.computedValues);
 
       let c3_expected = [
@@ -215,7 +215,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c4_actual = c4.properties({ computedValues: [{ "name": "cv_field_replace", "expression": "RETURN SOUNDEX('water')", "computeOn": ["replace"], "overwrite": true }] })
+      let c4_actual = c4.properties({ computedValues: [{ "name": "cv_field_replace", "expression": "RETURN SOUNDEX('water')", "computeOn": ["replace"], "overwrite": true }] });
       compareProperties(collections_names[4], c4_expected, c4_actual.computedValues);
 
       let c5_expected = [
@@ -296,7 +296,7 @@ function compareProperties(name, obj1, obj2) {
           keepNull: true
         }
       ];
-      let c9_actual = c9.properties({ computedValues: [{ "name": "cv_field1", "expression": "RETURN 'foo'", "overwrite": true }, { "name": "cv_field2", "expression": "RETURN 'bar'", "overwrite": true }, { "name": "cv_field3", "expression": "RETURN 'baz'", "overwrite": true }] })
+      let c9_actual = c9.properties({ computedValues: [{ "name": "cv_field1", "expression": "RETURN 'foo'", "overwrite": true }, { "name": "cv_field2", "expression": "RETURN 'bar'", "overwrite": true }, { "name": "cv_field3", "expression": "RETURN 'baz'", "overwrite": true }] });
       compareProperties(collections_names[9], c9_expected, c9_actual.computedValues);
 
       let c10_expected = [
@@ -531,7 +531,7 @@ function compareProperties(name, obj1, obj2) {
             "trackListPositions" : false
           }
         }
-      }
+      };
 
       // this method will compare two outputs
       compareProperties(`${views[0]}`, creationOutput, expected_output);
@@ -628,37 +628,37 @@ function compareProperties(name, obj1, obj2) {
 
       // Verify collection c3
       let c3_count_before = db._query(`for doc in ${collections_names[3]} filter has(doc, 'cv_field_update') == true collect with count into c return c`).toArray();
-      if (Number(c3_count_before) == NaN) {
+      if (isNaN(Number(c3_count_before))) {
         throw new Error(`101: Can't get number during quering ${collections_names[3]}: Got ${c3_count_before}`);
       }
       c3_count_before = Number(c3_count_before);
-      assertTrue(c3_count_before == 0); // Check that we have no computed values
+      assertEqual(c3_count_before, 0); // Check that we have no computed values
 
       // Perform UPDATE operation
       db._query(`FOR doc IN ${collections_names[3]} UPDATE doc WITH { cv_field_update: 'update' } IN ${collections_names[3]}`);
       let c3_count_after = db._query(`for doc in ${collections_names[3]} filter doc.cv_field_update == soundex('beer') collect with count into c return c`).toArray();
-      if (Number(c3_count_after) == NaN) {
+      if (isNaN(Number(c3_count_after))) {
         throw new Error(`101: Can't get number during quering ${collections_names[3]}: Got ${c3_count_after}`);
       }
       c3_count_after = Number(c3_count_after);
-      assertTrue(c3_count_after == 16000); // Check that Computed Values are created
+      assertEqual(c3_count_after, 16000); // Check that Computed Values are created
 
       // Verify collection c4
       let c4_count_before = db._query(`for doc in ${collections_names[4]} filter has(doc, 'cv_field_replace') == true collect with count into c return c`).toArray();
-      if (Number(c4_count_before) == NaN) {
+      if (isNaN(Number(c4_count_before))) {
         throw new Error(`101: Can't get number during quering ${collections_names[4]}: Got ${c4_count_before}`);
       }
       c4_count_before = Number(c4_count_before);
-      assertTrue(c4_count_before == 0); // Check that we have no computed values
+      assertEqual(c4_count_before, 0); // Check that we have no computed values
 
       // Perform REPLACE operation
-      db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`)
+      db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`);
       let c4_count_after = db._query(`for doc in ${collections_names[4]} filter doc.cv_field_replace == soundex('water') collect with count into c return c`).toArray();
-      if (Number(c4_count_after) == NaN) {
+      if (isNaN(Number(c4_count_after))) {
         throw new Error(`101: Can't get number during quering ${collections_names[4]}: Got ${c4_count_after}`);
       }
       c4_count_after = Number(c4_count_after);
-      assertTrue(c4_count_after == 16000); // Check that Computed Values are created
+      assertEqual(c4_count_after, 16000); // Check that Computed Values are created
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
@@ -702,9 +702,9 @@ function compareProperties(name, obj1, obj2) {
       // getting all the collection name with dbcount
       let c = collections_names_declaration(dbCount);
       c.forEach(col => {
-        db[col].properties({computedValues: []})
+        db[col].properties({computedValues: []});
         //checking the properties set to null properly
-        if (db[col].properties()["computedValues"] == null) {
+        if (db[col].properties()["computedValues"] === null) {
           //drop the collection after check
           db._drop(col);
           progress(`101: deleting ${col} collection`);
