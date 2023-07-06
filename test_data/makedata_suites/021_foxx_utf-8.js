@@ -48,7 +48,9 @@
   };    
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
-      return options.testFoxx;
+      let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
+      let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
+      return options.testFoxx && semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       let dbName = `${extendedNames[0]}FoxxTest${extendedNames[3]}_${dbCount}`;
