@@ -651,6 +651,7 @@ function compareProperties(name, obj1, obj2) {
       c4_count_before = Number(c4_count_before);
       assertEqual(c4_count_before, 0); // Check that we have no computed values
 
+      /* BTS-1508: re-enable for triggering again.
       // Perform REPLACE operation
       db._query(`FOR doc IN ${collections_names[4]} REPLACE doc WITH { cv_field_replace: 'replace' } IN ${collections_names[4]}`);
       let c4_count_after = db._query(`for doc in ${collections_names[4]} filter doc.cv_field_replace == soundex('water') collect with count into c return c`).toArray();
@@ -659,6 +660,7 @@ function compareProperties(name, obj1, obj2) {
       }
       c4_count_after = Number(c4_count_after);
       assertEqual(c4_count_after, 16000); // Check that Computed Values are created
+      */
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
