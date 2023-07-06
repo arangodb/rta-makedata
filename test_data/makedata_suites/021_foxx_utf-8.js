@@ -47,7 +47,7 @@
     throw new Error("foxx route '" + route + "' not ready on time!");
   };    
   return {
-    isSupported: function (version, oldVersion, options, enterprise, cluster) {
+    isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
       return options.testFoxx && semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
