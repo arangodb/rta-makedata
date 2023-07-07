@@ -111,7 +111,7 @@
           throw new Error("Red Currant 5 != " + len);
         }
       }
-      progress();
+      progress("570: ");
       {
           //check K_SHORTEST_PATHS query on an enterprise graph
           const gName = `G_enterprise_${dbCount}`;

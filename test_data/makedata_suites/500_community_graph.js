@@ -50,7 +50,7 @@
                  RETURN v`).toArray().length !== 6) {
         throw new Error("Physalis");
       }
-      progress();
+      progress("500: ");
       if (db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/US:60095410" TO "${patentsNaive.name()}/US:49997870"
                  GRAPH "G_naive_${loopCount}"
                  LIMIT 100

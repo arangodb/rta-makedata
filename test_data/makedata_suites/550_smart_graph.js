@@ -63,7 +63,7 @@
       if (len !== 6) {
         throw new Error("Black Currant 6 != " + len);
       }
-      progress();
+      progress("550: ");
       len = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/US:60095410" TO "${patentsSmart.name()}/US:49997870"
                  GRAPH "${gName}"
                  LIMIT 100
