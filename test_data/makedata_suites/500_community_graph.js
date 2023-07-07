@@ -50,6 +50,13 @@
                  RETURN v`).toArray().length !== 6) {
         throw new Error("Physalis");
       }
+      progress();
+      if (db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/US:60095410" TO "${patentsNaive.name()}/US:49997870"
+                 GRAPH "G_naive_${loopCount}"
+                 LIMIT 100
+                 RETURN p`).toArray().length !== 2) {
+        throw new Error("Dragonfruit");
+      }
       progress("500: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {

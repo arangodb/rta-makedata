@@ -111,6 +111,22 @@
           throw new Error("Red Currant 5 != " + len);
         }
       }
+      progress();
+      {
+          //check K_SHORTEST_PATHS query on an enterprise graph
+          const gName = `G_enterprise_${dbCount}`;
+          let query = `
+                 FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/US:60095410" TO "${patentsSmart.name()}/US:49997870"
+                 GRAPH "${gName}"
+                 LIMIT 100
+                 RETURN p
+                    `;
+          progress(`running query: ${query}\n`);
+          let len = db._query(query).toArray().length;
+          if (len !== 2) {
+            throw new Error("Yellow Currant 2 != " + len);
+          }
+      }
       progress("570: done");
       return 0;
     },

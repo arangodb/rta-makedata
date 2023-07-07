@@ -63,6 +63,14 @@
       if (len !== 6) {
         throw new Error("Black Currant 6 != " + len);
       }
+      progress();
+      len = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/US:60095410" TO "${patentsSmart.name()}/US:49997870"
+                 GRAPH "${gName}"
+                 LIMIT 100
+                 RETURN p`).toArray().length;
+      if (len !== 2) {
+        throw new Error("White Currant 2 != " + len);
+      }
       progress('550: done');
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
