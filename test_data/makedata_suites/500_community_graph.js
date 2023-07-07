@@ -10,7 +10,7 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`making data ${dbCount} ${loopCount}`);
+      print(`500: making data ${dbCount} ${loopCount}`);
       createSafe(`G_naive_${loopCount}`, graphName => {
         return g._create(graphName,
                          [
@@ -34,19 +34,17 @@
       progress('loadGraph1');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
-    // Check graph:
-
+      progress("500: Checking patents naive");
       let patentsNaive = db._collection(`patents_naive_${loopCount}`);
       if (patentsNaive.count() !== 761) {
-        throw new Error("Orange");
+        throw new Error("500: patents naive count failed: want 761 have " + patentsNaive.count());
       }
-      progress();
+      progress("500: Creating citations");
       let citationsNaive = db._collection(`citations_naive_${loopCount}`);
       if (citationsNaive.count() !== 1000) {
-        throw new Error("Papaya");
+        throw new Error("500: Citations naive count incomplete: want 1000 have: " + citationsNaive.count());
       }
-      progress();
+      progress("500: testing graph query");
       if (db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/US:3858245${loopCount}"
                  GRAPH "G_naive_${loopCount}"
                  RETURN v`).toArray().length !== 6) {
@@ -59,12 +57,11 @@
                  RETURN p`).toArray().length !== 2) {
         throw new Error("Dragonfruit");
       }
-      progress();
+      progress("500: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
-      // Drop graph:
-      progress();
+      print(`500: clearing data ${dbCount} ${loopCount}`);
+      progress("500: dropping graph");
       try {
         g._drop(`G_naive_${loopCount}`, true);
       } catch (e) { }

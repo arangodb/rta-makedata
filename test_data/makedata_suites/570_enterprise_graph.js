@@ -14,7 +14,7 @@
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       egm = require('@arangodb/enterprise-graph');
       // All items created must contain dbCount
-      print(`making per database data ${dbCount}`);
+      print(`570: making per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -58,7 +58,7 @@
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`checking data in database ${database} dbCount: ${dbCount}`);
+      print(`570: checking data in database ${database} dbCount: ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -74,7 +74,7 @@
       if (patentsSmart.count() !== 761) {
         throw new Error(vColName + " expected count to be 761 but is: " + patentsSmart.count());
       }
-      progress();
+      progress("570: count patents");
       const eColName = `citations_enterprise_${dbCount}`;
       if (colNames.find(cn => cn.name() === eColName) === undefined) {
         throw new Error(eColName + " doesn't exist!");
@@ -84,32 +84,32 @@
         throw new Error(eColName + "count expected to be 1000 but is: " + citationsSmart.count());
       }
       {
-          progress();
-          //traverse enterprise graph
-          const gName = `G_enterprise_${dbCount}`;
-          let query = `FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${dbCount}"
+        progress("570: smart traversal named graph start");
+        //traverse enterprise graph
+        const gName = `G_enterprise_${dbCount}`;
+        let query = `FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${dbCount}"
                        GRAPH "${gName}"
                        RETURN v`;
-          progress(`running query: ${query}\n`);
-          let len = db._query(query).toArray().length;
-          if (len !== 6) {
-            throw new Error("Black Currant 6 != " + len);
-          }
+        progress(`570: running query: ${query}\n`);
+        let len = db._query(query).toArray().length;
+        if (len !== 6) {
+          throw new Error("Black Currant 6 != " + len);
+        }
       }
-      progress();
+      progress("570: smart traversal done anonymous Graph starts");
       {
-          //use enterprise graph's edge collection as an anonymous graph
-          let query = `
+        //use enterprise graph's edge collection as an anonymous graph
+        let query = `
                     WITH ${patentsSmart.name()}
                     FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/IL:6009552${dbCount}"
                     ${citationsSmart.name()}
                     RETURN v
                     `;
-          progress(`running query: ${query}\n`);
-          let len = db._query(query).toArray().length;
-          if (len !== 5) {
-            throw new Error("Red Currant 5 != " + len);
-          }
+        progress(`570: running query: ${query}\n`);
+        let len = db._query(query).toArray().length;
+        if (len !== 5) {
+          throw new Error("Red Currant 5 != " + len);
+        }
       }
       progress();
       {
@@ -127,7 +127,7 @@
             throw new Error("Yellow Currant 2 != " + len);
           }
       }
-      progress();
+      progress("570: done");
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {

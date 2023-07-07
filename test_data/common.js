@@ -4,20 +4,28 @@
 // these are our state variables, we need to write them:
 /* global tStart:true, timeLine:true */
 //
+const AsciiTable = require('ascii-table');
 
 function isCharDigit(n){
   return !!n.trim() && n > -1;
 }
 
 function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString) {
+  let tableColumnHeaders = [
+    "DB", "loop", "testname"
+  ];
+  let resultTable = new AsciiTable("");
+  resultTable.setHeading(tableColumnHeaders);
+
   let fns = [[],[]];
   const FNChars = [ 'D', 'L'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
     filters = options.test.split(',');
   }
+  let testDir = fs.join(PWD, 'makedata_suites');
   let suites = _.filter(
-    fs.list(fs.join(PWD, 'makedata_suites')),
+    fs.list(testDir),
     function (p) {
       if (!isCharDigit(p.charAt(0))) {
         return false;
@@ -38,6 +46,7 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
       return fs.join(fs.join(PWD, 'makedata_suites'), x);
     }).sort();
   suites.forEach(suitePath => {
+    let column = [];
     let supported = "";
     let unsupported = "";
     let suite = require("internal").load(suitePath);
@@ -45,19 +54,27 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
       let count = 0;
       wantFunctions.forEach(fn => {
         if (wantFunctions[count] in suite) {
+          column.push(' X');
           supported += FNChars[count];
           fns[count].push(suite[fn]);
         } else {
+          column.push(' ');
           unsupported += " ";
         }
         count += 1;
       });
     } else {
+      column.push(' ');
+      column.push(' ');
       supported = " ";
       unsupported = " ";
     }
-    print("[" + supported +"]   " + unsupported + suitePath);
+    let pseg = suitePath.split(fs.pathSeparator);
+    column.push(pseg[pseg.length - 1]);
+    resultTable.addRow(column);
   });
+  print(resultTable.toString());
+  print(` in ${testDir}`);
   return fns;
 }
 
@@ -77,7 +94,7 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
 
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
-      progress();
+      progress('inner Loop start');
       fns[1].forEach(func => {
         func(options,
              isCluster,
@@ -86,13 +103,15 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
              loopCount);
       });
 
-      progress();
+      progress('inner Loop End');
       loopCount ++;
     }
-    progress();
+    progress('outer loop end');
 
     endOfLoopFN(database);
-    print(timeLine.join());
+    if (options.printTimeMeasurement) {
+      print(timeLine.join());
+    }
     dbCount++;
   }
 }

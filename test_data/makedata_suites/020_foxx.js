@@ -53,7 +53,7 @@ function installFoxx (mountpoint, which, mode, options) {
     crudResp = arango.PUT('/_api/foxx/service?mount=' + mountpoint + devmode, content, headers);
   } else {
     let reply = download(arango.getEndpoint().replace(/^tcp:/, 'http:').replace(/^ssl:/, 'https:') +
-                         '/_api/foxx?mount=' + mountpoint + devmode,
+                         '/_db/' + arango.getDatabaseName() + '/_api/foxx?mount=' + mountpoint + devmode,
                          content,
                          {
                            method: 'POST',
@@ -116,14 +116,14 @@ const crudTestServiceSource = {
       }
       internal.sleep(3);
     }
-    throw new Error("foxx routeing not ready on time!");
+    throw new Error("020: foxx routeing not ready on time!");
   };
   let testFoxxReady = function(route) {
     for (let i = 0; i < 200; i++) {
       try {
         let reply = arango.GET_RAW(route, onlyJson);
         if (reply.code === 200) {
-          print(route + " OK");
+          print("020: " + route + " OK");
           return 0;
         }
         let msg = JSON.stringify(reply);
@@ -146,8 +146,8 @@ const crudTestServiceSource = {
       // All items created must contain dbCount
       testFoxxRoutingReady();
       testFoxxReady(aardvarkRoute);
-      print(`making per database data ${dbCount}`);
-      print("installing Itzpapalotl");
+      print(`020: making per database data ${dbCount}`);
+      print("020: installing Itzpapalotl");
       // installFoxx('/itz', itzpapalotlZip, "install", options);
 
       installFoxx(`/itz_${dbCount}`, itzpapalotlZip, "install", options);
@@ -167,28 +167,28 @@ const crudTestServiceSource = {
         `/_db/_system/crud_${dbCount}/xxx`
       ].forEach(route => testFoxxReady(route));
 
-      print("Foxx: Itzpapalotl getting the root of the gods");
+      print("020: Foxx: Itzpapalotl getting the root of the gods");
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}`);
       assertEqual(reply.code, "307", JSON.stringify(reply));
 
-      print('Foxx: Itzpapalotl getting index html with list of gods');
+      print('020: Foxx: Itzpapalotl getting index html with list of gods');
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}/index`);
       assertEqual(reply.code, "200", JSON.stringify(reply));
 
-      print("Foxx: Itzpapalotl summoning Chalchihuitlicue");
+      print("020: Foxx: Itzpapalotl summoning Chalchihuitlicue");
       reply = arango.GET_RAW(`/_db/_system/itz_${dbCount}/Chalchihuitlicue/summon`, onlyJson);
       assertEqual(reply.code, "200", JSON.stringify(reply));
       let parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody.name, "Chalchihuitlicue");
       assertTrue(parsedBody.summoned);
 
-      print("Foxx: crud testing get xxx");
+      print("020: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/_system/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody, []);
 
-      print("Foxx: crud testing POST xxx");
+      print("020: Foxx: crud testing POST xxx");
 
       reply = arango.POST_RAW(`/_db/_system/crud_${dbCount}/xxx`, {_key: "test"});
       if (options.readOnly) {
@@ -197,7 +197,7 @@ const crudTestServiceSource = {
         assertEqual(reply.code, "201");
       }
 
-      print("Foxx: crud testing get xxx");
+      print("020: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/_system/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
@@ -207,7 +207,7 @@ const crudTestServiceSource = {
         assertEqual(parsedBody.length, 1);
       }
 
-      print('Foxx: crud testing delete document');
+      print('020: Foxx: crud testing delete document');
       reply = arango.DELETE_RAW(`/_db/_system/crud_${dbCount}/xxx/` + 'test');
       if (options.readOnly) {
         assertEqual(reply.code, "400");
@@ -218,11 +218,11 @@ const crudTestServiceSource = {
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      print(`deleting foxx ${dbCount}`);
-      print("uninstalling Itzpapalotl");
+      print(`020: deleting foxx ${dbCount}`);
+      print("020: uninstalling Itzpapalotl");
       deleteFoxx(`/itz_${dbCount}`);
 
-      print("uninstalling crud");
+      print("020: uninstalling crud");
       deleteFoxx(`/crud_${dbCount}`);
       return 0;
     },

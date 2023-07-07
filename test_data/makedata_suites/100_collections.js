@@ -10,19 +10,19 @@ let rand = require("internal").rand;
       // All items created must contain dbCount and loopCount
       // Create a few collections:
       let c = createCollectionSafe(`c_${loopCount}`, 3, 2);
-      progress('createCollection1');
+      progress('100: createCollection1');
       let chash = createCollectionSafe(`chash_${loopCount}`, 3, 2);
-      progress('createCollection2');
+      progress('100: createCollection2');
       let cskip = createCollectionSafe(`cskip_${loopCount}`, 1, 1);
-      progress('createCollection3');
+      progress('100: createCollection3');
       let cfull = createCollectionSafe(`cfull_${loopCount}`, 3, 1);
-      progress('createCollection4');
+      progress('100: createCollection4');
       let cgeo = createCollectionSafe(`cgeo_${loopCount}`, 3, 2);
-      progress('createCollectionGeo5');
+      progress('100: createCollectionGeo5');
       let cunique = createCollectionSafe(`cunique_${loopCount}`, 1, 1);
-      progress('createCollection6');
+      progress('100: createCollection6');
       let cmulti = createCollectionSafe(`cmulti_${loopCount}`, 3, 2);
-      progress('createCollection7');
+      progress('100: createCollection7');
       let cempty = createCollectionSafe(`cempty_${loopCount}`, 3, 1);
 
       // create a special collection, which will store only one document - current arangodb version
@@ -31,25 +31,25 @@ let rand = require("internal").rand;
       version_coll.insert({"version": db._version()});
 
       // Create some indexes:
-      progress('createCollection8');
+      progress('100: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
-      progress('createIndexHash1');
+      progress('100: createIndexHash1');
       createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
-      progress('createIndexSkiplist2');
+      progress('100: createIndexSkiplist2');
       createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
-      progress('createIndexFulltext3');
+      progress('100: createIndexFulltext3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
-      progress('createIndexGeo4');
+      progress('100: createIndexGeo4');
       createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
-      progress('createIndex5');
+      progress('100: createIndex5');
       createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false});
-      progress('createIndex6');
+      progress('100: createIndex6');
       createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"]});
-      progress('createIndex7');
+      progress('100: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
-      progress('createIndexGeo8');
+      progress('100: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
-      progress('createIndexFulltext9');
+      progress('100: createIndexFulltext9');
 
       let makeRandomString = function (l) {
         var r = rand();
@@ -123,19 +123,19 @@ let rand = require("internal").rand;
 
       // Now the actual data writing:
       writeData(c, 1000);
-      progress('writeData1');
+      progress('100: writeData1');
       writeData(chash, 12345);
-      progress('writeData2');
+      progress('100: writeData2');
       writeData(cskip, 2176);
-      progress('writeData3');
+      progress('100: writeData3');
       writeData(cgeo, 5245);
-      progress('writeData4');
+      progress('100: writeData4');
       writeData(cfull, 6253);
-      progress('writeData5');
+      progress('100: writeData5');
       writeData(cunique, 5362);
-      progress('writeData6');
+      progress('100: writeData6');
       writeData(cmulti, 12346);
-      progress('writeData7');
+      progress('100: writeData7');
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       print(`checking data ${dbCount} ${loopCount}`);
@@ -176,7 +176,7 @@ let rand = require("internal").rand;
       let version_collection = db._collection(`version_collection_${loopCount}`);
 
       // Check indexes:
-      progress();
+      progress("100: checking indices");
 
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
@@ -193,7 +193,7 @@ let rand = require("internal").rand;
       if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
-      progress();
+      progress("100: checking data");
       if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
       if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
       if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
@@ -205,60 +205,61 @@ let rand = require("internal").rand;
       if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
 
       // Check a few queries:
-      progress();
+      progress("100: Query 1");
       if (db._query(`FOR x IN ${c.name()} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
-      progress();
+      progress("100: Query 2");
       if (db._query(`FOR x IN ${chash.name()} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
-      progress();
+      progress("100: Query 3");
       if (db._query(`FOR x IN ${cskip.name()} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
-      progress();
+      progress("100: Query 4");
       if (db._query(`FOR x IN ${cempty.name()} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
-      progress();
+      progress("100: Query 5");
       if (db._query(`FOR x IN ${cgeo.name()} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
-      progress();
+      progress("100: Query 6");
       if (db._query(`FOR x IN ${cunique.name()} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress();
+      progress("100: Query 7");
       if (db._query(`FOR x IN ${cmulti.name()} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
-      progress();
+      progress("100: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+      print(`clearing data ${dbCount} ${loopCount}`);
+      progress("100: drop 1");
       try {
         db._drop(`c_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 2");
       try {
         db._drop(`chash_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 3");
       try {
         db._drop(`cskip_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 4");
       try {
         db._drop(`cfull_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 5");
       try {
         db._drop(`cgeo_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 6");
       try {
         db._drop(`cunique_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 7");
       try {
         db._drop(`cmulti_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 8");
       try {
         db._drop(`cempty_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop 9");
       try {
         db._drop(`version_collection_${loopCount}`);
       } catch (e) {}
-      progress();
+      progress("100: drop done");
     }
   };
 }());
