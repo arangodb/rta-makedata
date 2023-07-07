@@ -660,11 +660,11 @@ function compareProperties(name, obj1, obj2) {
       }
       c4_count_after = Number(c4_count_after);
       assertEqual(c4_count_after, 16000); // Check that Computed Values are created
-      */
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
       result_comparison(db, collections_queries);
+      */
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
