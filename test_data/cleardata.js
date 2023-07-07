@@ -132,6 +132,6 @@ mainTestLoop(options, isCluster, enterprise, fns, function(database) {
     if (database !== "_system") {
       db._dropDatabase(databaseName);
     }
-    progress();
+    progress("mainTestLoop");
   }
 });
