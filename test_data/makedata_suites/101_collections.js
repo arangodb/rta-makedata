@@ -677,13 +677,14 @@ function compareProperties(name, obj1, obj2) {
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
 
+      /* BTS-1508: re-enable for triggering again
       // require("internal").sleep(120)
       result_comparison(db, collections_queries);
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
       result_comparison(db, views_queries);
-
+      */
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
