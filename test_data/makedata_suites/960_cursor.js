@@ -113,15 +113,17 @@ class testCursor {
             if (! cursors[i].runQuery()) {
             }
           }
-          for (;i < 30; i++) {
-            let collName = `citations_smart_${dbCount}`;
-            cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
-                                        {
-                                          "@coll": collName
-                                        },
-                                        i-18);
+          if (isCluster) {
+            for (;i < 30; i++) {
+              let collName = `citations_smart_${dbCount}`;
+              cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
+                                          {
+                                            "@coll": collName
+                                          },
+                                          i-18);
 
-            if (! cursors[i].runQuery()) {
+              if (! cursors[i].runQuery()) {
+              }
             }
           }
         }
