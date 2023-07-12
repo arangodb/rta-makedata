@@ -240,7 +240,10 @@ function ReplicationSuite() {
             let dbs;
             while (true) {
               dbs = db._databases().filter(function(db) {
-                return ((db !== '_system') && !db.startsWith('system_'));
+                return ((db !== '_system') &&
+                        !db.startsWith('system_') &&
+                        ![...db].some(char => char.charCodeAt(0) > 127)
+                       );
               });
               if (dbs.length !== 0) {
                 break;
@@ -254,7 +257,12 @@ function ReplicationSuite() {
           let pickCollection = function() {
             let collections;
             while (true) {
-              collections = db._collections().filter(function(c) { return c.name()[0] !== '_' && c.type() === 2; });
+              collections = db._collections().filter(function(c) { return (
+                c.name()[0] !== '_' &&
+                  c.type() === 2 &&
+                  ![...c.name()].some(char => char.charCodeAt(0) > 127)
+              );
+                                                                 });
               if (collections.length !== 0) {
                 break;
               }
@@ -266,7 +274,11 @@ function ReplicationSuite() {
           let pickEdgeCollection = function() {
             let collections;
             while (true) {
-              collections = db._collections().filter(function(c) { return c.name()[0] !== '_' && c.type() === 3; });
+              collections = db._collections().filter(function(c) { return (
+                c.name()[0] !== '_' &&
+                  c.type() === 3 &&
+                  ![...c.name()].some(char => char.charCodeAt(0) > 127));
+                                                                 });
               if (collections.length !== 0) {
                 break;
               }
