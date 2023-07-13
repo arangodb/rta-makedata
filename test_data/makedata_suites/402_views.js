@@ -1101,6 +1101,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let viewPSCache = db._view(`viewPSCache_${loopCount}`);
       let viewNoCache = db._view(`viewNoCache_${loopCount}`);
 
+      print(`402: check different cache values in the views`);
+
       // for 3.10.0 and 3.10.1 we should verify that no cache is present
       if (!isCacheSupported || (!isCacheSupportedOld && isCacheSupported) || !isEnterprise) {
         // we can't see 'cache fields' in current version OR
@@ -1144,12 +1146,16 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         print(`402: removing PK and PS cache fields. currVersion: ${currVersion}. oldVersion: ${oldVersion}`);
       }
 
+      print(`402: check cache values in the links of each view`);
+
       [viewSVCache, viewPSCache, viewPKCache, viewNoCache].forEach(view => {
         if (view === null) {
           return;
         }
         let actualLinks = view.properties().links;
-
+        
+        print(`402: check view: ${view.name()}`);
+        
         arangosearchTestCases.forEach(test => {
           // get link for each collection
           let collectionName = `${test["collectionName"]}_as_${loopCount}`;
@@ -1192,6 +1198,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           }
         });
       });
+
+      print(`402: check cache values for inverted index`);
 
       if (semver.gt(oldVersion, "3.10.2")) {
         invertedIndexTestCases.forEach(test => {
