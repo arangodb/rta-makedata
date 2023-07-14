@@ -16,6 +16,7 @@
 // `--progress [false]          whether to output a keepalive indicator to signal the invoker that work is ongoing
 // `--bigDoc                    Increase size of the graph documents
 // `--test                      comma separated list of testcases to filter for
+// `--tempDataDir               directory to store temporary data
 'use strict';
 const fs = require('fs');
 const _ = require('lodash');
@@ -65,7 +66,8 @@ const optionsDefaults = {
   passvoid: '',
   printTimeMeasurement: false,
   bigDoc: false,
-  test: undefined
+  test: undefined,
+  tempDataDir: "/tmp/makedata",
 };
 
 let args = _.clone(ARGUMENTS);
@@ -195,7 +197,7 @@ function createIndexSafe (options) {
   });
 }
 
-const fns = scanMakeDataPaths(options, PWD, dbVersion, dbVersion, wantFunctions, 'makeData');
+const fns = scanMakeDataPaths(options, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', true);
 mainTestLoop(options, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
