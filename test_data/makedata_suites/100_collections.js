@@ -6,28 +6,28 @@ let rand = require("internal").rand;
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
       return true;
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
+    makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and loopCount
       // Create a few collections:
-      let c = createCollectionSafe(`c_${loopCount}`, 3, 2);
+      let c = createCollectionSafe(`c_${dbCount}`, 3, 2);
       progress('100: createCollection1');
-      let chash = createCollectionSafe(`chash_${loopCount}`, 3, 2);
+      let chash = createCollectionSafe(`chash_${dbCount}`, 3, 2);
       progress('100: createCollection2');
-      let cskip = createCollectionSafe(`cskip_${loopCount}`, 1, 1);
+      let cskip = createCollectionSafe(`cskip_${dbCount}`, 1, 1);
       progress('100: createCollection3');
-      let cfull = createCollectionSafe(`cfull_${loopCount}`, 3, 1);
+      let cfull = createCollectionSafe(`cfull_${dbCount}`, 3, 1);
       progress('100: createCollection4');
-      let cgeo = createCollectionSafe(`cgeo_${loopCount}`, 3, 2);
+      let cgeo = createCollectionSafe(`cgeo_${dbCount}`, 3, 2);
       progress('100: createCollectionGeo5');
-      let cunique = createCollectionSafe(`cunique_${loopCount}`, 1, 1);
+      let cunique = createCollectionSafe(`cunique_${dbCount}`, 1, 1);
       progress('100: createCollection6');
-      let cmulti = createCollectionSafe(`cmulti_${loopCount}`, 3, 2);
+      let cmulti = createCollectionSafe(`cmulti_${dbCount}`, 3, 2);
       progress('100: createCollection7');
-      let cempty = createCollectionSafe(`cempty_${loopCount}`, 3, 1);
+      let cempty = createCollectionSafe(`cempty_${dbCount}`, 3, 1);
 
       // create a special collection, which will store only one document - current arangodb version
       // version is required for 402_views.js test case
-      let version_coll = createCollectionSafe(`version_collection_${loopCount}`, 3, 3);
+      let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 3);
       version_coll.insert({"version": db._version()});
 
       // Create some indexes:
@@ -50,7 +50,17 @@ let rand = require("internal").rand;
       progress('100: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
       progress('100: createIndexFulltext9');
-
+    },
+    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
+      let c = db[`c_${dbCount}`];
+      let chash = db[`chash_${dbCount}`];
+      let cskip = db[`cskip_${dbCount}`];
+      let cfull = db[`cfull_${dbCount}`];
+      let cgeo = db[`cgeo_${dbCount}`];
+      let cunique = db[`cunique_${dbCount}`];
+      let cmulti = db[`cmulti_${dbCount}`];
+      let cempty = db[`cempty_${dbCount}`];
+      
       let makeRandomString = function (l) {
         var r = rand();
         var d = rand();

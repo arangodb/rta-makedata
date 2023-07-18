@@ -1,4 +1,4 @@
-/* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD */
+/* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD, _ */
 
 class testCursor {
   constructor(query, bindvars, batchSize) {
@@ -62,10 +62,10 @@ class testCursor {
     this.hasMore = ret.parsedBody.hasMore;
     let reGotChunk = this.compressDocuments(ret.parsedBody.result);
     if (!_.isEqual(this.resultChunks[this.currentBatchId], reGotChunk)) {
-      print(this.resultChunks)
-      print(this.currentBatchId)
-      print(this.resultChunks[this.currentBatchId])
-      print(reGotChunk)
+      print(this.resultChunks);
+      print(this.currentBatchId);
+      print(this.resultChunks[this.currentBatchId]);
+      print(reGotChunk);
       throw new Error("960: Chunks weren't as expected: " + url);
     }
     this.currentBatchId = this.nextBatchId;
@@ -129,11 +129,11 @@ class testCursor {
         }
         while (cursors.length > 0) {
           // print(cursors.length)
-          let c = Math.floor(Math.random() * cursors.length)
+          let c = Math.floor(Math.random() * cursors.length);
           //print('c: ' + c)
           cursors[c].getLast();
           if (!cursors[c].getNext()) {
-            print('960: regetting last')
+            print('960: regetting last');
             cursors[c].getLast();
             print('960: done with ' + c);
             cursors = cursors.splice(c + 1, 1);
