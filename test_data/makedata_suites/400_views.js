@@ -5,13 +5,13 @@
     isSupported: function (version, oldVersion, enterprise, cluster) {
       return true;
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
+    makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and loopCount
-      print(`400: making data ${dbCount} ${loopCount}`);
-      let viewCollectionName = `old_cview1_${loopCount}`;
+      print(`400: making data ${dbCount}`);
+      let viewCollectionName = `old_cview1_${dbCount}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
       progress('createView1');
-      let viewName1 = `old_view1_${loopCount}`;
+      let viewName1 = `old_view1_${dbCount}`;
       let view1 = createSafe(viewName1,
                              viewname => {
                                return db._createView(viewname, "arangosearch", {});
@@ -35,26 +35,26 @@
       ]);
       progress('createView3');
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`400: checking data ${dbCount} ${loopCount}`);
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      print(`400: checking data ${dbCount}`);
       // Check view:
-      let view1 = db._view(`old_view1_${loopCount}`);
-      if (!view1.properties().links.hasOwnProperty(`old_cview1_${loopCount}`)) {
+      let view1 = db._view(`old_view1_${dbCount}`);
+      if (!view1.properties().links.hasOwnProperty(`old_cview1_${dbCount}`)) {
         throw new Error("Hass");
       }
       progress("400: view properties");
     },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`400: checking data ${dbCount} ${loopCount}`);
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`400: checking data ${dbCount}`);
 
       try {
-        db._dropView(`old_view1_${loopCount}`);
+        db._dropView(`old_view1_${dbCount}`);
       } catch (e) {
         print(`400: ${e}`);
       }
       progress("400: drop view1");
       try {
-        db._drop(`old_cview1_${loopCount}`);
+        db._drop(`old_cview1_${dbCount}`);
       } catch (e) {
         print(`400: ${e}`);
       }

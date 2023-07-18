@@ -8,13 +8,13 @@
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
       return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      // All items created must contain dbCount and loopCount
-      print(`403: making data ${dbCount} ${loopCount}`);
-      let viewCollectionName = `old_cview1_${loopCount}${extendedNames[3]}`;
+    makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      // All items created must contain dbCount
+      print(`403: making data ${dbCount}`);
+      let viewCollectionName = `old_cview1_${dbCount}${extendedNames[3]}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
       progress('403: createView1');
-      let viewName1 = `old_view1_403_${loopCount}${extendedNames[6]}`;
+      let viewName1 = `old_view1_403_${dbCount}${extendedNames[6]}`;
       let view1 = createSafe(viewName1,
                              viewname => {
                                return db._createView(viewname, "arangosearch", {});
@@ -38,27 +38,27 @@
       ]);
       progress('403: createView3');
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`403: checking data ${dbCount} ${loopCount}`);
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      print(`403: checking data ${dbCount}`);
       // Check view:
-      let view1 = db._view(`old_view1_403_${loopCount}${extendedNames[6]}`);
-      if (!view1.properties().links.hasOwnProperty(`old_cview1_${loopCount}${extendedNames[3]}`)) {
+      let view1 = db._view(`old_view1_403_${dbCount}${extendedNames[6]}`);
+      if (!view1.properties().links.hasOwnProperty(`old_cview1_${dbCount}${extendedNames[3]}`)) {
         throw new Error("403: Hass");
       }
       progress(`403: checkdata done`);
     },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`403: checking data ${dbCount} ${loopCount}`);
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`403: checking data ${dbCount}`);
 
       try {
-        db._dropView(`old_view1_403_${loopCount}${extendedNames[6]}`);
+        db._dropView(`old_view1_403_${dbCount}${extendedNames[6]}`);
       } catch (e) {
         print(`403: dropping view didn't work: ${e}`);
         throw e;
       }
       progress("403: dropping view");
       try {
-        db._drop(`old_cview1_${loopCount}${extendedNames[3]}`);
+        db._drop(`old_cview1_${dbCount}${extendedNames[3]}`);
       } catch (e) {
         print(`403: cleanup caught ${e}`);
         throw e;

@@ -15,16 +15,16 @@
       // as of 3.10 BTS-776 has to have this workaround:
       return enterprise && (cluster || semver.lt(ver, "3.10.0"));
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      // All items created must contain dbCount and loopCount
-      print(`550: making data ${dbCount} ${loopCount}`);
+    makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      // All items created must contain dbCount and dbCount
+      print(`550: making data ${dbCount} ${dbCount}`);
       // And now a smart graph (if enterprise):
-      createSafe(`G_smart_${loopCount}`, graphName => {
+      createSafe(`G_smart_${dbCount}`, graphName => {
         return gsm._create(graphName,
                            [
-                             gsm._relation(`citations_smart_${loopCount}`,
-                                           [`patents_smart_${loopCount}`],
-                                           [`patents_smart_${loopCount}`])],
+                             gsm._relation(`citations_smart_${dbCount}`,
+                                           [`patents_smart_${dbCount}`],
+                                           [`patents_smart_${dbCount}`])],
                            [],
                            {
                              numberOfShards: getShardCount(3),
@@ -35,29 +35,29 @@
         return gsm._graph(graphName);
       });
       progress('550: createEGraph2');
-      writeGraphData(db._collection(`patents_smart_${loopCount}`),
-                     db._collection(`citations_smart_${loopCount}`),
+      writeGraphData(db._collection(`patents_smart_${dbCount}`),
+                     db._collection(`citations_smart_${dbCount}`),
                      _.clone(vertices),
                      _.clone(smartEdges));
       progress('550: writeEGraph2 done');
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`550: checking data ${dbCount} ${loopCount}`);
-      const vColName = `patents_smart_${loopCount}`;
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      print(`550: checking data ${dbCount} ${dbCount}`);
+      const vColName = `patents_smart_${dbCount}`;
       let patentsSmart = db._collection(vColName);
       progress(`550: checking ${vColName} collection count`);
       if (patentsSmart.count() !== 761) {
         throw new Error(vColName + " expected count to be 761 but is: " + patentsSmart.count());
       }
-      const eColName = `citations_smart_${loopCount}`;
+      const eColName = `citations_smart_${dbCount}`;
       progress(`550: checking ${eColName} collection count`);
       let citationsSmart = db._collection(eColName);
       if (citationsSmart.count() !== 1000) {
         throw new Error(eColName + "count expected to be 1000 but is: " + citationsSmart.count());
       }
-      const gName = `G_smart_${loopCount}`;
+      const gName = `G_smart_${dbCount}`;
       progress(`550: checking query on ${gName}`);
-      let len = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${loopCount}"
+      let len = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${dbCount}"
                    GRAPH "${gName}"
                    RETURN v`).toArray().length;
       if (len !== 6) {
@@ -73,13 +73,13 @@
       }
       progress('550: done');
     },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`550: checking data ${dbCount} ${loopCount}`);
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`550: checking data ${dbCount} ${dbCount}`);
     // Drop graph:
       let gsm = require("@arangodb/smart-graph");
       progress('550 dropping smart graph');
       try {
-        gsm._drop(`G_smart_${loopCount}`, true);
+        gsm._drop(`G_smart_${dbCount}`, true);
       } catch (e) { }
     }
   };

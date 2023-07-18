@@ -858,9 +858,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     isSupported: function (version, oldVersion, enterprise, cluster) {
       return semver.gte(version, '3.9.5');
     },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      // All items created must contain dbCount and loopCount
-      print(`402: making data ${dbCount} ${loopCount}`);
+    makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      // All items created must contain dbCount and dbCount
+      print(`402: making data ${dbCount}`);
 
       let currVersion = db._version();
 
@@ -871,7 +871,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       // create view with cache in 'storedValues'
       progress('402: createViewSVCache');
-      let viewNameSVCache = `viewSVCache_${loopCount}`;
+      let viewNameSVCache = `viewSVCache_${dbCount}`;
       let viewSVCache = createSafe(viewNameSVCache,
         viewNameSVCache => {
           return db._createView(viewNameSVCache, "arangosearch", {
@@ -893,7 +893,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
         // create view with cache in 'primaryKeyCache'
         progress('402: createViewPKCache');
-        let viewNamePKCache = `viewPKCache_${loopCount}`;
+        let viewNamePKCache = `viewPKCache_${dbCount}`;
         viewPKCache = createSafe(viewNamePKCache,
           viewNamePKCache => {
             return db._createView(viewNamePKCache, "arangosearch", { 
@@ -906,7 +906,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
         // create view with cache in 'primarySort'
         progress('402: 402: createViewPSCache');
-        let viewNamePSCache = `viewPSCache_${loopCount}`;
+        let viewNamePSCache = `viewPSCache_${dbCount}`;
         viewPSCache = createSafe(viewNamePSCache,
           viewNamePSCache => {
             return db._createView(viewNamePSCache, "arangosearch", { 
@@ -924,7 +924,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       // create view with without utilizing cache
       progress('402: createViewNoCache');
-      let viewNameNoCache = `viewNoCache_${loopCount}`;
+      let viewNameNoCache = `viewNoCache_${dbCount}`;
       let viewNoCache = createSafe(viewNameNoCache,
         viewNameNoCache => {
           return db._createView(viewNameNoCache, "arangosearch", { 
@@ -957,7 +957,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       arangosearchTestCases.forEach(test => {
         // create collection for each testing link
-        let collectionName = `${test["collectionName"]}_as_${loopCount}`; // collections for testing 'arangosearch'
+        let collectionName = `${test["collectionName"]}_as_${dbCount}`; // collections for testing 'arangosearch'
         createCollectionSafe(collectionName, 3, 1);
         // insert some test data. Also insert version, on which 'make_data' was called
         db._collection(collectionName).insert([
@@ -1014,7 +1014,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       if (semver.gte(currVersion, "3.10.2")) {
         invertedIndexTestCases.forEach(test => {
           // This collection was created on previous step. Just extract the name.
-          let collectionName = `${test["collectionName"]}_ii_${loopCount}`; // collection for testing inverted index
+          let collectionName = `${test["collectionName"]}_ii_${dbCount}`; // collection for testing inverted index
           createCollectionSafe(collectionName, 3, 1);
 
           db._collection(collectionName).insert([
@@ -1075,10 +1075,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         });
       }
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`402: checking data ${dbCount} ${loopCount}`);
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      print(`402: checking data ${dbCount}`);
 
-      let oldVersion = db._query(`for d in version_collection_${loopCount} filter HAS(d, 'version') return d.version`).toArray()[0];
+      let oldVersion = db._query(`for d in version_collection_${dbCount} filter HAS(d, 'version') return d.version`).toArray()[0];
       if (semver.lt(oldVersion, '3.9.5')) {
         // old version doesn't support column cache.
         // MakeData was not called. Nothing to check here.
@@ -1096,10 +1096,10 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       }
 
-      let viewSVCache = db._view(`viewSVCache_${loopCount}`);
-      let viewPKCache = db._view(`viewPKCache_${loopCount}`);
-      let viewPSCache = db._view(`viewPSCache_${loopCount}`);
-      let viewNoCache = db._view(`viewNoCache_${loopCount}`);
+      let viewSVCache = db._view(`viewSVCache_${dbCount}`);
+      let viewPKCache = db._view(`viewPKCache_${dbCount}`);
+      let viewPSCache = db._view(`viewPSCache_${dbCount}`);
+      let viewNoCache = db._view(`viewNoCache_${dbCount}`);
 
       print(`402: check different cache values in the views`);
 
@@ -1158,7 +1158,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         
         arangosearchTestCases.forEach(test => {
           // get link for each collection
-          let collectionName = `${test["collectionName"]}_as_${loopCount}`;
+          let collectionName = `${test["collectionName"]}_as_${dbCount}`;
           let linkFromView = actualLinks[collectionName];
           if (!isCacheSupported || (!isCacheSupportedOld && isCacheSupported) || !isEnterprise) {
             // we can't see 'cache fields' in current version OR
@@ -1203,7 +1203,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (semver.gt(oldVersion, "3.10.2")) {
         invertedIndexTestCases.forEach(test => {
-          let collectionName = `${test["collectionName"]}_ii_${loopCount}`;
+          let collectionName = `${test["collectionName"]}_ii_${dbCount}`;
           let actualIndex = db._collection(collectionName).index(test["name"]);
 
           let expectedIndex = test;
@@ -1223,28 +1223,28 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
     },
 
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`402: removing data ${dbCount} ${loopCount}`);
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`402: removing data ${dbCount} ${dbCount}`);
       try {
-        db._dropView(`viewSVCache_${loopCount}`);
+        db._dropView(`viewSVCache_${dbCount}`);
       } catch (e) {
         print(e);
         throw e;
       }
       try {
-        db._dropView(`viewPKCache_${loopCount}`);
+        db._dropView(`viewPKCache_${dbCount}`);
       } catch (e) {
         print(e);
         throw e;
       }
       try {
-        db._dropView(`viewPSCache_${loopCount}`);
+        db._dropView(`viewPSCache_${dbCount}`);
       } catch (e) {
         print(e);
         throw e;
       }
       try {
-        db._dropView(`viewNoCache_${loopCount}`);
+        db._dropView(`viewNoCache_${dbCount}`);
       } catch (e) {
         print(e);
         throw e;
@@ -1252,12 +1252,12 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       try {
         arangosearchTestCases.forEach(test => {
           // get collection and drop it
-          let collectionName = `${test["collectionName"]}_as_${loopCount}`;
+          let collectionName = `${test["collectionName"]}_as_${dbCount}`;
           db._drop(collectionName);
         });
         invertedIndexTestCases.forEach(test => {
           // get collection and drop it
-          let collectionName = `${test["collectionName"]}_ii_${loopCount}`;
+          let collectionName = `${test["collectionName"]}_ii_${dbCount}`;
           db._drop(collectionName);
         });
       } catch (e) {

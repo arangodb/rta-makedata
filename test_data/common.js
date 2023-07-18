@@ -79,7 +79,7 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
 }
 
 function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
-  let dbCount = 0;
+  let dbCount = options.countOffset;
   while (dbCount < options.numberOfDBs) {
     tStart = time();
     timeLine = [tStart];
@@ -95,6 +95,7 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
       progress('inner Loop start');
+      print(`inner Loop start ${loopCount} ${dbCount}`);
       fns[1].forEach(func => {
         func(options,
              isCluster,
