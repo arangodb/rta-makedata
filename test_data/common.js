@@ -80,7 +80,8 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
 
 function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
   let dbCount = options.countOffset;
-  while (dbCount < options.numberOfDBs) {
+  let totalCount = options.countOffset + options.numberOfDBs;
+  while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
     fns[0].forEach(func => {
