@@ -851,8 +851,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     }
   };
 
-  let isCacheSizeSupported = function (version) {
-    return semver.gte(version, "3.9.5") && semver.neq(version, "3.10.0") && semver.neq(version, "3.10.1");
+  let isCacheSizeSupported = function (version, options) {
+    // when in bulk mode, cache size is dynamic.
+    return options.numberOfDBs === 1 && semver.gte(version, "3.9.5") && semver.neq(version, "3.10.0") && semver.neq(version, "3.10.1");
   };
   return {
     isSupported: function (version, oldVersion, enterprise, cluster) {
@@ -943,7 +944,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         }
       );
 
-      let cacheSizeSupported = isCacheSizeSupported(currVersion);
+      let cacheSizeSupported = isCacheSizeSupported(currVersion, options);
 
       let cacheSize = 0;
       let prevCacheSize = cacheSize;
