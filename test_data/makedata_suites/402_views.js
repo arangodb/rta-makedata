@@ -1087,8 +1087,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       }
 
       let currVersion = db._version();
-      let isCacheSupportedOld = isCacheSizeSupported(oldVersion);
-      let isCacheSupported = isCacheSizeSupported(currVersion);
+      let isCacheSupportedOld = isCacheSizeSupported(oldVersion, options);
+      let isCacheSupported = isCacheSizeSupported(currVersion, options);
 
       if (isCacheSupported && isCacheSupportedOld && isEnterprise) {
         let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
