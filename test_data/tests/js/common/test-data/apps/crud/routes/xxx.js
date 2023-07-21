@@ -36,10 +36,13 @@ router.get(function (req, res) {
 
 router.post(function (req, res) {
   const xxx = req.body;
+  console.log("posting %s", JSON.stringify(xxx));
   let meta;
   try {
     meta = xxxItems.save(xxx);
+    console.log("post saved to %s", JSON.stringify(meta));
   } catch (e) {
+    console.log("post caught to %s", e);
     if (e.isArangoError && e.errorNum === ARANGO_DUPLICATE) {
       throw httpError(HTTP_CONFLICT, e.message);
     }
@@ -50,6 +53,7 @@ router.post(function (req, res) {
   res.set('location', req.makeAbsolute(
     req.reverse('detail', {key: xxx._key})
   ));
+  console.log("post sending reply");
   res.send(xxx);
 }, 'create')
 .body(Xxx, 'The xxx to create.')
@@ -64,6 +68,7 @@ router.post(function (req, res) {
 
 router.get(':key', function (req, res) {
   const key = req.pathParams.key;
+  console.log("getting %s", key);
   let xxx;
   try {
     xxx = xxxItems.document(key);
@@ -85,6 +90,7 @@ router.get(':key', function (req, res) {
 
 router.put(':key', function (req, res) {
   const key = req.pathParams.key;
+  console.log("putting %s", key);
   const xxx = req.body;
   let meta;
   try {
@@ -113,6 +119,7 @@ router.put(':key', function (req, res) {
 
 router.patch(':key', function (req, res) {
   const key = req.pathParams.key;
+  console.log("patching %s", key);
   const patchData = req.body;
   let xxx;
   try {
