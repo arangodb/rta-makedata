@@ -26,5 +26,6 @@ while (count < 100000) {
 
   internal.sleep(0.1);
   count += 1;
-  print('.');
+  print(`${options.count} - ${count}.`);
 }
+print(`DONE! ${options.count}`);
