@@ -22,7 +22,6 @@ const _ = require('lodash');
 const internal = require('internal');
 const semver = require('semver');
 const arangodb = require("@arangodb");
-const console = require("console");
 const db = internal.db;
 const time = internal.time;
 const sleep = internal.sleep;
@@ -36,12 +35,20 @@ let stack = new Error().stack;
 let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
-let databaseName;
 const wantFunctions = ['makeDataDB', 'makeData'];
 
-const {
+let {
+  options,
+  setOptions,
   scanMakeDataPaths,
-  mainTestLoop
+  mainTestLoop,
+  createSafe,
+  progress,
+  getShardCount,
+  getReplicationFactor,
+  writeGraphData,
+  createCollectionSafe,
+  createIndexSafe
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -75,128 +82,17 @@ if ((args.length > 0) &&
   args = args.slice(1);
 }
 
-let options = internal.parseArgv(args, 0);
-_.defaults(options, optionsDefaults);
-
-var numberLength = Math.log(options.numberOfDBs + options.countOffset) * Math.LOG10E + 1 | 0;
+let opts = internal.parseArgv(args, 0);
+_.defaults(opts, optionsDefaults);
+setOptions(opts);
+var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E + 1 | 0;
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
-let tStart = 0;
-let timeLine = [];
-function progress (gaugeName) {
-  if (gaugeName === undefined) {
-    throw new Error("gauge name must be defined");
-  }
-  let now = time();
-  let delta = now - tStart;
-  timeLine.push(delta);
-  if (options.progress) {
-    if (options.printTimeMeasurement) {
-      print(`# - ${gaugeName},${tStart},${delta}`);
-    } else {
-      print(`# - ${gaugeName}`);
-    }
-  }
-  tStart = now;
-}
 
-function getShardCount (defaultShardCount) {
-  if (options.singleShard) {
-    return 1;
-  }
-  return defaultShardCount;
-}
 
-function getReplicationFactor (defaultReplicationFactor) {
-  if (defaultReplicationFactor > options.maxReplicationFactor) {
-    return options.maxReplicationFactor;
-  }
-  if (defaultReplicationFactor < options.minReplicationFactor) {
-    return options.minReplicationFactor;
-  }
-  return defaultReplicationFactor;
-}
-
-let bigDoc = '';
-if (options.bigDoc) {
-  for (let i = 0; i < 100000; i++) {
-    bigDoc += "abcde" + i;
-  }
-}
-function writeGraphData (V, E, vertices, edges) {
-  let gcount = 0;
-  while (gcount < options.dataMultiplier) {
-    edges.forEach(edg => {
-      edg._from = V.name() + '/' + edg._from.split('/')[1] + "" + gcount;
-      edg._to = V.name() + '/' + edg._to.split('/')[1] + "" + gcount;
-      if (options.bigDoc) {
-        edg.bigDoc = bigDoc;
-      }
-    });
-    let cVertices = _.clone(vertices);
-    cVertices.forEach(vertex => {
-      vertex['_key'] = vertex['_key'] + gcount;
-    });
-    V.insert(vertices);
-    E.insert(edges);
-    gcount += 1;
-  }
-}
-
-function createSafe (name, fn1, fnErrorExists) {
-  let countDbRetry = 0;
-  while (countDbRetry < 50) {
-    try {
-      return fn1(name);
-    } catch (x) {
-      if (x.errorNum === ERRORS.ERROR_ARANGO_DUPLICATE_NAME.code) {
-        console.error(`${databaseName}: ${name}: its already there? ${x.message} `);
-        try {
-          // make sure no local caches are there:
-          db._flushCache();
-          return fnErrorExists(name);
-        } catch (x) {
-          sleep(countDbRetry * 0.1);
-          countDbRetry += 1;
-          console.error(`${databaseName}: ${name}: isn't there anyways??? ${x.message} - ${x.stack}`);
-        }
-      } else {
-        sleep(countDbRetry * 0.1);
-        countDbRetry += 1;
-        console.error(`${databaseName}: ${name}: ${x.message} - ${x.stack}`);
-      }
-    }
-  }
-  console.error(`${name}: finally giving up anyways.`);
-  throw new Error(`${name} creation failed!`);
-}
-
-function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {
-  let defaultOptions = {
-    numberOfShards: getShardCount(DefaultNumShards),
-    replicationFactor: getReplicationFactor(DefaultReplFactor)
-  };
-  let options = {...defaultOptions, ...otherOptions};
-  return createSafe(name, colName => {
-    return db._create(colName, options);
-  }, colName => {
-    return db._collection(colName);
-  });
-}
-
-function createIndexSafe (options) {
-  let opts = _.clone(options);
-  delete opts.col;
-  return createSafe(options.col.name(), colname => {
-    options.col.ensureIndex(opts);
-  }, colName => {
-    return false; // well, its there?
-  });
-}
-
-const fns = scanMakeDataPaths(options, PWD, dbVersion, dbVersion, wantFunctions, 'makeData');
-mainTestLoop(options, isCluster, enterprise, fns, function(database) {
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData');
+mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
     db._create('_fishbowl', {
