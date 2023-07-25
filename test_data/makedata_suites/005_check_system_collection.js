@@ -3,6 +3,7 @@
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      return false;
       if(currentVersion.includes("nightly")){
         let version = semver.parse(currentVersion.split('-')[0]);
         return semver.satisfies(currentVersion, '>3.11.2 <3.12.0 || >=3.12.1');
