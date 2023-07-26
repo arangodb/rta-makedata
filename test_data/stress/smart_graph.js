@@ -12,7 +12,7 @@ let {
   progress,
   getShardCount,
   getReplicationFactor,
-  writeGraphData } = require(fs.join(PWD, "common"));
+  writeGraphData } = require(fs.join(PWD, "..", "common"));
 
 const _ = require('lodash');
 const arangodb = require('@arangodb');
@@ -25,8 +25,8 @@ let args = _.clone(ARGUMENTS);
 options = internal.parseArgv(args, 0);
 
 
-let vertices = JSON.parse(fs.readFileSync(`${PWD}/makedata_suites/500_550_570_vertices.json`));
-let smartEdges = JSON.parse(fs.readFileSync(`${PWD}/makedata_suites/550_570_edges.json`));
+let vertices = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/500_550_570_vertices.json`));
+let smartEdges = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/550_570_edges.json`));
 
 print('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
 const databaseName = `egdb_${options.count}_entGraph`;
