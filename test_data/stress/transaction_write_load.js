@@ -1,17 +1,33 @@
 /* global ARGUMENTS, print */
+const fs = require('fs');
 
 const _ = require('lodash');
 const arangodb = require('@arangodb');
 const db = arangodb.db;
 const internal = require("internal");
+const sleep = internal.sleep;
+let PWDRE = /.*at (.*)transaction_write_load.js.*/;
+let stack = new Error().stack;
+let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
+
+let {
+  options,
+  setOptions,
+  createCollectionSafe,
+  createSafe,
+  progress,
+  getShardCount,
+  getReplicationFactor,
+  writeGraphData } = require(fs.join(PWD, "..", "common"));
 
 let args = _.clone(ARGUMENTS);
 
-let options = internal.parseArgv(args, 0);
+let opts = internal.parseArgv(args, 0);
+setOptions(opts);
 
-print('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
-let c = db._create(`transaction_${options.count}`, {numberOfShards: 2});
-
+let c =createCollectionSafe(`transaction_${opts.count}`, 3, 1);
+sleep(10);
+console.log('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
 let count = 0;
 while (count < 100000) {
   let trx = db._createTransaction({
@@ -26,6 +42,6 @@ while (count < 100000) {
 
   internal.sleep(0.1);
   count += 1;
-  print(`${options.count} - ${count}.`);
+  print(`${opts.count} - ${count}.`);
 }
 print(`DONE! ${options.count}`);

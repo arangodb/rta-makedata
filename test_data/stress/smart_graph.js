@@ -8,6 +8,7 @@ let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 
 let {
   options,
+  setOptions,
   createSafe,
   progress,
   getShardCount,
@@ -19,17 +20,16 @@ const arangodb = require('@arangodb');
 const db = arangodb.db;
 const internal = require("internal");
 const time = internal.time;
+const sleep = internal.sleep;
 
 let args = _.clone(ARGUMENTS);
 
-options = internal.parseArgv(args, 0);
+let opts = internal.parseArgv(args, 0);
+
+setOptions(opts);
 
 
-let vertices = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/500_550_570_vertices.json`));
-let smartEdges = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/550_570_edges.json`));
-
-print('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
-const databaseName = `egdb_${options.count}_entGraph`;
+const databaseName = `egdb_${opts.count}_entGraph`;
 const created = createSafe(databaseName,
                            dbname => {
                              db._flushCache();
@@ -41,13 +41,13 @@ const created = createSafe(databaseName,
                            }
                           );
 progress(`created database '${databaseName}'`);
-createSafe(`G_enterprise_${options.count}`, graphName => {
+createSafe(`G_enterprise_${opts.count}`, graphName => {
   return egm._create(graphName,
                      [
                        {
-                         "collection": `citations_enterprise_${options.count}`,
-                         "to": [`patents_enterprise_${options.count}`],
-                         "from": [`patents_enterprise_${options.count}`]
+                         "collection": `citations_enterprise_${opts.count}`,
+                         "to": [`patents_enterprise_${opts.count}`],
+                         "from": [`patents_enterprise_${opts.count}`]
                        }
                      ],
                      [],
@@ -59,9 +59,14 @@ createSafe(`G_enterprise_${options.count}`, graphName => {
 }, graphName => {
   return egm._graph(graphName);
 });
+sleep(10);
+console.log('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
+let vertices = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/500_550_570_vertices.json`));
+let smartEdges = JSON.parse(fs.readFileSync(`${PWD}/../makedata_suites/550_570_edges.json`));
+
 progress('createEGraph2');
-let E = db._collection(`citations_enterprise_${options.count}`);
-let V = db._collection(`patents_enterprise_${options.count}`);
+let E = db._collection(`citations_enterprise_${opts.count}`);
+let V = db._collection(`patents_enterprise_${opts.count}`);
 writeGraphData(V,
                E,
                _.clone(vertices),
@@ -76,6 +81,6 @@ while (count < 100000) {
     E.insert(edg);
   });
   count += 1;
-  print(`${options.count} - ${count}.`);
+  print(`${opts.count} - ${count}.`);
 }
 print(`DONE! ${options.count}`);
