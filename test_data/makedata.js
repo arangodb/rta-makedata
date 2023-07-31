@@ -91,9 +91,6 @@ var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E +
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
-
-
-<<<<<<< HEAD
 function getReplicationFactor (defaultReplicationFactor) {
   if (defaultReplicationFactor > options.maxReplicationFactor) {
     return options.maxReplicationFactor;
