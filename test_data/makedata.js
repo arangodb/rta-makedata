@@ -23,7 +23,6 @@ const _ = require('lodash');
 const internal = require('internal');
 const semver = require('semver');
 const arangodb = require("@arangodb");
-const console = require("console");
 const db = internal.db;
 const time = internal.time;
 const sleep = internal.sleep;
@@ -37,12 +36,20 @@ let stack = new Error().stack;
 let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
-let databaseName;
 const wantFunctions = ['makeDataDB', 'makeData'];
 
-const {
+let {
+  options,
+  setOptions,
   scanMakeDataPaths,
-  mainTestLoop
+  mainTestLoop,
+  createSafe,
+  progress,
+  getShardCount,
+  getReplicationFactor,
+  writeGraphData,
+  createCollectionSafe,
+  createIndexSafe
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -77,39 +84,16 @@ if ((args.length > 0) &&
   args = args.slice(1);
 }
 
-let options = internal.parseArgv(args, 0);
-_.defaults(options, optionsDefaults);
-
-var numberLength = Math.log(options.numberOfDBs + options.countOffset) * Math.LOG10E + 1 | 0;
+let opts = internal.parseArgv(args, 0);
+_.defaults(opts, optionsDefaults);
+setOptions(opts);
+var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E + 1 | 0;
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
-let tStart = 0;
-let timeLine = [];
-function progress (gaugeName) {
-  if (gaugeName === undefined) {
-    throw new Error("gauge name must be defined");
-  }
-  let now = time();
-  let delta = now - tStart;
-  timeLine.push(delta);
-  if (options.progress) {
-    if (options.printTimeMeasurement) {
-      print(`# - ${gaugeName},${tStart},${delta}`);
-    } else {
-      print(`# - ${gaugeName}`);
-    }
-  }
-  tStart = now;
-}
 
-function getShardCount (defaultShardCount) {
-  if (options.singleShard) {
-    return 1;
-  }
-  return defaultShardCount;
-}
 
+<<<<<<< HEAD
 function getReplicationFactor (defaultReplicationFactor) {
   if (defaultReplicationFactor > options.maxReplicationFactor) {
     return options.maxReplicationFactor;
@@ -198,7 +182,7 @@ function createIndexSafe (options) {
 }
 
 const fns = scanMakeDataPaths(options, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', true);
-mainTestLoop(options, isCluster, enterprise, fns, function(database) {
+mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
     db._create('_fishbowl', {

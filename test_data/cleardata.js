@@ -41,7 +41,9 @@ let databaseName;
 
 const wantFunctions = ['clearDataDB', 'clearData'];
 
-const {
+let {
+  options,
+  setOptions,
   scanMakeDataPaths,
   mainTestLoop
 } = require(fs.join(PWD, 'common'));
@@ -77,10 +79,11 @@ if ((args.length > 0) &&
   args = args.slice(1);
 }
 
-let options = internal.parseArgv(args, 0);
-_.defaults(options, optionsDefaults);
+let opts = internal.parseArgv(args, 0);
+_.defaults(opts, optionsDefaults);
+setOptions(opts);
 
-var numberLength = Math.log(options.numberOfDBs + options.countOffset) * Math.LOG10E + 1 | 0;
+var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E + 1 | 0;
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
@@ -93,8 +96,8 @@ function progress (gaugeName) {
   let now = time();
   let delta = now - tStart;
   timeLine.push(delta);
-  if (options.progress) {
-    if (options.printTimeMeasurement) {
+  if (opts.progress) {
+    if (opts.printTimeMeasurement) {
       print(`# - ${gaugeName},${tStart},${delta}`);
     } else {
       print(`# - ${gaugeName}`);
@@ -106,24 +109,24 @@ function progress (gaugeName) {
 
 
 function getShardCount (defaultShardCount) {
-  if (options.singleShard) {
+  if (opts.singleShard) {
     return 1;
   }
   return defaultShardCount;
 }
 
 function getReplicationFactor (defaultReplicationFactor) {
-  if (defaultReplicationFactor > options.maxReplicationFactor) {
-    return options.maxReplicationFactor;
+  if (defaultReplicationFactor > opts.maxReplicationFactor) {
+    return opts.maxReplicationFactor;
   }
-  if (defaultReplicationFactor < options.minReplicationFactor) {
-    return options.minReplicationFactor;
+  if (defaultReplicationFactor < opts.minReplicationFactor) {
+    return opts.minReplicationFactor;
   }
   return defaultReplicationFactor;
 }
 
-const fns = scanMakeDataPaths(options, PWD, dbVersion, options.oldVersion, wantFunctions, 'clearData', false);
-mainTestLoop(options, isCluster, enterprise, fns, function(database) {
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'clearData', false);
+mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   // Drop database:
   if (database !== "_system") {
     print('#ix');
