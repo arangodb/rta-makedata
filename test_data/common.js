@@ -129,6 +129,19 @@ function createIndexSafe (options) {
   });
 }
 
+function runAqlQueryResultCount(query, expectLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length !== expectLength) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting ${expectLength} but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
+
+function runAqlQueryResultCountMultiply(query, expectLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length !== expectLength * options.dataMultiplier) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting ${expectLength * options.dataMultiplier} but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
 
 function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString) {
   let tableColumnHeaders = [
@@ -257,5 +270,7 @@ exports.getReplicationFactor = getReplicationFactor;
 exports.writeGraphData = writeGraphData;
 exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
+exports.runAqlQueryResultCount = runAqlQueryResultCount;
+exports.runAqlQueryResultCountMultiply = runAqlQueryResultCountMultiply;
 exports.setOptions = function (opts) { options = opts;};
 Object.defineProperty(exports, 'options', { get: () => options });

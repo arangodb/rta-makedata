@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time  */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql  */
 let rand = require("internal").rand;
 
 (function () {
@@ -215,20 +215,21 @@ let rand = require("internal").rand;
       if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
 
       // Check a few queries:
-      progress("100: Query 1");
-      if (db._query(`FOR x IN ${c.name()} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
-      progress("100: Query 2");
-      if (db._query(`FOR x IN ${chash.name()} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
-      progress("100: Query 3");
-      if (db._query(`FOR x IN ${cskip.name()} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
-      progress("100: Query 4");
-      if (db._query(`FOR x IN ${cempty.name()} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
-      progress("100: Query 5");
-      if (db._query(`FOR x IN ${cgeo.name()} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
-      progress("100: Query 6");
-      if (db._query(`FOR x IN ${cunique.name()} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress("100: Query 7");
-      if (db._query(`FOR x IN ${cmulti.name()} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
+      progress("100: query 1");
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
+      progress("100: query 3");
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
+      progress("100: query 3");
+      runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`,  1);
+      progress("100: query 4");
+      runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
+      progress("100: query 5");
+      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`, 1);
+      progress("100: query 6");
+      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`, 1);
+      progress("100: query 6");
+      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`, 1);
+      progress("100: queries done");
       progress("100: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {

@@ -44,16 +44,22 @@
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`550: checking data ${dbCount} ${dbCount}`);
       const vColName = `patents_smart_${dbCount}`;
+      let expectNoDocs = options.dataMultiplier * 761;
       let patentsSmart = db._collection(vColName);
       progress(`550: checking ${vColName} collection count`);
-      if (patentsSmart.count() !== 761) {
-        throw new Error(vColName + " expected count to be 761 but is: " + patentsSmart.count());
+      if (patentsSmart.count() !== expectNoDocs) {
+        throw new Error(`550: patents smart count failed: want ${expectNoDocs} but have ${patentsSmart.count()}`);
       }
       const eColName = `citations_smart_${dbCount}`;
       progress(`550: checking ${eColName} collection count`);
+      let expectNoEdges = options.dataMultiplier * 1000;
       let citationsSmart = db._collection(eColName);
-      if (citationsSmart.count() !== 1000) {
-        throw new Error(eColName + "count expected to be 1000 but is: " + citationsSmart.count());
+      if (citationsSmart.count() !== expectNoEdges) {
+        throw new Error(`550: Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
+      }
+      if (options.dataMultiplier !== 1) {
+        progress("550: skipping graph query");
+        return 0;
       }
       const gName = `G_smart_${dbCount}`;
       progress(`550: checking query on ${gName}`);

@@ -63,6 +63,7 @@
       if (baseName === "_system") {
         baseName = "system";
       }
+      let expectNoDocs = options.dataMultiplier * 761;
       const databaseName = `${baseName}_${dbCount}_entGraph`;
       db._useDatabase(databaseName);
       const vColName = `patents_enterprise_${dbCount}`;
@@ -71,17 +72,22 @@
         throw new Error(vColName + " doesn't exist!");
       }
       let patentsSmart = db._collection(vColName);
-      if (patentsSmart.count() !== 761) {
-        throw new Error(vColName + " expected count to be 761 but is: " + patentsSmart.count());
+      if (patentsSmart.count() !== expectNoDocs) {
+        throw new Error(`570: patents smart count failed: want ${expectNoDocs} but have ${patentsSmart.count()}`);
       }
       progress("570: count patents");
+      let expectNoEdges = options.dataMultiplier * 1000;
       const eColName = `citations_enterprise_${dbCount}`;
       if (colNames.find(cn => cn.name() === eColName) === undefined) {
         throw new Error(eColName + " doesn't exist!");
       }
       let citationsSmart = db._collection(eColName);
-      if (citationsSmart.count() !== 1000) {
-        throw new Error(eColName + "count expected to be 1000 but is: " + citationsSmart.count());
+      if (citationsSmart.count() !== expectNoEdges) {
+        throw new Error(`570: ${eColName} Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
+      }
+      if (options.dataMultiplier !== 1) {
+        progress("570: skipping graph query");
+        return 0;
       }
       {
         progress("570: smart traversal named graph start");

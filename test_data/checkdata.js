@@ -44,6 +44,8 @@ const wantFunctions = ['checkDataDB', 'checkData'];
 let {
   options,
   setOptions,
+  runAqlQueryResultCount,
+  runAqlQueryResultCountMultiply,
   scanMakeDataPaths,
   mainTestLoop
 } = require(fs.join(PWD, 'common'));

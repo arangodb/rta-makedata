@@ -35,27 +35,35 @@
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       progress("500: Checking patents naive");
+      let expectNoDocs = options.dataMultiplier * 761;
       let patentsNaive = db._collection(`patents_naive_${dbCount}`);
-      if (patentsNaive.count() !== 761) {
-        throw new Error("500: patents naive count failed: want 761 have " + patentsNaive.count());
+      if (patentsNaive.count() !== expectNoDocs) {
+        throw new Error(`500: patents naive count failed: want ${expectNoDocs} but have ${patentsNaive.count()}`);
       }
       progress("500: Creating citations");
+      let expectNoEdges = options.dataMultiplier * 1000;
       let citationsNaive = db._collection(`citations_naive_${dbCount}`);
-      if (citationsNaive.count() !== 1000) {
-        throw new Error("500: Citations naive count incomplete: want 1000 have: " + citationsNaive.count());
+      if (citationsNaive.count() !== expectNoEdges) {
+        throw new Error(`500: Citations naive count incomplete: want ${expectNoEdges} have: ${citationsNaive.count()}`);
+      }
+      if (options.dataMultiplier !== 1) {
+        progress("500: skipping graph query");
+        return 0;
       }
       progress("500: testing graph query");
-      if (db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/US:3858245${dbCount}"
+      let ret = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/US:3858245${dbCount}"
                  GRAPH "G_naive_${dbCount}"
-                 RETURN v`).toArray().length !== 6) {
-        throw new Error("Physalis");
+                 RETURN v`).toArray();
+      if (ret.length !== 6) {
+        throw new Error(`500: Query 1 got ${ret.length} was expecting 6: ${JSON.stringify(ret)}`);
       }
       progress("500: ");
-      if (db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/US:60095410" TO "${patentsNaive.name()}/US:49997870"
+      ret = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/US:60095410" TO "${patentsNaive.name()}/US:49997870"
                  GRAPH "G_naive_${dbCount}"
                  LIMIT 100
-                 RETURN p`).toArray().length !== 2) {
-        throw new Error("Dragonfruit");
+                 RETURN p`).toArray();
+      if (ret.length !== 2) {
+        throw new Error(`500: Query 12 got ${ret.length} was expecting 2: ${JSON.stringify(ret)}`);
       }
       progress("500: done");
     },

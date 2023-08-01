@@ -1080,7 +1080,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       print(`402: checking data ${dbCount}`);
 
       let oldVersion = db._query(`for d in version_collection_${dbCount} filter HAS(d, 'version') return d.version`).toArray()[0];
-      if (semver.lt(oldVersion, '3.9.5')) {
+      if (semver.lt(oldVersion, '3.9.5') || options.numberOfDBs !== 1) {
+        print("402: skipping checkdata");
         // old version doesn't support column cache.
         // MakeData was not called. Nothing to check here.
         return;
@@ -1103,7 +1104,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let viewNoCache = db._view(`viewNoCache_${dbCount}`);
 
       print(`402: check different cache values in the views`);
-
       // for 3.10.0 and 3.10.1 we should verify that no cache is present
       if (!isCacheSupported || (!isCacheSupportedOld && isCacheSupported) || !isEnterprise) {
         // we can't see 'cache fields' in current version OR

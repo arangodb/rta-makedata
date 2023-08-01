@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -218,30 +218,34 @@
 
       // Check data:
       progress("102: checking counts");
-      if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
 
       // Check a few queries:
       progress("102: query 1");
-      if (db._query(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
       progress("102: query 3");
-      if (db._query(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
       progress("102: query 3");
-      if (db._query(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
+      let searchId = "id" + (13948 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchId} RETURN x`,  1);
       progress("102: query 4");
-      if (db._query(aql`FOR x IN ${cempty} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
+      runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       progress("102: query 5");
-      if (db._query(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
+      searchId = "id" + (20473 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("102: query 6");
-      if (db._query(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress("102: query 6");
-      if (db._query(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
+      searchId = "id" + (32236 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchId} RETURN x`, 1);
+      progress("102: query 7");
+      searchId = "id" + (32847 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("102: queries done");
       db._useDatabase('_system');
     },
