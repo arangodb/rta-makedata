@@ -15,17 +15,17 @@ function SyncCheckSuite() {
     },
 
     testCollectionInSync: function() {
+      let firstExec = true;
       let colectionsInSync = true;
       let attempts = 100;
       do {
         colectionsInSync = true;
         let countInSync = 0;
         let countStillWaiting = 0;
-        arango.GET('/_api/replication/clusterInventory').collections.forEach(col => {
+        let cols = arango.GET('/_api/replication/clusterInventory').collections;
+        cols.forEach(col => {
           colectionsInSync &= col.allInSync;
           if (!col.allInSync) {
-            print("not in sync: ");
-            print(col);
             countStillWaiting += 1;
           } else {
             countInSync+= 1;
@@ -33,7 +33,17 @@ function SyncCheckSuite() {
         });
         if (!colectionsInSync) {
           require('internal').sleep(1);
+          if (attempts % 50 === 0) {
+            print(cols);
+          }
           print(`Amount of collection in sync: "${countInSync}". Still not in sync: ${countStillWaiting}`);
+        }
+        if (firstExec) {
+          firstExec = false;
+          if (countInSync + countStillWaiting > 100) {
+            attempts = Math.round((countInSync + countStillWaiting) * 0.8);
+            print(`Set attempts to ${attempts}`);
+          }
         }
         attempts -= 1;
       } while (!colectionsInSync && (attempts > 0));
