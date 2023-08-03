@@ -14,8 +14,10 @@
     let launchQueries = function(viewName) {
 
       // check query without sorting by score
-      let r = db._query(`FOR d IN ${viewName} SEARCH d.a == 'a' OPTIONS {waitForSync:true} LIMIT 10 RETURN d`).toArray();
-      assertEqual(r.length, 10);
+      let r1 = db._query(`FOR d IN ${viewName} SEARCH d.a == 'a' OPTIONS {waitForSync:true} LIMIT 10 RETURN d`).toArray();
+      assertEqual(r1.length, 10);
+      let r2 = db._query(`FOR d IN ${viewName} SEARCH d.b == 'b' OPTIONS {waitForSync:true} LIMIT 10 RETURN d`).toArray();
+      assertEqual(r2.length, 10);
       
       let extended_scorers = scorers;
       extended_scorers.push('BM25(@doc, 1.3, 1) DESC');
@@ -56,38 +58,27 @@
             'a': {}
           }
         };
-        meta0["links"][collectionName1] = {
-          'fields': {
-            'a': {},
-            'b': {}
-          }
-        };
         let as_view = db._createView(asViewWandName, "arangosearch", meta0);
 
-        c0.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["a", "b"], "optimizeTopK": scorers});
+        c0.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["a"], "optimizeTopK": scorers});
 
         let docs = [];
         for (let i = 0; i < 1000; ++i) {
           docs.push({a: "a", b: "b"});
         }
-        
         c0.save(docs);
         c1.save(docs);
 
-        c1.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["a"], "optimizeTopK": scorers});
+        c1.ensureIndex({"type": "inverted", "name": "inverted", "fields": ["b"], "optimizeTopK": scorers});
 
         let meta1 = {
-          "links": {},
-          'optimizeTopK': scorers
+          "links": {}
         };
-        as_view.properties(meta1, true);
-
         meta1["links"][collectionName1] = {
           'fields': {
             'b': {}
           }
         };
-        delete meta1["optimizeTopK"];
         as_view.properties(meta1, true);
 
         let sa_view = db._createView(saViewWandName, 'search-alias', {
