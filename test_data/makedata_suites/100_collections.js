@@ -217,7 +217,7 @@ let rand = require("internal").rand;
       // Check a few queries:
       progress("100: query 1");
       runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
-      progress("100: query 3");
+      progress("100: query 2");
       runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
       progress("100: query 3");
       runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`,  1);
