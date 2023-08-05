@@ -667,7 +667,6 @@ function compareProperties(name, obj1, obj2) {
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
       result_comparison(db, views_queries);
-      */
 
       return 0;
     },
