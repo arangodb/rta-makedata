@@ -25,41 +25,41 @@
       print(`102: using ${baseName}`);
       db._useDatabase(baseName);
       let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
-      progress('createCollection1');
+      progress('102: createCollection1');
       let chash = createCollectionSafe(`chash_${loopCount}${extendedNames[1]}`, 3, 2);
-      progress('createCollection2');
+      progress('102: createCollection2');
       let cskip = createCollectionSafe(`cskip_${loopCount}${extendedNames[2]}`, 1, 1);
-      progress('createCollection3');
+      progress('102: createCollection3');
       let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[3]}`, 3, 1);
-      progress('createCollection4');
+      progress('102: createCollection4');
       let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[4]}`, 3, 2);
-      progress('createCollectionGeo5');
+      progress('102: createCollectionGeo5');
       let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[5]}`, 1, 1);
-      progress('createCollection6');
+      progress('102: createCollection6');
       let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[6]}`, 3, 2);
-      progress('createCollection7');
+      progress('102: createCollection7');
       let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
 
       // Create some indexes:
-      progress('createCollection8');
+      progress('102: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false, name: extendedNames[1]});
-      progress('createIndexHash1');
+      progress('102: createIndexHash1');
       createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false, name: extendedNames[2]});
-      progress('createIndexSkiplist2');
+      progress('102: createIndexSkiplist2');
       createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4, name: extendedNames[3]});
-      progress('createIndexFulltext3');
+      progress('102: createIndexFulltext3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[4]});
-      progress('createIndexGeo4');
+      progress('102: createIndexGeo4');
       createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true, name: extendedNames[5]});
-      progress('createIndex5');
+      progress('102: createIndex5');
       createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false, name: extendedNames[6]});
-      progress('createIndex6');
+      progress('102: createIndex6');
       createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"], name: extendedNames[7]});
-      progress('createIndex7');
+      progress('102: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[8]});
-      progress('createIndexGeo8');
+      progress('102: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
-      progress('createIndexFulltext9');
+      progress('102: createIndexFulltext9');
 
       let makeRandomString = function (l) {
         var r = rand();
@@ -128,24 +128,25 @@
           //       "min   :", times[0], "\n",
           //       "max   :", times[times.length-1]);
           wcount += 1;
+          print(".");
         }
       };
 
       // Now the actual data writing:
       writeData(c, 1000);
-      progress('writeData1');
+      progress('102: writeData1');
       writeData(chash, 12345);
-      progress('writeData2');
+      progress('102: writeData2');
       writeData(cskip, 2176);
-      progress('writeData3');
+      progress('102: writeData3');
       writeData(cgeo, 5245);
-      progress('writeData4');
+      progress('102: writeData4');
       writeData(cfull, 6253);
-      progress('writeData5');
+      progress('102: writeData5');
       writeData(cunique, 5362);
-      progress('writeData6');
+      progress('102: writeData6');
       writeData(cmulti, 12346);
-      progress('writeData7');
+      progress('102: writeData7');
       db._useDatabase('_system');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {

@@ -38,13 +38,13 @@
         let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
         return semver.gte(currentVersionSemver, "3.12.0") && semver.gte(oldVersionSemver, "3.12.0");
       },
-      makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-        // All items created must contain dbCount and loopCount
-        print(`404: making data ${dbCount} ${loopCount}`);
-        let asViewWandName = `as_view_wand_${loopCount}`;
-        let saViewWandName = `sa_view_wand_${loopCount}`;
-        let collectionName0 = `collection_wand_0${loopCount}`;
-        let collectionName1 = `collection_wand_1${loopCount}`;
+      makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+        // All items created must contain dbCount and dbCount
+        print(`404: making data ${dbCount}`);
+        let asViewWandName = `as_view_wand_${dbCount}`;
+        let saViewWandName = `sa_view_wand_${dbCount}`;
+        let collectionName0 = `collection_wand_0${dbCount}`;
+        let collectionName1 = `collection_wand_1${dbCount}`;
 
         let c0 = db._create(collectionName0, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
         let c1 = db._create(collectionName1, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
