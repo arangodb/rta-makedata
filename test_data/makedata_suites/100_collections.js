@@ -151,15 +151,15 @@ let rand = require("internal").rand;
       print(`checking data ${dbCount} ${loopCount}`);
       let cols = db._collections();
       let allFound = true;
-      [`c_${loopCount}`,
-       `chash_${loopCount}`,
-       `cskip_${loopCount}`,
-       `cfull_${loopCount}`,
-       `cgeo_${loopCount}`,
-       `cunique_${loopCount}`,
-       `cmulti_${loopCount}`,
-       `cempty_${loopCount}`,
-       `version_collection_${loopCount}`].forEach(colname => {
+      [`c_${dbCount}`,
+       `chash_${dbCount}`,
+       `cskip_${dbCount}`,
+       `cfull_${dbCount}`,
+       `cgeo_${dbCount}`,
+       `cunique_${dbCount}`,
+       `cmulti_${dbCount}`,
+       `cempty_${dbCount}`,
+       `version_collection_${dbCount}`].forEach(colname => {
          let foundOne = false;
          cols.forEach(oneCol => {
            if (oneCol.name() === colname) {
@@ -167,12 +167,12 @@ let rand = require("internal").rand;
            }
          });
          if (!foundOne) {
-           print("Didn't find this collection: " + colname);
+           print("100: Didn't find this collection: " + colname);
            allFound = false;
          }
        });
       if (!allFound) {
-        throw new Error("not all collections were present on the system!");
+        throw new Error("100: not all collections were present on the system!");
       }
 
       let c = db._collection(`c_${loopCount}`);
