@@ -73,7 +73,15 @@ function writeGraphData (V, E, vertices, edges) {
       vertex['_key'] = vertex['_key'] + gcount;
     });
     V.insert(vertices);
-    E.insert(edges);
+    if (options.bigDoc) {
+      print(".");
+      let len = edges.length / 8;
+      [0, 1, 2, 3, 4, 5, 6, 7].forEach(i => {
+        E.insert(edges.slice(len*i, len * (i+1)));
+      });
+    } else {
+      E.insert(edges);
+    }
     gcount += 1;
   }
 }
