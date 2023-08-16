@@ -61,6 +61,7 @@ const optionsDefaults = {
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
   readonly: false,
+  bigDoc: false,
   numberOfDBs: 1,
   countOffset: 0,
   dataMultiplier: 1,
