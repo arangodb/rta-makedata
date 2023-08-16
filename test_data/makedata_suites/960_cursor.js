@@ -82,7 +82,7 @@ class testCursor {
         oldVersion = version;
       }
       let old = semver.parse(semver.coerce(oldVersion));
-      return semver.gte(old, "3.11.0");
+      return semver.gte(old, "3.11.0") && !options.bigDoc;
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {

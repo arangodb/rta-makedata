@@ -92,12 +92,12 @@
           launchQueries(v);
         }
       },
-      checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-        print(`404: checking data ${dbCount} ${loopCount}`);
-        let asViewWandName = `as_view_wand_${loopCount}`;
-        let saViewWandName = `sa_view_wand_${loopCount}`;
-        let collectionName0 = `collection_wand_0${loopCount}`;
-        let collectionName1 = `collection_wand_1${loopCount}`;
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+        print(`404: checking data ${dbCount} ${dbCount}`);
+        let asViewWandName = `as_view_wand_${dbCount}`;
+        let saViewWandName = `sa_view_wand_${dbCount}`;
+        let collectionName0 = `collection_wand_0${dbCount}`;
+        let collectionName1 = `collection_wand_1${dbCount}`;
 
         let asView = db._view(asViewWandName);
         let c0 = db._collection(collectionName0);
@@ -149,12 +149,12 @@
           launchQueries(v);
         }
       },
-      clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-        print(`404: removing data ${dbCount} ${loopCount}`);
-        let asViewWandName = `as_view_wand_${loopCount}`;
-        let saViewWandName = `sa_view_wand_${loopCount}`;
-        let collectionName0 = `collection_wand_0${loopCount}`;
-        let collectionName1 = `collection_wand_1${loopCount}`;
+    clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+        print(`404: removing data ${dbCount}`);
+        let asViewWandName = `as_view_wand_${dbCount}`;
+        let saViewWandName = `sa_view_wand_${dbCount}`;
+        let collectionName0 = `collection_wand_0${dbCount}`;
+        let collectionName1 = `collection_wand_1${dbCount}`;
 
         db._dropView(asViewWandName);
         db._dropView(saViewWandName);
