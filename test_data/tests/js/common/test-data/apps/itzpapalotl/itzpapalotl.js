@@ -1,5 +1,4 @@
 /*jslint indent: 2, nomen: true, maxlen: 100, white: true, plusplus: true, unparam: true */
-/*global require */
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief An example Foxx-Application for ArangoDB

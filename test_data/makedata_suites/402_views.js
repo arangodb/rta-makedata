@@ -1,6 +1,6 @@
 /* global print, progress, createCollectionSafe, db, createSafe, arango, semver */
 // these come from makedata.js / checkdata.js / cleardata.js:
-/* global _, fs, enterprise, db, database, isCluster, progress, time, PWD */
+/* global _, fs, enterprise, database, isCluster, time, PWD */
 
 const analyzers = require("@arangodb/analyzers");
 
