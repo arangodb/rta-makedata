@@ -24,7 +24,7 @@ const time = internal.time;
 
 let args = _.clone(ARGUMENTS);
 
-opts = internal.parseArgv(args, 0);
+let opts = internal.parseArgv(args, 0);
 setOptions(opts);
 
 
