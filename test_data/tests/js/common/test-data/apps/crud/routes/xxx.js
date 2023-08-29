@@ -14,6 +14,7 @@ const keySchema = joi.string().required()
 const ARANGO_NOT_FOUND = errors.ERROR_ARANGO_DOCUMENT_NOT_FOUND.code;
 const ARANGO_DUPLICATE = errors.ERROR_ARANGO_UNIQUE_CONSTRAINT_VIOLATED.code;
 const ARANGO_CONFLICT = errors.ERROR_ARANGO_CONFLICT.code;
+const ARANGO_READ_ONLY= errors.ERROR_ARANGO_READ_ONLY.code;
 const HTTP_NOT_FOUND = status('not found');
 const HTTP_CONFLICT = status('conflict');
 
@@ -46,7 +47,14 @@ router.post(function (req, res) {
     if (e.isArangoError && e.errorNum === ARANGO_DUPLICATE) {
       throw httpError(HTTP_CONFLICT, e.message);
     }
-    throw e;
+    if (e.isArangoError && e.errorNum === ARANGO_READ_ONLY) {
+      res.status(400);
+      console.log("system is read only");
+      res.send([]);
+      return;
+    } else {
+      throw e;
+    }
   }
   Object.assign(xxx, meta);
   res.status(201);
@@ -154,7 +162,14 @@ router.delete(':key', function (req, res) {
     if (e.isArangoError && e.errorNum === ARANGO_NOT_FOUND) {
       throw httpError(HTTP_NOT_FOUND, e.message);
     }
-    throw e;
+    if (e.isArangoError && e.errorNum === ARANGO_READ_ONLY) {
+      res.status(400);
+      console.log("system is read only");
+      res.send([]);
+      return;
+    } else {
+      throw e;
+    }
   }
 }, 'delete')
 .pathParam('key', keySchema)

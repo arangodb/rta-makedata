@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time  */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql  */
 let rand = require("internal").rand;
 
 (function () {
@@ -147,19 +147,19 @@ let rand = require("internal").rand;
       writeData(cmulti, 12346);
       progress('100: writeData7');
     },
-    checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`checking data ${dbCount} ${loopCount}`);
+    checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      print(`checking data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
-      [`c_${loopCount}`,
-       `chash_${loopCount}`,
-       `cskip_${loopCount}`,
-       `cfull_${loopCount}`,
-       `cgeo_${loopCount}`,
-       `cunique_${loopCount}`,
-       `cmulti_${loopCount}`,
-       `cempty_${loopCount}`,
-       `version_collection_${loopCount}`].forEach(colname => {
+      [`c_${dbCount}`,
+       `chash_${dbCount}`,
+       `cskip_${dbCount}`,
+       `cfull_${dbCount}`,
+       `cgeo_${dbCount}`,
+       `cunique_${dbCount}`,
+       `cmulti_${dbCount}`,
+       `cempty_${dbCount}`,
+       `version_collection_${dbCount}`].forEach(colname => {
          let foundOne = false;
          cols.forEach(oneCol => {
            if (oneCol.name() === colname) {
@@ -167,23 +167,23 @@ let rand = require("internal").rand;
            }
          });
          if (!foundOne) {
-           print("Didn't find this collection: " + colname);
+           print("100: Didn't find this collection: " + colname);
            allFound = false;
          }
        });
       if (!allFound) {
-        throw new Error("not all collections were present on the system!");
+        throw new Error("100: not all collections were present on the system!");
       }
 
-      let c = db._collection(`c_${loopCount}`);
-      let chash = db._collection(`chash_${loopCount}`);
-      let cskip = db._collection(`cskip_${loopCount}`);
-      let cfull = db._collection(`cfull_${loopCount}`);
-      let cgeo = db._collection(`cgeo_${loopCount}`);
-      let cunique = db._collection(`cunique_${loopCount}`);
-      let cmulti = db._collection(`cmulti_${loopCount}`);
-      let cempty = db._collection(`cempty_${loopCount}`);
-      let version_collection = db._collection(`version_collection_${loopCount}`);
+      let c = db._collection(`c_${dbCount}`);
+      let chash = db._collection(`chash_${dbCount}`);
+      let cskip = db._collection(`cskip_${dbCount}`);
+      let cfull = db._collection(`cfull_${dbCount}`);
+      let cgeo = db._collection(`cgeo_${dbCount}`);
+      let cunique = db._collection(`cunique_${dbCount}`);
+      let cmulti = db._collection(`cmulti_${dbCount}`);
+      let cempty = db._collection(`cempty_${dbCount}`);
+      let version_collection = db._collection(`version_collection_${dbCount}`);
 
       // Check indexes:
       progress("100: checking indices");
@@ -204,31 +204,36 @@ let rand = require("internal").rand;
 
       // Check data:
       progress("100: checking data");
-      if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
       if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
 
       // Check a few queries:
-      progress("100: Query 1");
-      if (db._query(`FOR x IN ${c.name()} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
-      progress("100: Query 2");
-      if (db._query(`FOR x IN ${chash.name()} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
-      progress("100: Query 3");
-      if (db._query(`FOR x IN ${cskip.name()} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
-      progress("100: Query 4");
-      if (db._query(`FOR x IN ${cempty.name()} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
-      progress("100: Query 5");
-      if (db._query(`FOR x IN ${cgeo.name()} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
-      progress("100: Query 6");
-      if (db._query(`FOR x IN ${cunique.name()} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress("100: Query 7");
-      if (db._query(`FOR x IN ${cmulti.name()} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
+      progress("100: query 1");
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
+      progress("100: query 2");
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
+      if (options.dataMultiplier === 1) {
+        progress("100: query 3");
+        runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`,  1);
+      }
+      progress("100: query 4");
+      runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
+      if (options.dataMultiplier === 1) {
+        progress("100: query 5");
+        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`, 1);
+        progress("100: query 6");
+        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`, 1);
+        progress("100: query 6");
+        runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`, 1);
+      }
+      progress("100: queries done");
       progress("100: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {

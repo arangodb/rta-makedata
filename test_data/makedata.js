@@ -49,7 +49,8 @@ let {
   getReplicationFactor,
   writeGraphData,
   createCollectionSafe,
-  createIndexSafe
+  createIndexSafe,
+  runAqlQueryResultCount
 } = require(fs.join(PWD, 'common'));
 
 const {

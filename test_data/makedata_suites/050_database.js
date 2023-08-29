@@ -1,4 +1,4 @@
-/* global arangodb, print,  db, zeroPad, createSafe, ERRORS, databaseName, createSafe */
+/* global arangodb, print,  db, zeroPad, createSafe, ERRORS, databaseName, createSafe,progress  */
 
 (function () {
   return {
@@ -19,6 +19,7 @@
           localCount++;
           return localCount;
         }
+        progress(`050: creating database ${databaseName}`);
         createSafe(databaseName,
                    dbname => {
                      db._flushCache();
@@ -42,6 +43,7 @@
       if (database !== "_system") {
         let c = zeroPad(dbCount + options.countOffset);
         let databaseName = `${database}_${c}`; // TODO: global variable :/
+        progress(`050: using database ${databaseName}`);
         db._useDatabase(databaseName);
       } else if (options.numberOfDBs > 1) {
         throw new Error("050: must specify a database prefix if want to work with multiple DBs.");

@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -25,41 +25,41 @@
       print(`102: using ${baseName}`);
       db._useDatabase(baseName);
       let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
-      progress('createCollection1');
+      progress('102: createCollection1');
       let chash = createCollectionSafe(`chash_${loopCount}${extendedNames[1]}`, 3, 2);
-      progress('createCollection2');
+      progress('102: createCollection2');
       let cskip = createCollectionSafe(`cskip_${loopCount}${extendedNames[2]}`, 1, 1);
-      progress('createCollection3');
+      progress('102: createCollection3');
       let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[3]}`, 3, 1);
-      progress('createCollection4');
+      progress('102: createCollection4');
       let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[4]}`, 3, 2);
-      progress('createCollectionGeo5');
+      progress('102: createCollectionGeo5');
       let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[5]}`, 1, 1);
-      progress('createCollection6');
+      progress('102: createCollection6');
       let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[6]}`, 3, 2);
-      progress('createCollection7');
+      progress('102: createCollection7');
       let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
 
       // Create some indexes:
-      progress('createCollection8');
+      progress('102: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false, name: extendedNames[1]});
-      progress('createIndexHash1');
+      progress('102: createIndexHash1');
       createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false, name: extendedNames[2]});
-      progress('createIndexSkiplist2');
+      progress('102: createIndexSkiplist2');
       createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4, name: extendedNames[3]});
-      progress('createIndexFulltext3');
+      progress('102: createIndexFulltext3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[4]});
-      progress('createIndexGeo4');
+      progress('102: createIndexGeo4');
       createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true, name: extendedNames[5]});
-      progress('createIndex5');
+      progress('102: createIndex5');
       createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false, name: extendedNames[6]});
-      progress('createIndex6');
+      progress('102: createIndex6');
       createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"], name: extendedNames[7]});
-      progress('createIndex7');
+      progress('102: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[8]});
-      progress('createIndexGeo8');
+      progress('102: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
-      progress('createIndexFulltext9');
+      progress('102: createIndexFulltext9');
 
       let makeRandomString = function (l) {
         var r = rand();
@@ -128,24 +128,25 @@
           //       "min   :", times[0], "\n",
           //       "max   :", times[times.length-1]);
           wcount += 1;
+          print(".");
         }
       };
 
       // Now the actual data writing:
       writeData(c, 1000);
-      progress('writeData1');
+      progress('102: writeData1');
       writeData(chash, 12345);
-      progress('writeData2');
+      progress('102: writeData2');
       writeData(cskip, 2176);
-      progress('writeData3');
+      progress('102: writeData3');
       writeData(cgeo, 5245);
-      progress('writeData4');
+      progress('102: writeData4');
       writeData(cfull, 6253);
-      progress('writeData5');
+      progress('102: writeData5');
       writeData(cunique, 5362);
-      progress('writeData6');
+      progress('102: writeData6');
       writeData(cmulti, 12346);
-      progress('writeData7');
+      progress('102: writeData7');
       db._useDatabase('_system');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -218,30 +219,34 @@
 
       // Check data:
       progress("102: checking counts");
-      if (c.count() !== 1000) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
 
       // Check a few queries:
       progress("102: query 1");
-      if (db._query(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`).toArray().length !== 1) { throw new Error("Red Currant"); }
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
       progress("102: query 3");
-      if (db._query(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`).toArray().length !== 1) { throw new Error("Blueberry"); }
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
       progress("102: query 3");
-      if (db._query(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`).toArray().length !== 1) { throw new Error("Grape"); }
+      let searchId = "id" + (13948 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchId} RETURN x`,  1);
       progress("102: query 4");
-      if (db._query(aql`FOR x IN ${cempty} RETURN x`).toArray().length !== 0) { throw new Error("Grapefruit"); }
+      runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       progress("102: query 5");
-      if (db._query(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`).toArray().length !== 1) { throw new Error("Bean"); }
+      searchId = "id" + (20473 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("102: query 6");
-      if (db._query(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`).toArray().length !== 1) { throw new Error("Watermelon"); }
-      progress("102: query 6");
-      if (db._query(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`).toArray().length !== 1) { throw new Error("Honeymelon"); }
+      searchId = "id" + (32236 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchId} RETURN x`, 1);
+      progress("102: query 7");
+      searchId = "id" + (32847 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("102: queries done");
       db._useDatabase('_system');
     },

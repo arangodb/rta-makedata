@@ -44,6 +44,8 @@ const wantFunctions = ['checkDataDB', 'checkData'];
 let {
   options,
   setOptions,
+  runAqlQueryResultCount,
+  runAqlQueryResultCountMultiply,
   scanMakeDataPaths,
   mainTestLoop
 } = require(fs.join(PWD, 'common'));
@@ -59,6 +61,7 @@ const optionsDefaults = {
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
   readonly: false,
+  bigDoc: false,
   numberOfDBs: 1,
   countOffset: 0,
   dataMultiplier: 1,

@@ -73,7 +73,15 @@ function writeGraphData (V, E, vertices, edges) {
       vertex['_key'] = vertex['_key'] + gcount;
     });
     V.insert(vertices);
-    E.insert(edges);
+    if (options.bigDoc) {
+      print(".");
+      let len = edges.length / 8;
+      [0, 1, 2, 3, 4, 5, 6, 7].forEach(i => {
+        E.insert(edges.slice(len*i, len * (i+1)));
+      });
+    } else {
+      E.insert(edges);
+    }
     gcount += 1;
   }
 }
@@ -129,6 +137,19 @@ function createIndexSafe (options) {
   });
 }
 
+function runAqlQueryResultCount(query, expectLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length !== expectLength) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting ${expectLength} but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
+
+function runAqlQueryResultCountMultiply(query, expectLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length !== expectLength * options.dataMultiplier) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting ${expectLength * options.dataMultiplier} but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
 
 function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
   var EXECUTED_TEST_SUITES_FILE = "";
@@ -279,5 +300,7 @@ exports.getReplicationFactor = getReplicationFactor;
 exports.writeGraphData = writeGraphData;
 exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
+exports.runAqlQueryResultCount = runAqlQueryResultCount;
+exports.runAqlQueryResultCountMultiply = runAqlQueryResultCountMultiply;
 exports.setOptions = function (opts) { options = opts;};
 Object.defineProperty(exports, 'options', { get: () => options });
