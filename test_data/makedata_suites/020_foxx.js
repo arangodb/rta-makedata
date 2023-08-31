@@ -161,6 +161,7 @@ const crudTestServiceSource = {
       let reply;
       db._useDatabase("_system");
 
+      testFoxxRoutingReady();
       [
         aardvarkRoute,
         `/_db/_system/itz_${dbCount}/index`,
