@@ -41,7 +41,7 @@
         throw new Error(`500: patents naive count failed: want ${expectNoDocs} but have ${patentsNaive.count()}`);
       }
       progress("500: Checking citations");
-      let docIds = ['US:3858245', 'US:60095410', 'US:49997870'];
+      let docIds = ['US:38582450', 'US:60095410', 'US:49997870'];
       if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
         [0, 1, 2].forEach(i => {
           let doc = {};

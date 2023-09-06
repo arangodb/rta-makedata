@@ -85,7 +85,7 @@
       if (citationsSmart.count() !== expectNoEdges) {
         throw new Error(`570: ${eColName} Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
       }
-      let docIds = ['US:3858245', 'IL:6009552', 'US:60095410', 'US:49997870'];
+      let docIds = ['US:38582450', 'IL:60095520', 'US:60095410', 'US:49997870'];
       if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
         [0, 1, 2, 3].forEach(i => {
           let doc = {};
@@ -125,9 +125,9 @@
                     RETURN v
                     `;
         progress(`570: running query: ${query}\n`);
-        let len = db._query(query).toArray().length;
-        if (len !== 5) {
-          throw new Error("Red Currant 5 != " + len);
+        let ret = db._query(query).toArray();
+        if (ret.length !== 5) {
+          throw new Error(`Graph query ${query} failed: 5 != ${ret.length} ${JSON.stringify(ret)}`);
         }
       }
       progress("570: ");
