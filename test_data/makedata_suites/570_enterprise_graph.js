@@ -85,6 +85,19 @@
       if (citationsSmart.count() !== expectNoEdges) {
         throw new Error(`570: ${eColName} Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
       }
+      let docIds = ['US:3858245', 'IL:6009552', 'US:60095410', 'US:49997870'];
+      if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
+        [0, 1, 2, 3].forEach(i => {
+          let doc = {};
+          do {
+            try {
+              doc = patentsSmart.document(docIds[i]);
+            } catch (ex) {
+              docIds[i] = docIds[i] + '0';
+            }
+          } while (!doc.hasOwnProperty('_key'));
+        });
+      }
       if (options.dataMultiplier !== 1) {
         progress("570: skipping graph query");
         return 0;
@@ -93,7 +106,7 @@
         progress("570: smart traversal named graph start");
         //traverse enterprise graph
         const gName = `G_enterprise_${dbCount}`;
-        let query = `FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${dbCount}"
+        let query = `FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/${docIds[0]}"
                        GRAPH "${gName}"
                        RETURN v`;
         progress(`570: running query: ${query}\n`);
@@ -107,7 +120,7 @@
         //use enterprise graph's edge collection as an anonymous graph
         let query = `
                     WITH ${patentsSmart.name()}
-                    FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/IL:6009552${dbCount}"
+                    FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/${docIds[1]}"
                     ${citationsSmart.name()}
                     RETURN v
                     `;
@@ -119,19 +132,19 @@
       }
       progress("570: ");
       {
-          //check K_SHORTEST_PATHS query on an enterprise graph
-          const gName = `G_enterprise_${dbCount}`;
-          let query = `
-                 FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/US:60095410" TO "${patentsSmart.name()}/US:49997870"
+        //check K_SHORTEST_PATHS query on an enterprise graph
+        const gName = `G_enterprise_${dbCount}`;
+        let query = `
+                 FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/${docIds[2]}" TO "${patentsSmart.name()}/${docIds[3]}"
                  GRAPH "${gName}"
                  LIMIT 100
                  RETURN p
                     `;
-          progress(`running query: ${query}\n`);
-          let len = db._query(query).toArray().length;
-          if (len !== 2) {
-            throw new Error("Yellow Currant 2 != " + len);
-          }
+        progress(`running query: ${query}\n`);
+        let ret = db._query(query).toArray();
+        if (ret.length !== 2) {
+          throw new Error(`Graph query ${query} failed: 2 != ${ret.length} ${JSON.stringify(ret)}`);
+        }
       }
       progress("570: done");
       return 0;
