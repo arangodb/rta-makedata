@@ -23,6 +23,7 @@ function loadFoxxIntoZip (path) {
 }
 
 function installFoxx (mountpoint, which, mode, options) {
+  print(`Installing Foxx  to ${mountpoint}`);
   let headers = {};
   let content;
   if (which.type === 'js') {
@@ -160,7 +161,6 @@ const crudTestServiceSource = {
       print(`checking data ${dbCount} `);
       let reply;
       db._useDatabase("_system");
-
       testFoxxRoutingReady();
       [
         aardvarkRoute,
