@@ -57,25 +57,36 @@
       if (citationsSmart.count() !== expectNoEdges) {
         throw new Error(`550: Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
       }
-      if (options.dataMultiplier !== 1) {
-        progress("550: skipping graph query");
-        return 0;
+      let docIds = ['US:38582450', 'US:60095410', 'US:49997870'];
+      if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
+        [0, 1, 2, 3].forEach(i => {
+          let doc = {};
+          do {
+            try {
+              doc = patentsSmart.document(docIds[i]);
+            } catch (ex) {
+              docIds[i] = docIds[i] + '0';
+            }
+          } while (!doc.hasOwnProperty('_key'));
+        });
       }
       const gName = `G_smart_${dbCount}`;
       progress(`550: checking query on ${gName}`);
-      let len = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/US:3858245${dbCount}"
+      let query = `FOR v, e, p IN 1..10 OUTBOUND "${patentsSmart.name()}/${docIds[0]}"
                    GRAPH "${gName}"
-                   RETURN v`).toArray().length;
-      if (len !== 6) {
-        throw new Error("Black Currant 6 != " + len);
+                   RETURN v`;
+      let result = db._query(query).toArray();
+      if (result.length !== 6) {
+        throw new Error(`550: ${query} expected 6 results, but got ${result.length} - ${JSON.stringify(result)}`);
       }
       progress("550: ");
-      len = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/US:60095410" TO "${patentsSmart.name()}/US:49997870"
+      query = `FOR p IN ANY K_SHORTEST_PATHS "${patentsSmart.name()}/${docIds[1]}" TO "${patentsSmart.name()}/${docIds[2]}"
                  GRAPH "${gName}"
                  LIMIT 100
-                 RETURN p`).toArray().length;
-      if (len !== 2) {
-        throw new Error("White Currant 2 != " + len);
+                 RETURN p`;
+      result = db._query(query).toArray();
+      if (result.length !== 2) {
+        throw new Error(`550: ${query} expected 2 results, but got ${result.length} - ${JSON.stringify(result)}`);
       }
       progress('550: done');
     },
