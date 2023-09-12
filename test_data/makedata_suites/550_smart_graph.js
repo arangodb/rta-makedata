@@ -60,7 +60,7 @@
       let docIds = ['US:38582450', 'US:60095410', 'US:49997870'];
       let count = 0;
       if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
-        [0, 1, 2, 3].forEach(i => {
+        [0, 1, 2].forEach(i => {
           let doc = {};
           do {
             try {
