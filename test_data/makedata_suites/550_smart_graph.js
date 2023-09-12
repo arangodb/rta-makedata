@@ -58,6 +58,7 @@
         throw new Error(`550: Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
       }
       let docIds = ['US:38582450', 'US:60095410', 'US:49997870'];
+      let count = 0;
       if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
         [0, 1, 2, 3].forEach(i => {
           let doc = {};
@@ -66,6 +67,10 @@
               doc = patentsSmart.document(docIds[i]);
             } catch (ex) {
               docIds[i] = docIds[i] + '0';
+            }
+            count += 1;
+            if (count > 100) {
+              throw new Error(`failed to locate ${docIds[i]}`);
             }
           } while (!doc.hasOwnProperty('_key'));
         });
