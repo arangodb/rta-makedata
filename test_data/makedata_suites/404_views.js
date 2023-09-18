@@ -24,6 +24,7 @@
       extended_scorers.push('BM25(@doc, 1, 1) DESC');
 
       for (const s of extended_scorers) {
+        print(`404: ${s}`);
         let score = s.replace('@doc', 'd');
         let res1 = db._query(`FOR d IN ${viewName} SEARCH d.a == 'a' OPTIONS {waitForSync:true} SORT ${score} LIMIT 10 RETURN d`).toArray();
         assertEqual(res1.length, 10);

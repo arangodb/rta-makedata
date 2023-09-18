@@ -177,6 +177,10 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
     filters = options.test.split(',');
   }
+  let negFilters = [];
+  if (options.hasOwnProperty('skip') && (typeof (options.skip) !== 'undefined')) {
+    negFilters = options.skip.split(',');
+  }
   let testDir = fs.join(PWD, 'makedata_suites');
   let suites = _.filter(
     fs.list(testDir),
@@ -192,6 +196,17 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
           }
         });
         if (!found) {
+          return false;
+        }
+      }
+      if (negFilters.length > 0) {
+        let found = false;
+        negFilters.forEach(flt => {
+          if (p.search(flt) >= 0) {
+            found = true;
+          }
+        });
+        if (found) {
           return false;
         }
       }

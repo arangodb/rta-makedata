@@ -74,7 +74,7 @@
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       let dbName = `${extendedNames[0]}FoxxTest${extendedNames[3]}_${dbCount}`;
       db._useDatabase(dbName);
-      print(`021: checking data ${dbCount} ${dbName}`);
+      print(`021: checking foxx ${dbCount} ${dbName}`);
       let reply;
 
       [

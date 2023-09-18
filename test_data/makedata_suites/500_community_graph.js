@@ -40,7 +40,20 @@
       if (patentsNaive.count() !== expectNoDocs) {
         throw new Error(`500: patents naive count failed: want ${expectNoDocs} but have ${patentsNaive.count()}`);
       }
-      progress("500: Creating citations");
+      progress("500: Checking citations");
+      let docIds = ['US:38582450', 'US:60095410', 'US:49997870'];
+      if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
+        [0, 1, 2].forEach(i => {
+          let doc = {};
+          do {
+            try {
+              doc = patentsNaive.document(docIds[i]);
+            } catch (ex) {
+              docIds[i] = docIds[i] + '0';
+            }
+          } while (!doc.hasOwnProperty('_key'));
+        });
+      }
       let expectNoEdges = options.dataMultiplier * 1000;
       let citationsNaive = db._collection(`citations_naive_${dbCount}`);
       if (citationsNaive.count() !== expectNoEdges) {
@@ -51,14 +64,14 @@
         return 0;
       }
       progress("500: testing graph query");
-      let ret = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/US:3858245${dbCount}"
+      let ret = db._query(`FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/${docIds[0]}"
                  GRAPH "G_naive_${dbCount}"
                  RETURN v`).toArray();
       if (ret.length !== 6) {
-        throw new Error(`500: Query 1 got ${ret.length} was expecting 6: ${JSON.stringify(ret)}`);
+        throw new Error(`500: Query 'FOR v, e, p IN 1..10 OUTBOUND "${patentsNaive.name()}/${docIds[0]}' got ${ret.length} was expecting 6: ${JSON.stringify(ret)}`);
       }
       progress("500: ");
-      ret = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/US:60095410" TO "${patentsNaive.name()}/US:49997870"
+        ret = db._query(`FOR p IN ANY K_SHORTEST_PATHS "${patentsNaive.name()}/${docIds[1]}" TO "${patentsNaive.name()}/${docIds[2]}"
                  GRAPH "G_naive_${dbCount}"
                  LIMIT 100
                  RETURN p`).toArray();
