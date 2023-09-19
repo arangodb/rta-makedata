@@ -92,7 +92,7 @@ var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E +
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
-const fns = scanMakeDataPaths(options, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', true);
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', true);
 mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
