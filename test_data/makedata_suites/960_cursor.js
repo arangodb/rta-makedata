@@ -25,14 +25,14 @@ class testCursor {
     });
     //print(ret)
     if (ret.code !== 201) {
-      throw new Error(`960: Cursor could not be created: ${JSON.stringify(ret)}`);
+      throw new Error(`960: Cursor for query '${this.query}' could not be created: ${JSON.stringify(ret)}`);
     }
     this.hasMore = ret.parsedBody.hasMore;
     this.currentBatchId = 1;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
-    if (this.cursorId === undefined) {
-      throw new Error("960: failed to create a query with cursor: " + JSON.stringify(ret));
+    if (this.hasMore && this.cursorId === undefined) {
+      throw new Error(`960: failed to create the query '${this.query}' with cursor: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     return this.hasMore;
