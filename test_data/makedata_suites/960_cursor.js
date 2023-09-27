@@ -99,6 +99,7 @@ class testCursor {
                                      i+2);
           
           if (! cursors[i].runQuery()) {
+              delete cursors[i];
           }
         }
         if (isEnterprise) {
@@ -111,6 +112,7 @@ class testCursor {
                                         i-8);
             
             if (! cursors[i].runQuery()) {
+              delete cursors[i];
             }
           }
           if (isCluster) {
@@ -123,6 +125,7 @@ class testCursor {
                                           i-18);
 
               if (! cursors[i].runQuery()) {
+                delete cursors[i];
               }
             }
           }
