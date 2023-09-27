@@ -144,7 +144,8 @@ class testCursor {
             print('960: regetting last');
             cursors[c].getLast();
             print('960: done with ' + c);
-            cursors = cursors.splice(c + 1, 1);
+            let tail = cursor.splice(c + 1, cursors.length);
+            cursors = cursors.splice(0, c).concat(tail);
           }
         }
       } catch (ex) {
