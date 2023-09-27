@@ -100,23 +100,25 @@ class testCursor {
                                      "@coll": collName
                                    },
                                    i+2);
-          
+
           if (cur.runQuery()) {
             cursors.push(cur);
               }
         }
         if (isEnterprise) {
-          for (; i < 20; i++) {
-            let viewName = `view2_101_${dbCount}`;
-            let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
-                                     {
-                                       "@view": viewName
-                                     },
-                                     i-8);
-            
+          let viewName = `view2_101_${dbCount}`;
+          if (viewName in db.views()) {
+            for (; i < 20; i++) {
+              let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
+                                       {
+                                         "@view": viewName
+                                       },
+                                       i-8);
+
               if (cur.runQuery()) {
                 cursors.push(cur);
               }
+            }
           }
           if (isCluster) {
             for (;i < 30; i++) {
