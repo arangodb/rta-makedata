@@ -31,7 +31,10 @@ class testCursor {
     this.currentBatchId = 1;
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
-    if (this.hasMore && this.cursorId === undefined) {
+    if (!this.hasMore) {
+      throw new Error(`960: failed to create the query '${this.query}' with cursor: ${JSON.stringify(ret)}`);
+    }
+    if (this.cursorId === undefined) {
       throw new Error(`960: failed to create the query '${this.query}' with cursor: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
@@ -92,40 +95,40 @@ class testCursor {
         let i=0;
         for (; i < 10; i++) {
           let collName = `citations_naive_${dbCount}`;
-          cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
-                                      {
-                                        "@coll": collName
-                                      },
-                                     i+2);
+          let cur = new testCursor("FOR k IN @@coll RETURN k",
+                                   {
+                                     "@coll": collName
+                                   },
+                                   i+2);
           
-          if (! cursors[i].runQuery()) {
-              delete cursors[i];
-          }
+          if (cur.runQuery()) {
+            cursors.push(cur);
+              }
         }
         if (isEnterprise) {
           for (; i < 20; i++) {
             let viewName = `view2_101_${dbCount}`;
-            cursors[i] = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
-                                        {
-                                          "@view": viewName
-                                        },
-                                        i-8);
+            let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
+                                     {
+                                       "@view": viewName
+                                     },
+                                     i-8);
             
-            if (! cursors[i].runQuery()) {
-              delete cursors[i];
-            }
+              if (cur.runQuery()) {
+                cursors.push(cur);
+              }
           }
           if (isCluster) {
             for (;i < 30; i++) {
               let collName = `citations_smart_${dbCount}`;
-              cursors[i] = new testCursor("FOR k IN @@coll RETURN k",
-                                          {
-                                            "@coll": collName
-                                          },
-                                          i-18);
+              let cur = new testCursor("FOR k IN @@coll RETURN k",
+                                       {
+                                         "@coll": collName
+                                       },
+                                       i-18);
 
-              if (! cursors[i].runQuery()) {
-                delete cursors[i];
+              if (cur.runQuery()) {
+                cursors.push(cur);
               }
             }
           }
