@@ -107,7 +107,7 @@ class testCursor {
         }
         if (isEnterprise) {
           let viewName = `view2_101_${dbCount}`;
-          if (viewName in db.views()) {
+          if (viewName in db._views()) {
             for (; i < 20; i++) {
               let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
                                        {
