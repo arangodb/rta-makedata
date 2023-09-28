@@ -17,12 +17,13 @@ class testCursor {
     return ret;
   }
   runQuery() {
-    let ret = arango.POST_RAW('/_api/cursor', {
+    let postData = {
       "query": this.query,
       "batchSize": this.batchSize,
       "bindVars": this.bindvars,
       "options": {"stream": false, "allowRetry": true}
-    });
+    };
+    let ret = arango.POST_RAW('/_api/cursor', postData);
     //print(ret)
     if (ret.code !== 201) {
       throw new Error(`960: Cursor for query '${this.query}' could not be created: ${JSON.stringify(ret)}`);
@@ -32,10 +33,10 @@ class testCursor {
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
     if (!this.hasMore) {
-      throw new Error(`960: failed to create the query '${this.query}' with cursor: ${JSON.stringify(ret)}`);
+      throw new Error(`960: failed to create the query '${postData}' with cursor: ${JSON.stringify(ret)}`);
     }
     if (this.cursorId === undefined) {
-      throw new Error(`960: failed to create the query '${this.query}' with cursor: ${JSON.stringify(ret)}`);
+      throw new Error(`960: failed to create the query '${postData}' with cursor: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     return this.hasMore;
@@ -105,20 +106,24 @@ class testCursor {
             cursors.push(cur);
               }
         }
+
+        let offset = 8;
         if (isEnterprise) {
           let viewName = `view2_101_${dbCount}`;
-          if (viewName in db._views()) {
+          let filteredViews = db._views().filter(view => view.name() === viewName);
+          if (filteredViews.length > 0) {
             for (; i < 20; i++) {
               let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
                                        {
                                          "@view": viewName
                                        },
-                                       i-8);
+                                       i - offset);
 
               if (cur.runQuery()) {
                 cursors.push(cur);
               }
             }
+            offset += 10;
           }
           if (isCluster) {
             for (;i < 30; i++) {
@@ -127,7 +132,7 @@ class testCursor {
                                        {
                                          "@coll": collName
                                        },
-                                       i-18);
+                                       i - offset);
 
               if (cur.runQuery()) {
                 cursors.push(cur);
@@ -144,7 +149,7 @@ class testCursor {
             print('960: regetting last');
             cursors[c].getLast();
             print('960: done with ' + c);
-            let tail = cursor.splice(c + 1, cursors.length);
+            let tail = cursors.splice(c + 1, cursors.length);
             cursors = cursors.splice(0, c).concat(tail);
           }
         }
