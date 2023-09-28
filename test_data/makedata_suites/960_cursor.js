@@ -104,7 +104,7 @@ class testCursor {
 
           if (cur.runQuery()) {
             cursors.push(cur);
-              }
+          }
         }
 
         let offset = 8;
