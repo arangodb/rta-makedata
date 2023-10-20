@@ -113,7 +113,7 @@ class testCursor {
           let filteredViews = db._views().filter(view => view.name() === viewName);
           if (filteredViews.length > 0) {
             for (; i < 20; i++) {
-              let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') return doc",
+              let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') OPTIONS { waitForSync: true } return doc",
                                        {
                                          "@view": viewName
                                        },
