@@ -36,7 +36,7 @@ router.get(function (req, res) {
 
 
 router.post(function (req, res) {
-  console.log(process.env)
+  console.log(process.env);
   const xxx = req.body;
   console.log("posting %s", JSON.stringify(xxx));
   let meta;
