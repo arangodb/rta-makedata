@@ -108,16 +108,16 @@ const crudTestServiceSource = {
       try {
         let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
         if (reply.code === 404) {
-          print("selfHeal was already executed - Foxx is ready!");
+          print("020: selfHeal was already executed - Foxx is ready!");
           return 0;
         }
-        print(" Not yet ready, retrying: " + reply.parsedBody);
+        print(`020: Not yet ready, retrying: ${JSON.stringify(reply.parsedBody)}`);
       } catch (e) {
-        print(" Caught - need to retry. " + JSON.stringify(e));
+        print("020: Caught - need to retry. " + JSON.stringify(e));
       }
       internal.sleep(3);
     }
-    throw new Error("020: foxx routeing not ready on time!");
+    throw new Error("020: foxx routing not ready on time!");
   };
   let testFoxxReady = function(route) {
     for (let i = 0; i < 200; i++) {
@@ -137,7 +137,7 @@ const crudTestServiceSource = {
       }
       internal.sleep(3);
     }
-    throw new Error("foxx route '" + route + "' not ready on time!");
+    throw new Error("020: foxx route '" + route + "' not ready on time!");
   };    
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
