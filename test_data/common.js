@@ -151,7 +151,20 @@ function runAqlQueryResultCountMultiply(query, expectLength) {
   }
 }
 
-function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString) {
+function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
+  var EXECUTED_TEST_SUITES_FILE = "";
+  var previously_executed_suites = [];
+  if(excludePreviouslyExecuted) {
+    EXECUTED_TEST_SUITES_FILE = fs.join(options.tempDataDir, "executed_test_suites.json");
+    if(!fs.exists(options.tempDataDir)){
+      fs.makeDirectoryRecursive(options.tempDataDir);
+    }
+    
+    try {
+      previously_executed_suites = JSON.parse(fs.read(EXECUTED_TEST_SUITES_FILE));
+    } catch (exception) { } 
+  }
+
   let tableColumnHeaders = [
     "DB", "loop", "testname"
   ];
@@ -201,10 +214,13 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
     }).map(function (x) {
       return fs.join(fs.join(PWD, 'makedata_suites'), x);
     }).sort();
+  var executed_suites = [];
   suites.forEach(suitePath => {
     let column = [];
     let supported = "";
     let unsupported = "";
+    let pseg = suitePath.split(fs.pathSeparator);
+    let suite_filename = pseg[pseg.length - 1];    
     let suite = require("internal").load(suitePath);
     if (suite.isSupported(oldVersion, newVersion, options, enterprise, isCluster)) {
       let count = 0;
@@ -212,7 +228,10 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
         if (wantFunctions[count] in suite) {
           column.push(' X');
           supported += FNChars[count];
-          fns[count].push(suite[fn]);
+          if(!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted){
+            fns[count].push(suite[fn]);
+            executed_suites.push(suite_filename);
+          }
         } else {
           column.push(' ');
           unsupported += " ";
@@ -225,10 +244,13 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
       supported = " ";
       unsupported = " ";
     }
-    let pseg = suitePath.split(fs.pathSeparator);
-    column.push(pseg[pseg.length - 1]);
+    column.push(suite_filename);
     resultTable.addRow(column);
   });
+  if(excludePreviouslyExecuted){
+    executed_suites.forEach(suite=> {previously_executed_suites.push(suite)});
+    fs.write(EXECUTED_TEST_SUITES_FILE, JSON.stringify(previously_executed_suites));
+  }
   print(resultTable.toString());
   print(` in ${testDir}`);
   return fns;

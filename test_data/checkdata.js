@@ -73,7 +73,7 @@ const optionsDefaults = {
   oldVersion: "3.5.0",
   test: undefined,
   passvoid: '',
-  printTimeMeasurement: false,
+  printTimeMeasurement: false
 };
 
 let args = _.clone(ARGUMENTS);
@@ -127,7 +127,7 @@ function getReplicationFactor (defaultReplicationFactor) {
   return defaultReplicationFactor;
 }
 
-const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'checkData');
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'checkData', false);
 mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   if (opts.printTimeMeasurement) {
     opts.error(timeLine.join());

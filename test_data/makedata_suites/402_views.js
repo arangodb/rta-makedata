@@ -819,7 +819,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       if (ret["parsedBody"].hasOwnProperty("Health")) {
         clusterHealth = ret["parsedBody"]["Health"];
       } else {
-        print(`402: Cluster health did not return, retrying: ${ret['parsedBody']}`);
+        print(`402: Cluster health did not return, retrying: ${JSON.stringify(ret['parsedBody'])}`);
         require("internal").sleep(0.2);
         count += 1;
       }

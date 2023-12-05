@@ -125,7 +125,7 @@ function getReplicationFactor (defaultReplicationFactor) {
   return defaultReplicationFactor;
 }
 
-const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'clearData');
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'clearData', false);
 mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   // Drop database:
   if (database !== "_system") {
