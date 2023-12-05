@@ -4,19 +4,20 @@
 //   arangosh USUAL_OPTIONS_INCLUDING_AUTHENTICATION --javascript.execute makedata.js [DATABASENAME]
 // where DATABASENAME is optional and defaults to "_system". The database
 // in question is created (if it is not "_system").
-// `--minReplicationFactor [1]  don't create collections with smaller replication factor than this.
-// `--maxReplicationFactor [2]  don't create collections with a bigger replication factor than this.
-// `--dataMultiplier [1]        0 - no data; else n-times the data
-// `--numberOfDBs [1]           count of databases to create and fill
-// `--countOffset [0]           number offset at which to start the database count
-// `--bigDoc false              attach a big string to the edge documents
-// `--collectionMultiplier [1]  how many times to create the collections / index / view / graph set?
-// `--collectionCountOffset [0] number offset at which to start the database count
-// `--singleShard [false]       whether this should only be a single shard instance
-// `--progress [false]          whether to output a keepalive indicator to signal the invoker that work is ongoing
-// `--bigDoc                    Increase size of the graph documents
-// `--test                      comma separated list of testcases to filter for
-// `--tempDataDir               directory to store temporary data
+// `--minReplicationFactor [1]             don't create collections with smaller replication factor than this.
+// `--maxReplicationFactor [2]             don't create collections with a bigger replication factor than this.
+// `--dataMultiplier [1]                   0 - no data; else n-times the data
+// `--numberOfDBs [1]                      count of databases to create and fill
+// `--countOffset [0]                      number offset at which to start the database count
+// `--bigDoc false                         attach a big string to the edge documents
+// `--collectionMultiplier [1]             how many times to create the collections / index / view / graph set?
+// `--collectionCountOffset [0]            number offset at which to start the database count
+// `--singleShard [false]                  whether this should only be a single shard instance
+// `--progress [false]                     whether to output a keepalive indicator to signal the invoker that work is ongoing
+// `--bigDoc                               Increase size of the graph documents
+// `--test                                 comma separated list of testcases to filter for
+// `--tempDataDir                          directory to store temporary data
+// `--excludePreviouslyExecutedTests       If enabled, information about which tests were ran will be saved in the temporary directory. These tests will be skipped during next run. Default: false.
 'use strict';
 const fs = require('fs');
 const _ = require('lodash');
@@ -76,6 +77,7 @@ const optionsDefaults = {
   bigDoc: false,
   test: undefined,
   tempDataDir: "/tmp/makedata",
+  excludePreviouslyExecutedTests: false,
 };
 
 let args = _.clone(ARGUMENTS);
@@ -92,7 +94,7 @@ var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E +
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
-const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', true);
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', opts.excludePreviouslyExecutedTests);
 mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
