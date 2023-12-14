@@ -26,7 +26,7 @@
           break;
         }
         let options = {};
-        if (cluster) {
+        if (isCluster) {
           options = { replicationFactor: 2};
         }
         createSafe(databaseName,
