@@ -47,8 +47,8 @@
         let collectionName0 = `collection_wand_0${dbCount}`;
         let collectionName1 = `collection_wand_1${dbCount}`;
 
-        let c0 = db._create(collectionName0, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
-        let c1 = db._create(collectionName1, {"numberOfShards": 3, "replicationFactor": 3, "writeConcern": 3});
+        let c0 = db._create(collectionName0, {"numberOfShards": 3, "replicationFactor": 2, "writeConcern": 1});
+        let c1 = db._create(collectionName1, {"numberOfShards": 3, "replicationFactor": 2, "writeConcern": 1});
 
         let meta0 = {
           'links': { },
