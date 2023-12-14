@@ -959,7 +959,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       arangosearchTestCases.forEach(test => {
         // create collection for each testing link
         let collectionName = `${test["collectionName"]}_as_${dbCount}`; // collections for testing 'arangosearch'
-        createCollectionSafe(collectionName, 3, 1);
+        createCollectionSafe(collectionName, 3, 2);
         // insert some test data. Also insert version, on which 'make_data' was called
         db._collection(collectionName).insert([
           { "animal": "cat", "name": "tom", "geo_location": { "type": "Point", "coordinates": [0.937, 50.932] }, "geo_latlng": { "lat": 50.932, "lng": 6.937 } },
@@ -1016,7 +1016,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         invertedIndexTestCases.forEach(test => {
           // This collection was created on previous step. Just extract the name.
           let collectionName = `${test["collectionName"]}_ii_${dbCount}`; // collection for testing inverted index
-          createCollectionSafe(collectionName, 3, 1);
+          createCollectionSafe(collectionName, 3, 2);
 
           db._collection(collectionName).insert([
             { "animal": "cat1", "name": "tom2", "geo_location": { "type": "Point", "coordinates": [1.937, 40.932] }, "geo_latlng": { "lat": 40.932, "lng": 8 } },

@@ -9,7 +9,7 @@
       // All items created must contain dbCount and dbCount
       print(`401: making data ${dbCount}`);
       let viewCollectionName = `cview1_${dbCount}`;
-      let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
+      let cview1 = createCollectionSafe(viewCollectionName, 3, 2);
       progress('createView1');
       let viewName1 = `view1_${dbCount}`;
       let view1 = createSafe(viewName1,

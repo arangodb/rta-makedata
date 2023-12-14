@@ -27,7 +27,7 @@ let rand = require("internal").rand;
 
       // create a special collection, which will store only one document - current arangodb version
       // version is required for 402_views.js test case
-      let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 3);
+      let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 2);
       version_coll.insert({"version": db._version()});
 
       // Create some indexes:
