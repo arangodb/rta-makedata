@@ -20,10 +20,14 @@
           return localCount;
         }
         progress(`050: creating database ${databaseName}`);
+        let options = {};
+        if (cluster) {
+          options = { replicationFactor: 2};
+        }
         createSafe(databaseName,
                    dbname => {
                      db._flushCache();
-                     db._createDatabase(dbname);
+                     db._createDatabase(dbname, options);
                      return db._useDatabase(dbname);
                    }, dbname => {
                      return db._useDatabase(databaseName);

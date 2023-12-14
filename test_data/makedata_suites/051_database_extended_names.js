@@ -25,10 +25,14 @@
           print(`051: skipping ${databaseName} - its already there.`);
           break;
         }
+        let options = {};
+        if (cluster) {
+          options = { replicationFactor: 2};
+        }
         createSafe(databaseName,
           dbname => {
               db._flushCache();
-              db._createDatabase(dbname);
+              db._createDatabase(dbname, options);
           }
           );
       }
