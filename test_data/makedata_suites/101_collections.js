@@ -138,17 +138,17 @@ function compareProperties(name, obj1, obj2) {
       // getting all the collection names
       let collections_names = collections_names_declaration(dbCount);
 
-      let c0 = createCollectionSafe (collections_names[0], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN SOUNDEX('sky')", overwrite: true }] });
-      let c1 = createCollectionSafe (collections_names[1], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN SOUNDEX('dog')", overwrite: true }] });
-      let c2 = createCollectionSafe (collections_names[2], 3, 3, { computedValues: [{ "name": "default_insert", "expression": "RETURN SOUNDEX('frog')", computeOn: ["insert"], overwrite: true }] });
-      let c3 = createCollectionSafe (collections_names[3], 3, 3, { computedValues: [{ "name": "default_update", "expression": "RETURN SOUNDEX('beer')", computeOn: ["update"], overwrite: true }] });
-      let c4 = createCollectionSafe (collections_names[4], 3, 3, { computedValues: [{ "name": "default_replace", "expression": "RETURN SOUNDEX('water')", computeOn: ["replace"], overwrite: true }] });
-      let c5 = createCollectionSafe (collections_names[5], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN null", overwrite: true, keepNull: false }] });
-      let c6 = createCollectionSafe (collections_names[6], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN TO_HEX(@doc.name)", overwrite: true }] });
-      let c7 = createCollectionSafe (collections_names[7], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: false }] });
-      let c8 = createCollectionSafe (collections_names[8], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: true }] });
-      let c9 = createCollectionSafe(collections_names[9], 3, 3, { computedValues: [{ "name": "default1", "expression": "RETURN 'foo'", overwrite: true }, { "name": "default2", "expression": "RETURN 'bar'", overwrite: true }, { "name": "default3", "expression": "RETURN 'baz'", overwrite: true }] });
-      let c10 = createCollectionSafe(collections_names[10], 3, 3, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)", overwrite: true }] });
+      let c0 = createCollectionSafe (collections_names[0], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN SOUNDEX('sky')", overwrite: true }] });
+      let c1 = createCollectionSafe (collections_names[1], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN SOUNDEX('dog')", overwrite: true }] });
+      let c2 = createCollectionSafe (collections_names[2], 3, 2, { computedValues: [{ "name": "default_insert", "expression": "RETURN SOUNDEX('frog')", computeOn: ["insert"], overwrite: true }] });
+      let c3 = createCollectionSafe (collections_names[3], 3, 2, { computedValues: [{ "name": "default_update", "expression": "RETURN SOUNDEX('beer')", computeOn: ["update"], overwrite: true }] });
+      let c4 = createCollectionSafe (collections_names[4], 3, 2, { computedValues: [{ "name": "default_replace", "expression": "RETURN SOUNDEX('water')", computeOn: ["replace"], overwrite: true }] });
+      let c5 = createCollectionSafe (collections_names[5], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN null", overwrite: true, keepNull: false }] });
+      let c6 = createCollectionSafe (collections_names[6], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN TO_HEX(@doc.name)", overwrite: true }] });
+      let c7 = createCollectionSafe (collections_names[7], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: false }] });
+      let c8 = createCollectionSafe (collections_names[8], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: true }] });
+      let c9 = createCollectionSafe(collections_names[9],  3, 2, { computedValues: [{ "name": "default1", "expression": "RETURN 'foo'", overwrite: true }, { "name": "default2", "expression": "RETURN 'bar'", overwrite: true }, { "name": "default3", "expression": "RETURN 'baz'", overwrite: true }] });
+      let c10 = createCollectionSafe(collections_names[10],3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)", overwrite: true }] });
       //-------------------------------------------------------x-------------------------------------------------------------
 
       progress("101: Perform modification and comparison for desired output of Computed Values");
