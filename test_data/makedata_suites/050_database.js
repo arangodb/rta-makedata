@@ -20,14 +20,14 @@
           return localCount;
         }
         progress(`050: creating database ${databaseName}`);
-        let options = {};
+        let dbcOptions = {};
         if (isCluster) {
-          options = { replicationFactor: 2};
+          dbcOptions = { replicationFactor: 2};
         }
         createSafe(databaseName,
                    dbname => {
                      db._flushCache();
-                     db._createDatabase(dbname, options);
+                     db._createDatabase(dbname, dbcOptions);
                      return db._useDatabase(dbname);
                    }, dbname => {
                      return db._useDatabase(databaseName);
