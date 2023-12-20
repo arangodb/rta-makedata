@@ -214,7 +214,7 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
     }).map(function (x) {
       return fs.join(fs.join(PWD, 'makedata_suites'), x);
     }).sort();
-  var executed_suites = [];
+  let executed_suites = [];
   suites.forEach(suitePath => {
     let column = [];
     let supported = "";
@@ -247,8 +247,8 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
     column.push(suite_filename);
     resultTable.addRow(column);
   });
-  if(excludePreviouslyExecuted){
-    executed_suites.forEach(suite=> {previously_executed_suites.push(suite)});
+  if (excludePreviouslyExecuted) {
+    executed_suites.forEach(suite => { previously_executed_suites.push(suite); });
     fs.write(EXECUTED_TEST_SUITES_FILE, JSON.stringify(previously_executed_suites));
   }
   print(resultTable.toString());
