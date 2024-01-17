@@ -51,7 +51,13 @@ let {
   writeGraphData,
   createCollectionSafe,
   createIndexSafe,
-  runAqlQueryResultCount
+  runAqlQueryResultCount,
+  makeRandomString,
+  makeRandomNumber,
+  makeRandomTimeStamp,
+  makeRandomDoc,
+  writeData,
+  resetRCount,
 } = require(fs.join(PWD, 'common'));
 
 const {

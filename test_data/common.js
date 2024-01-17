@@ -305,6 +305,83 @@ function getMetricValue (text, name) {
   return Number(matches[0].replace(/^.*{.*}([0-9. ]+)$/, "$1"));
 }
 
+function makeRandomString (l) {
+  var r = rand();
+  var d = rand();
+  var s = "x";
+  while (s.length < l) {
+    s += r;
+    r += d;
+  }
+  return s.slice(0, l);
+};
+
+function makeRandomNumber (low, high) {
+  return (Math.abs(rand()) % (high - low)) + low;
+};
+
+function makeRandomTimeStamp () {
+  return new Date(rand() * 1000).toISOString();
+};
+
+let rcount = 1; // for uniqueness
+function resetRCount() { rcount = 1;}
+function makeRandomDoc () {
+  rcount += 1;
+  let s = "";
+  for (let i = 0; i < 10; ++i) {
+    s += " " + makeRandomString(10);
+  }
+  return { Type: makeRandomNumber(1000, 65535),
+           ID: makeRandomString(40),
+           OptOut: rand() > 0 ? 1 : 0,
+           Source: makeRandomString(14),
+           dateLast: makeRandomTimeStamp(),
+           a: "id" + rcount,
+           b: makeRandomString(20),
+           c: makeRandomString(40),
+           text: s,
+           position: {type: "Point",
+                      coordinates: [makeRandomNumber(0, 3600) / 10.0,
+                                    makeRandomNumber(-899, 899) / 10.0]
+                     }};
+};
+
+function writeData (coll, n) {
+  let wcount = 0;
+  while (wcount < options.dataMultiplier) {
+    let l = [];
+    let times = [];
+
+    for (let i = 0; i < n; ++i) {
+      l.push(makeRandomDoc());
+      if (l.length % 1000 === 0 || i === n - 1) {
+        print("%");
+        let t = time();
+        coll.insert(l);
+        let t2 = time();
+        l = [];
+        // print(i+1, t2-t);
+        times.push(t2 - t);
+      }
+    }
+    // Timings, if ever needed:
+    // times = times.sort(function(a, b) { return a-b; });
+    // print(" Median:", times[Math.floor(times.length / 2)], "\n",
+    //       "90%ile:", times[Math.floor(times.length * 0.90)], "\n",
+    //       "99%ile:", times[Math.floor(times.length * 0.99)], "\n",
+    //       "min   :", times[0], "\n",
+    //       "max   :", times[times.length-1]);
+    wcount += 1;
+  }
+};
+
+exports.makeRandomString = makeRandomString;
+exports.makeRandomNumber = makeRandomNumber;
+exports.makeRandomTimeStamp = makeRandomTimeStamp;
+exports.makeRandomDoc = makeRandomDoc;
+exports.resetRCount = resetRCount;
+exports.writeData = writeData;
 exports.scanMakeDataPaths = scanMakeDataPaths;
 exports.mainTestLoop = mainTestLoop;
 exports.getMetricValue = getMetricValue;
