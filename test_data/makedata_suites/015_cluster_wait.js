@@ -8,11 +8,8 @@
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
-      // return false;
-      //FIXME QA 362
      let old = semver.parse(semver.coerce(oldVersion));
      return (options.disabledDbserverUUID !== "" &&
-             enterprise &&
              cluster &&
              semver.gte(old, "3.10.0"));
     },
