@@ -55,6 +55,7 @@ const {
 } = require(fs.join(PWD, 'makedata_suites', '_600_analyzer_base'));
 
 const optionsDefaults = {
+  curVersion: dbVersion,
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
   numberOfDBs: 1,

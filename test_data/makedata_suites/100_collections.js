@@ -1,5 +1,4 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql  */
-let rand = require("internal").rand;
 
 (function () {
   return {

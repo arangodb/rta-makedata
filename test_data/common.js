@@ -9,6 +9,7 @@ const AsciiTable = require('ascii-table');
 const arangodb = require("@arangodb");
 const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
+let rand = require("internal").rand;
 
 function isCharDigit(n){
   return !!n.trim() && n > -1;
