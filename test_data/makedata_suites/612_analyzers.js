@@ -8,7 +8,7 @@ function getTestData_612(dbCount) {
       bindVars: {
         analyzerName: `multi_delimiter_${dbCount}`
       },
-      query: "RETURN TOKENS('some:delimited;words,with.multiple/delimiters', @analyzerName)",
+      query: "RETURN TOKENS('some:delimited;words,with.multiple/delimitersÛunicode⚽asßwell', @analyzerName)",
       analyzerProperties: [
         "multi_delimiter",
         {
@@ -18,7 +18,10 @@ function getTestData_612(dbCount) {
             ",",
             ".",
             "/",
-            " "
+            " ",
+            "⚽",
+            "ß",
+            "Û"
           ]
         },
         [
@@ -35,7 +38,10 @@ function getTestData_612(dbCount) {
           ",",
           ".",
           "/",
-          " "
+          " ",
+          "⚽",
+          "ß",
+          "Û"
         ]
       },
       expectedResult: [
@@ -54,7 +60,7 @@ function getTestData_612(dbCount) {
       bindVars: {
         analyzerName: `wildcard_${dbCount}`
       },
-      query: "RETURN TOKENS('abracadabra', @analyzerName)",
+      query: "RETURN TOKENS('ẬℬrẬc⏰adabra', @analyzerName)",
       analyzerProperties: [
         "wildcard",
         {
@@ -72,13 +78,14 @@ function getTestData_612(dbCount) {
       },
       expectedResult: [
         [
-          "abrac",
-          "braca",
-          "racad",
-          "acada",
-          "cadab",
-          "adabr",
-          "dabra"
+          "Ậ ℬ r Ậ c",
+          "ℬ r Ậ c ⏰",
+          "r Ậ c ⏰ a",
+          "Ậ c ⏰ a d",
+          "c ⏰ a d a",
+          "⏰ a d a b",
+          "a d a b r",
+          "d a b r a"
         ]
       ]
     }
