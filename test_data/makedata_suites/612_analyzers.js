@@ -78,7 +78,7 @@ function getTestData_612(dbCount) {
       },
       expectedResult: [
         [
-          "Ậ ℬ r Ậ c",
+          "Ậ ℬ r Ậ cd",
           "ℬ r Ậ c ⏰",
           "r Ậ c ⏰ a",
           "Ậ c ⏰ a d",
@@ -98,7 +98,7 @@ function getTestData_612(dbCount) {
     isSupported: function (currentVersion, oldVersion, options, enterprise) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return semver.gte(oldVersionSemver, "3.12.0");
+      return semver.gte(currentVersionSemver, "3.12.0") && semver.gte(oldVersionSemver, "3.12.0");
     },
 
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
