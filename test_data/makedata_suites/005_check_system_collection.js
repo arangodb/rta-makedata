@@ -6,9 +6,9 @@
       return false;
       if(currentVersion.includes("nightly")){
         let version = semver.parse(currentVersion.split('-')[0]);
-        return semver.satisfies(currentVersion, '>3.11.2 <3.12.0 || >=3.12.1');
+        return semver.satisfies(currentVersion, '>3.11.2 <3.12.0');
       } else {
-        return semver.satisfies(currentVersion, '>3.11.1 <3.12.0 || >=3.12.0');
+        return semver.satisfies(currentVersion, '>3.11.1 <3.12.0');
       }
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
