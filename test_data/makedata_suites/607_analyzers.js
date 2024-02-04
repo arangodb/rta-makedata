@@ -293,7 +293,7 @@ function getTestData_607(dbCount) {
       analyzerProperties: [
         "text",
         {
-          locale: "el.utf-8",
+          locale: "el",
           stemming: true,
           case: "lower",
           accent: false,
@@ -307,7 +307,7 @@ function getTestData_607(dbCount) {
       ],
       analyzerType: "text",
       properties: {
-        "locale" : "el.utf-8",
+        "locale" : "el",
         "case" : "lower",
         "stopwords" : [ ],
         "accent" : false,

@@ -30,20 +30,20 @@ function getTestData_608(dbCount) {
       },
       expectedResult: [
         [
-          "A652"
+          "U164"
         ]
       ]
     },
     {
       analyzerName: `aqlConcat_${dbCount}`,
       bindVars: {
-        param: `aqlConcat_${dbCount}`
+        analyzerName: `aqlConcat_${dbCount}`,
       },
-      query: "RETURN LOWER(LEFT(@param, 5)) == 'inter' ? CONCAT(@param, 'ism') : CONCAT('inter', @param)",
+      query: "RETURN TOKENS('international', @analyzerName)",
       analyzerProperties: [
         "aql",
         {
-          queryString: "RETURN SOUNDEX(@param)"
+          queryString: "RETURN LOWER(LEFT(@param, 5)) == 'inter' ? CONCAT(@param, 'ism') : CONCAT('inter', @param)"
         }, [
           "frequency",
           "norm",
@@ -61,12 +61,7 @@ function getTestData_608(dbCount) {
       },
       expectedResult: [
         [
-          [
-            "internationalism"
-          ],
-          [
-            "interstate"
-          ]
+          "internationalism"
         ]
       ]
     },
@@ -76,11 +71,11 @@ function getTestData_608(dbCount) {
         analyzerName: `aqlFilter_${dbCount}`,
         "@testView": `aqlView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.value IN ['regular', 'irregular'], @analyzerName) RETURN doc",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.value IN ['regular', 'irregular'], @analyzerName) RETURN doc.value",
       analyzerProperties: [
         "aql",
         {
-          queryString: "RETURN SOUNDEX(@param)"
+          queryString: "FILTER LOWER(LEFT(@param, 2)) != 'ir' RETURN @param"
         }, [
           "frequency",
           "norm",
@@ -101,12 +96,7 @@ function getTestData_608(dbCount) {
         "returnType" : "string"
       },
       expectedResult: [
-        {
-          "_key" : "41974",
-          "_id" : "coll/41974",
-          "_rev" : "_edswByC---",
-          "value" : "regular"
-        }
+        "regular"
       ]
     },
     {
@@ -120,7 +110,7 @@ function getTestData_608(dbCount) {
           pipeline: [
             { type: "norm",
               properties: {
-                locale: "en.utf-8",
+                locale: "en",
                 "case": "upper" }
             },{
               type: "ngram",
@@ -164,22 +154,20 @@ function getTestData_608(dbCount) {
       },
       expectedResult: [
         [
-          [
-            "QU",
-            "UI",
-            "IC",
-            "CK",
-            "K ",
-            " B",
-            "BR",
-            "RO",
-            "OW",
-            "WN",
-            "N ",
-            " F",
-            "FO",
-            "OX"
-          ]
+          "QU",
+          "UI",
+          "IC",
+          "CK",
+          "K ",
+          " B",
+          "BR",
+          "RO",
+          "OW",
+          "WN",
+          "N ",
+          " F",
+          "FO",
+          "OX"
         ]
       ]
     },
@@ -195,7 +183,7 @@ function getTestData_608(dbCount) {
           pipeline: [
             { type: "delimiter", properties: { delimiter: "," } },
             { type: "delimiter", properties: { delimiter: ";" } },
-            { type: "stem", properties: { locale: "en.utf-8" } }
+            { type: "stem", properties: { locale: "en" } }
           ]
         },
         [
@@ -238,7 +226,7 @@ function getTestData_608(dbCount) {
       bindVars: {
         analyzerName: `stopwords_${dbCount}`
       },
-      query: "RETURN TOKENS('delimited,stemmable;words', @analyzerName)",
+      query: "RETURN FLATTEN(TOKENS(SPLIT('the fox and the dog and a theater', ' '), @analyzerName))",
       analyzerProperties: [
         "stopwords",
         {
@@ -273,7 +261,7 @@ function getTestData_608(dbCount) {
       analyzerProperties: [
         "pipeline",
         { "pipeline": [
-          { type: "norm", properties: { locale: "en.utf-8", accent: false, case: "lower" } },
+          { type: "norm", properties: { locale: "en", accent: false, case: "lower" } },
           { type: "stopwords", properties: { stopwords: ["and","the"], hex: false } }
         ]
         },
@@ -317,7 +305,7 @@ function getTestData_608(dbCount) {
         analyzerName: `geoJson_${dbCount}`,
         "@testView": `geoJsonView_${dbCount}`
       },
-      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) RETURN MERGE(doc, { distance: GEO_DISTANCE(doc.location, point) })",
+      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) RETURN MERGE(doc.location, { distance: GEO_DISTANCE(doc.location, point) })",
       analyzerProperties: [
         "geojson",
         {},
@@ -340,30 +328,20 @@ function getTestData_608(dbCount) {
       },
       expectedResult: [
         {
-          "_id" : "geo/603",
-          "_key" : "603",
-          "_rev" : "_ef_mIDq--_",
-          "location" : {
-            "type" : "Point",
-            "coordinates" : [
-              6.937,
-              50.932
-            ]
-          },
+          "type" : "Point",
+          "coordinates" : [
+            6.937,
+            50.932
+          ],
           "distance" : 1015.8355739436823
         },
         {
-          "_id" : "geo/604",
-          "_key" : "604",
-          "_rev" : "_ef_mIDq--A",
-          "location" : {
             "type" : "Point",
             "coordinates" : [
               6.956,
               50.941
-            ]
-          },
-          "distance" : 1825.1307183571266
+            ],
+            "distance" : 1825.1307183571266
         }
       ]
     },
@@ -373,7 +351,9 @@ function getTestData_608(dbCount) {
         analyzerName: `geoPoint_${dbCount}`,
         '@testView': `geoPointView_${dbCount}`
       },
-      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) RETURN MERGE(doc, { distance: GEO_DISTANCE([doc.location[1], doc.location[0]], point) })",
+      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) RETURN MERGE({location: doc.location}, { distance: GEO_DISTANCE([doc.location[1], doc.location[0]], point) })",
+      // query: "return sleep(600)",
+      
       analyzerProperties: [
         "geopoint",
         {},
@@ -397,9 +377,6 @@ function getTestData_608(dbCount) {
       },
       expectedResult: [
         {
-          "_id" : "geo01/2977",
-          "_key" : "2977",
-          "_rev" : "_efAhNE----",
           "location" : [
             50.932,
             6.937
@@ -407,9 +384,6 @@ function getTestData_608(dbCount) {
           "distance" : 1015.8355739436823
         },
         {
-          "_id" : "geo01/2978",
-          "_key" : "2978",
-          "_rev" : "_efAhNE---_",
           "location" : [
             50.941,
             6.956

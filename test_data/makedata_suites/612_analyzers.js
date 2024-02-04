@@ -8,7 +8,7 @@ function getTestData_612(dbCount) {
       bindVars: {
         analyzerName: `multi_delimiter_${dbCount}`
       },
-      query: "RETURN TOKENS('some:delimited;words,with.multiple/delimitersÛunicode⚽asßwell', @analyzerName)",
+      query: "RETURN TOKENS('some:delimited;words,with.multiple/delimitersÛunicode⚽asßwell⚽(◕‿◕)🪗🪗⚽Û✍', @analyzerName)",
       analyzerProperties: [
         "multi_delimiter",
         {
@@ -51,7 +51,12 @@ function getTestData_612(dbCount) {
           "words",
           "with",
           "multiple",
-          "delimiters"
+          "delimiters",
+          "unicode",
+          "as",
+          "well",
+          "(◕‿◕)🪗🪗",
+          "✍"
         ]
       ]
     },
@@ -78,14 +83,19 @@ function getTestData_612(dbCount) {
       },
       expectedResult: [
         [
-          "Ậ ℬ r Ậ cd",
-          "ℬ r Ậ c ⏰",
-          "r Ậ c ⏰ a",
-          "Ậ c ⏰ a d",
-          "c ⏰ a d a",
-          "⏰ a d a b",
-          "a d a b r",
-          "d a b r a"
+          "�ẬℬrẬ",
+          "ẬℬrẬc",
+          "ℬrẬc⏰",
+          "rẬc⏰a",
+          "Ậc⏰ad",
+          "c⏰ada",
+          "⏰adab",
+          "adabr",
+          "dabra",
+          "abra�",
+          "bra�",
+          "ra�",
+          "a�"
         ]
       ]
     }
@@ -103,7 +113,6 @@ function getTestData_612(dbCount) {
 
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      // documentation link: https://www.arangodb.com/docs/3.10/analyzers.html
 
       print(`612: making per database data ${dbCount}`);
       getTestData_612(dbCount).forEach((test) => {

@@ -44,21 +44,21 @@ function checkProperties(testgroup, analyzer_name, obj1, obj2) {
   if (obj1.hasOwnProperty('legacy')) {
     obj2['legacy'] = obj1['legacy'];
   }
-  const obj1Length = Object.keys(obj1).length;
-  const obj2Length = Object.keys(obj2).length;
-  
-  if (obj1Length === obj2Length) {
-    return Object.keys(obj1).every(
-      (key) => obj2.hasOwnProperty(key)
-        && obj2[key] === obj1[key]);
-  } else {
+
+  if (!_.isEqual(obj1, obj2)) {
+    print("NOT EQUAL")
+    print("a = ", obj1);
+    print("b = ", obj2);
     throw new Error(`${testgroup}: ${analyzer_name} analyzer's type missmatched! ${JSON.stringify(obj1)} != ${JSON.stringify(obj2)}`);
   }
 };
 
       //This function will check any analyzer's equality with expected server response
 function arraysEqual(testgroup, a, b) {
-  if ((a === b) && (a === null || b === null) && (a.length !== b.length)){
+  if (!_.isEqual(a, b)){
+    print("NOT EQUAL")
+    print("a = ", a);
+    print("b = ", b);
     throw new Error("${testgroup}: Didn't get the expected response from the server!");
   }
 }
@@ -67,6 +67,7 @@ function arraysEqual(testgroup, a, b) {
 function checkAnalyzerSet(testgroup, test){
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult = db._query(test);
+  print("RESULT = ", queryResult);
 
   if (analyzers.analyzer(test.analyzerName) === null) {
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer creation failed!`);
@@ -90,7 +91,11 @@ function checkAnalyzerSet(testgroup, test){
   checkProperties(testgroup, test.analyzerName, testProperties, test.properties);
 
   progress(`${testgroup}: ${test.analyzerName} checking analyzer's query results`);
-  arraysEqual(test.expectedResult, queryResult);
+  let actual = queryResult.toArray();
+  print("EXPECTED = ", test.expectedResult)
+  print("ACTUAL = ", actual)
+
+  arraysEqual(testgroup, test.expectedResult, actual);
 
   progress(`${testgroup}: ${test.analyzerName} done`);
 }

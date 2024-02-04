@@ -26,11 +26,9 @@ function getTestData_609(dbCount) {
         "locale" : "en"
       },
       expectedResult: [
-        [
-          "a",
-          "å",
-          "b"
-        ]
+        "a",
+        "å",
+        "b"
       ]
     },
     {
@@ -56,11 +54,8 @@ function getTestData_609(dbCount) {
         "locale" : "sv"
       },
       expectedResult: [
-        [
-          "a",
-          "å",
-          "b"
-        ]
+        "a",
+        "b"
       ]
     },
     {
@@ -142,7 +137,7 @@ function getTestData_609(dbCount) {
       bindVars: {
         analyzerName: `segmentGraphic_${dbCount}`
       },
-      query: "LET str = 'Test\twith An_EMAIL-address+123@example.org' RETURN {'alpha': TOKENS(str, @analyzerName),}",
+      query: "LET str = 'Test\twith An_EMAIL-address+123@example.org' RETURN TOKENS(str, @analyzerName)",
       analyzerProperties: [
         "segmentation",
         {
@@ -160,19 +155,17 @@ function getTestData_609(dbCount) {
         "break" : "graphic"
       },
       expectedResult: [
-        {
-          "graphic" : [
-            "test",
-            "with",
-            "an_email",
-            "-",
-            "address",
-            "+",
-            "123",
-            "@",
-            "example.org"
-          ]
-        }
+        [
+          "test",
+          "with",
+          "an_email",
+          "-",
+          "address",
+          "+",
+          "123",
+          "@",
+          "example.org"
+        ]
       ]
     },
   ];
