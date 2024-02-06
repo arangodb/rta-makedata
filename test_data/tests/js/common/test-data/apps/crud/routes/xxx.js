@@ -50,8 +50,8 @@ router.post(function (req, res) {
     }
     if (e.isArangoError && e.errorNum === ARANGO_READ_ONLY) {
       res.status(400);
-      console.log("system is read only");
-      res.send([]);
+      console.log(`system is read only: ${e.message}`);
+      res.send(e);
       return;
     } else {
       throw e;
@@ -165,8 +165,8 @@ router.delete(':key', function (req, res) {
     }
     if (e.isArangoError && e.errorNum === ARANGO_READ_ONLY) {
       res.status(400);
-      console.log("system is read only");
-      res.send([]);
+      console.log(`system is read only: ${e.message}`);
+      res.send(e);
       return;
     } else {
       throw e;
