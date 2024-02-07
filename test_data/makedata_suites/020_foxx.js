@@ -193,9 +193,9 @@ const crudTestServiceSource = {
 
       reply = arango.POST_RAW(`/_db/_system/crud_${dbCount}/xxx`, {_key: "test"});
       if (options.readOnly) {
-        assertEqual(reply.code, "400");
+        assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
-        assertEqual(reply.code, "201");
+        assertEqual(reply.code, "201", JSON.stringify(reply));
       }
 
       print("020: Foxx: crud testing get xxx");

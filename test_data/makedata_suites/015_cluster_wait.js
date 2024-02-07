@@ -8,10 +8,7 @@
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
-     let old = semver.parse(semver.coerce(oldVersion));
-     return (options.disabledDbserverUUID !== "" &&
-             cluster &&
-             semver.gte(old, "3.10.0"));
+     return (options.disabledDbserverUUID !== "" && cluster);
     },
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`checking data ${dbCount}`);
