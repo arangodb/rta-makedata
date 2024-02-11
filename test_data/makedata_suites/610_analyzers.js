@@ -68,72 +68,73 @@ function getTestData_610(dbCount) {
         }
       ]
     },
-    // {
-    //   analyzerName: `nearestNeighborsSingle_${dbCount}`,
-    //   bindVars: {
-    //     analyzerName: `nearestNeighborsSingle_${dbCount}`
-    //   },
-    //   query: `LET str = "salt, oil" RETURN {"all": TOKENS(str, @analyzerName)}`,
-    //   analyzerProperties: [
-    //     "nearest_neighbors",
-    //     {
-    //       "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`
-    //     },
-    //     [
-    //       "frequency",
-    //       "norm",
-    //       "position"
-    //     ]
-    //   ],
-    //   analyzerType: "nearest_neighbors",
-    //   properties: {
-    //     "model_location" : `${PWD}/makedata_suites/610_model_cooking.bin`, 
-    //     "top_k" : 1
-    //   },
-    //   expectedResult: [
-    //     {
-    //       "all" :
-    //       [
-    //         "pepper",
-    //         "olive"
-    //       ]
-    //     }
-    //   ]
-    // },
-    // {
-    //   analyzerName: `nearestNeighborsDouble_${dbCount}`,
-    //   bindVars: {
-    //     analyzerName: `nearestNeighborsDouble_${dbCount}`
-    //   },
-    //   query: `LET str = "salt, oil"RETURN {"double": TOKENS(str, @analyzerName)}`,
-    //   analyzerProperties: [
-    //     "nearest_neighbors",
-    //     {
-    //       "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`
-    //     },
-    //     [
-    //       "frequency",
-    //       "norm",
-    //       "position"
-    //     ]
-    //   ],
-    //   analyzerType: "nearest_neighbors",
-    //   properties: {
-    //     "model_location" : `${PWD}/makedata_suites/610_model_cooking.bin`, 
-    //     "top_k" : 2
-    //   },
-    //   expectedResult: [
-    //     { 
-    //       "double" :
-    //       [ 
-    //         "pepper",
-    //         "table",
-    //         "olive",
-    //         "avocado"
-    //       ]
-    //     }
-    //   ]
-    // },
+    {
+      analyzerName: `nearestNeighborsSingle_${dbCount}`,
+      bindVars: {
+        analyzerName: `nearestNeighborsSingle_${dbCount}`
+      },
+      query: `LET str = "salt, oil" RETURN {"all": TOKENS(str, @analyzerName)}`,
+      analyzerProperties: [
+        "nearest_neighbors",
+        {
+          "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`
+        },
+        [
+          "frequency",
+          "norm",
+          "position"
+        ]
+      ],
+      analyzerType: "nearest_neighbors",
+      properties: {
+        "model_location" : `${PWD}/makedata_suites/610_model_cooking.bin`, 
+        "top_k" : 1
+      },
+      expectedResult: [
+        {
+          "all" :
+          [
+            "ingredients",
+            "as"
+          ]
+        }
+      ]
+    },
+    {
+      analyzerName: `nearestNeighborsDouble_${dbCount}`,
+      bindVars: {
+        analyzerName: `nearestNeighborsDouble_${dbCount}`
+      },
+      query: `LET str = "salt, oil"RETURN {"double": TOKENS(str, @analyzerName)}`,
+      analyzerProperties: [
+        "nearest_neighbors",
+        {
+          "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`,
+          "top_k": 2
+        },
+        [
+          "frequency",
+          "norm",
+          "position"
+        ]
+      ],
+      analyzerType: "nearest_neighbors",
+      properties: {
+        "model_location" : `${PWD}/makedata_suites/610_model_cooking.bin`, 
+        "top_k" : 2
+      },
+      expectedResult: [
+        { 
+          "double" :
+          [ 
+            "ingredients",
+            "whole",
+            "as",
+            "in"
+          ]
+        }
+      ]
+    },
     {
       analyzerName: `minhash_${dbCount}`,
       bindVars: {
