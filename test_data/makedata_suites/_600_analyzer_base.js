@@ -46,9 +46,6 @@ function checkProperties(testgroup, analyzer_name, obj1, obj2) {
   }
 
   if (!_.isEqual(obj1, obj2)) {
-    print("NOT EQUAL")
-    print("a = ", obj1);
-    print("b = ", obj2);
     throw new Error(`${testgroup}: ${analyzer_name} analyzer's type missmatched! ${JSON.stringify(obj1)} != ${JSON.stringify(obj2)}`);
   }
 };
@@ -56,9 +53,6 @@ function checkProperties(testgroup, analyzer_name, obj1, obj2) {
       //This function will check any analyzer's equality with expected server response
 function arraysEqual(testgroup, a, b) {
   if (!_.isEqual(a, b)){
-    print("NOT EQUAL")
-    print("a = ", a);
-    print("b = ", b);
     throw new Error("${testgroup}: Didn't get the expected response from the server!");
   }
 }
@@ -67,7 +61,6 @@ function arraysEqual(testgroup, a, b) {
 function checkAnalyzerSet(testgroup, test){
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult = db._query(test);
-  print("RESULT = ", queryResult);
 
   if (analyzers.analyzer(test.analyzerName) === null) {
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer creation failed!`);
@@ -92,8 +85,6 @@ function checkAnalyzerSet(testgroup, test){
 
   progress(`${testgroup}: ${test.analyzerName} checking analyzer's query results`);
   let actual = queryResult.toArray();
-  print("EXPECTED = ", test.expectedResult)
-  print("ACTUAL = ", actual)
 
   arraysEqual(testgroup, test.expectedResult, actual);
 
@@ -101,20 +92,16 @@ function checkAnalyzerSet(testgroup, test){
 }
 
 function deleteAnalyzer(testgroup, analyzerName){
-  try {
-    const array = analyzers.toArray();
-    for (let i = 0; i < array.length; i++) {
-      const name = array[i].name().replace('_system::', '');
-      if (name === analyzerName) {
-        analyzers.remove(analyzerName);
-      }
+  const array = analyzers.toArray();
+  for (let i = 0; i < array.length; i++) {
+    const name = array[i].name().replace('_system::', '');
+    if (name === analyzerName) {
+      analyzers.remove(analyzerName);
     }
-    // checking created text analyzer is deleted or not
-    if (analyzers.analyzer(analyzerName) != null) {
-      throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!`);
-    }
-  } catch (e) {
-    print(e);
+  }
+  // checking created text analyzer is deleted or not
+  if (analyzers.analyzer(analyzerName) != null) {
+    throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!`);
   }
   progress(`${testgroup}: deleted ${analyzerName}`);
 }
