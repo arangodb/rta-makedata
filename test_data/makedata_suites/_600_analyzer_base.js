@@ -50,10 +50,10 @@ function checkProperties(testgroup, analyzer_name, obj1, obj2) {
   }
 };
 
-      //This function will check any analyzer's equality with expected server response
-function arraysEqual(testgroup, a, b) {
-  if (!_.isEqual(a, b)){
-    throw new Error("${testgroup}: Didn't get the expected response from the server!");
+//This function will check any analyzer's equality with expected server response
+function arraysEqual(analyzer_name, a, b) {
+  if (!_.isEqual(a, b)) {
+    throw new Error(`${analyzer_name}: Didn't get the expected response from the server! ${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
 }
 
@@ -86,7 +86,7 @@ function checkAnalyzerSet(testgroup, test){
   progress(`${testgroup}: ${test.analyzerName} checking analyzer's query results`);
   let actual = queryResult.toArray();
 
-  arraysEqual(testgroup, test.expectedResult, actual);
+  arraysEqual(test.analyzerName, test.expectedResult, actual);
 
   progress(`${testgroup}: ${test.analyzerName} done`);
 }
