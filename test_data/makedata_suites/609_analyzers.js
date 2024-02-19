@@ -9,7 +9,7 @@ function getTestData_609(dbCount) {
         analyzerName: `collationEn_${dbCount}`,
         "@testView": `collationEnView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) RETURN doc.text",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
       analyzerProperties: [
         "collation",
         { locale: "en.utf-8" },
@@ -26,11 +26,9 @@ function getTestData_609(dbCount) {
         "locale" : "en"
       },
       expectedResult: [
-        [
-          "a",
-          "å",
-          "b"
-        ]
+        "å",
+        "a",
+        "b"
       ]
     },
     {
@@ -39,7 +37,7 @@ function getTestData_609(dbCount) {
         analyzerName: `collationSv_${dbCount}`,
         "@testView": `collationSvView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) RETURN doc.text",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
       analyzerProperties: [
         "collation",
         { locale: "sv.utf-8" },
@@ -56,11 +54,8 @@ function getTestData_609(dbCount) {
         "locale" : "sv"
       },
       expectedResult: [
-        [
-          "a",
-          "å",
-          "b"
-        ]
+        "a",
+        "b"
       ]
     },
     {
@@ -142,7 +137,7 @@ function getTestData_609(dbCount) {
       bindVars: {
         analyzerName: `segmentGraphic_${dbCount}`
       },
-      query: "LET str = 'Test\twith An_EMAIL-address+123@example.org' RETURN {'alpha': TOKENS(str, @analyzerName),}",
+      query: "LET str = 'Test\twith An_EMAIL-address+123@example.org' RETURN TOKENS(str, @analyzerName)",
       analyzerProperties: [
         "segmentation",
         {
@@ -160,19 +155,17 @@ function getTestData_609(dbCount) {
         "break" : "graphic"
       },
       expectedResult: [
-        {
-          "graphic" : [
-            "test",
-            "with",
-            "an_email",
-            "-",
-            "address",
-            "+",
-            "123",
-            "@",
-            "example.org"
-          ]
-        }
+        [
+          "test",
+          "with",
+          "an_email",
+          "-",
+          "address",
+          "+",
+          "123",
+          "@",
+          "example.org"
+        ]
       ]
     },
   ];

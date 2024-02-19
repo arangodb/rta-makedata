@@ -73,7 +73,7 @@ function getTestData_610(dbCount) {
       bindVars: {
         analyzerName: `nearestNeighborsSingle_${dbCount}`
       },
-      query: `LET str = "salt, oil"RETURN {"all": TOKENS(str, @analyzerName)}`,
+      query: `LET str = "salt, oil" RETURN {"all": TOKENS(str, @analyzerName)}`,
       analyzerProperties: [
         "nearest_neighbors",
         {
@@ -88,13 +88,14 @@ function getTestData_610(dbCount) {
       analyzerType: "nearest_neighbors",
       properties: {
         "model_location" : `${PWD}/makedata_suites/610_model_cooking.bin`, 
-        "top_k" : 0
+        "top_k" : 1
       },
       expectedResult: [
         {
           "all" :
           [
-            "__label__baking"
+            "ingredients",
+            "as"
           ]
         }
       ]
@@ -108,7 +109,8 @@ function getTestData_610(dbCount) {
       analyzerProperties: [
         "nearest_neighbors",
         {
-          "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`
+          "model_location": `${PWD}/makedata_suites/610_model_cooking.bin`,
+          "top_k": 2
         },
         [
           "frequency",
