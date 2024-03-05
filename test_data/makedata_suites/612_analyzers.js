@@ -12,7 +12,7 @@ function getTestData_612(dbCount) {
       analyzerProperties: [
         "multi_delimiter",
         {
-          delimiter: [
+          delimiters: [
             ":",
             ";",
             ",",
@@ -32,7 +32,7 @@ function getTestData_612(dbCount) {
       ],
       analyzerType: "multi_delimiter",
       properties: {
-        "delimiter": [
+        "delimiters": [
           ":",
           ";",
           ",",
