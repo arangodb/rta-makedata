@@ -50,7 +50,7 @@
       progress("105: checking indices");
 
       if (c_zkd.getIndexes().length !== 2 || c_zkd.getIndexes()[1].type !== "zkd") {
-        throw new Error(`Banana ${JSON.stringify(c_zkd.getIndexes())} ${zkdString}`);
+        throw new Error(`Banana ${JSON.stringify(c_zkd.getIndexes())}`);
       }
 
       // Check data:
