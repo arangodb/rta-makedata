@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql  */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, _, */
 
 (function () {
   return {
@@ -55,7 +55,7 @@
 
       // Check data:
       progress("105: checking data");
-      if (c_zkd.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (c_zkd.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_zkd.count()} !== 1000`); }
 
       // // Check a few queries:
       // progress("105: query 1");
