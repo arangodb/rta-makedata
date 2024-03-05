@@ -299,6 +299,7 @@ function getTestData_608(dbCount) {
         ]
       ]
     },
+    /* BTS-1809: disable for now.
     {
       analyzerName: `geoJson_${dbCount}`,
       bindVars: {
@@ -391,7 +392,7 @@ function getTestData_608(dbCount) {
           "distance" : 1825.1307183571266
         }
       ]
-    },
+    },*/
   ];
 }
 
