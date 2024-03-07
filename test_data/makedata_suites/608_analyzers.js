@@ -299,14 +299,13 @@ function getTestData_608(dbCount) {
         ]
       ]
     },
-    /* BTS-1809: disable for now.
     {
       analyzerName: `geoJson_${dbCount}`,
       bindVars: {
         analyzerName: `geoJson_${dbCount}`,
         "@testView": `geoJsonView_${dbCount}`
       },
-      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) SORT GEO_DISTANCE(doc.location, point) RETURN MERGE(doc.location, { distance: GEO_DISTANCE(doc.location, point) })",
+      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) OPTIONS {waitForSync: true} SORT GEO_DISTANCE(doc.location, point) RETURN MERGE(doc.location, { distance: GEO_DISTANCE(doc.location, point) })",
       analyzerProperties: [
         "geojson",
         {},
@@ -352,7 +351,7 @@ function getTestData_608(dbCount) {
         analyzerName: `geoPoint_${dbCount}`,
         '@testView': `geoPointView_${dbCount}`
       },
-      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) SORT GEO_DISTANCE([doc.location[1], doc.location[0]], point) RETURN MERGE({location: doc.location}, { distance: GEO_DISTANCE([doc.location[1], doc.location[0]], point) })",
+      query: "LET point = GEO_POINT(6.93, 50.94) FOR doc IN @@testView SEARCH ANALYZER(GEO_DISTANCE(doc.location, point) < 2000, @analyzerName) OPTIONS {waitForSync: true} SORT GEO_DISTANCE([doc.location[1], doc.location[0]], point) RETURN MERGE({location: doc.location}, { distance: GEO_DISTANCE([doc.location[1], doc.location[0]], point) })",
       // query: "return sleep(600)",
       
       analyzerProperties: [
@@ -392,7 +391,7 @@ function getTestData_608(dbCount) {
           "distance" : 1825.1307183571266
         }
       ]
-    },*/
+    },
   ];
 }
 
