@@ -9,7 +9,7 @@ function getTestData_609(dbCount) {
         analyzerName: `collationEn_${dbCount}`,
         "@testView": `collationEnView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) OPTIONS {waitForSync: true} SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
       analyzerProperties: [
         "collation",
         { locale: "en.utf-8" },
@@ -37,7 +37,7 @@ function getTestData_609(dbCount) {
         analyzerName: `collationSv_${dbCount}`,
         "@testView": `collationSvView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.text < TOKENS('c', @analyzerName)[0], @analyzerName) OPTIONS {waitForSync: true} SORT TOKENS(doc.text, @analyzerName)[0] DESC RETURN doc.text",
       analyzerProperties: [
         "collation",
         { locale: "sv.utf-8" },
