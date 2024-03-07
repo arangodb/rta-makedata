@@ -20,9 +20,9 @@ function createAnalyzerSet(testgroup, test) {
                          ...test.analyzerProperties
                         );
   if (test.hasOwnProperty('collection')) {
-    progress(`${testgroup}: creating ${test.collection} `);
+    progress(`${testgroup}: creating collection ${test.collection}`);
     createCollectionSafe(test.collection, 2, 1).insert(test.colTestData);
-    progress(`${testgroup}: creating ${test["@testView"]} `);
+    progress(`${testgroup}: creating view ${test.bindVars["@testView"]}`);
     db._createView(test.bindVars["@testView"],
                    "arangosearch", {
                      links: {
@@ -35,7 +35,7 @@ function createAnalyzerSet(testgroup, test) {
                    }
                   );
   }
-  progress(`${testgroup}: creating ${test.analyzerName}`);
+  progress(`${testgroup}: creating analyzer ${test.analyzerName}`);
   createAnalyzer(test.analyzerName, q);
 }
 
