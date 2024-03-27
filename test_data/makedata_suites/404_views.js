@@ -47,8 +47,8 @@
         let collectionName0 = `collection_wand_0${dbCount}`;
         let collectionName1 = `collection_wand_1${dbCount}`;
 
-        let c0 = createCollectionSafe(collectionName0, 3, 2, {"writeConcern": 1})
-        let c1 = createCollectionSafe(collectionName1, 3, 2, {"writeConcern": 1})
+        let c0 = createCollectionSafe(collectionName0, 3, 2, {"writeConcern": 1});
+        let c1 = createCollectionSafe(collectionName1, 3, 2, {"writeConcern": 1});
 
         let meta0 = {
           'links': { },
