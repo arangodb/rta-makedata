@@ -77,7 +77,12 @@
       FOR x IN c_${ccount}_1
         RETURN {v1: testee.value, v2: x.value}
       `;
-        const result = db._query(query).toArray();
+        try {
+          const result = db._query(query).toArray();
+        } catch (ex) {
+          print(`Failed to instanciate query ${query} -> ${ex}`);
+          throw ex;
+        }
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {
           throw new Error("DOCUMENT call in OneShard database does not return data " + JSON.stringify(result));
         }
