@@ -41,8 +41,7 @@
                                 );
       if (!created) {
         // its already wrongly there - skip this one.
-        print(`900: skipping ${databaseName} - it failed to be created, but it is no one-shard.`);
-        return 0;
+        throw new Error(`900: skipping ${databaseName} - it failed to be created, or it is not of type one-shard.`);
       }
       progress(`created OneShard DB '${databaseName}'`);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
