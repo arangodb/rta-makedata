@@ -76,8 +76,9 @@
       FOR x IN c_${ccount}_1
         RETURN {v1: testee.value, v2: x.value}
       `;
+        let result;
         try {
-          const result = db._query(query).toArray();
+          result = db._query(query).toArray();
         } catch (ex) {
           print(`Failed to instanciate query ${query} -> ${ex}`);
           throw ex;
