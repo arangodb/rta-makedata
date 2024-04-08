@@ -3,7 +3,6 @@
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
-      return false; // TODO: re-enable with BTS-1426 fixed
       if(currentVersion.includes("nightly")){
         let version = semver.parse(currentVersion.split('-')[0]);
         return (
