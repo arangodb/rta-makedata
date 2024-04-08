@@ -23,6 +23,7 @@
       const databaseName = `${baseName}_${dbCount}_entGraph`;
       const created = createSafe(databaseName,
                                  dbname => {
+                                   db._useDatabase('_system')
                                    db._flushCache();
                                    db._createDatabase(dbname);
                                    db._useDatabase(dbname);

@@ -20,7 +20,6 @@
         baseName = "system";
       }
       progress('Start create OneShard DB');
-      db._useDatabase("_system");
       print('#ix');
       const databaseName = `${baseName}_${dbCount}_oneShard`;
       if (db._databases().includes(databaseName)) {
@@ -30,6 +29,7 @@
       }
       const created = createSafe(databaseName,
                                  dbname => {
+                                   db._useDatabase('_system');
                                    db._flushCache();
                                    db._createDatabase(dbname, {sharding: "single"});
                                    db._useDatabase(dbname);

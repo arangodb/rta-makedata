@@ -30,10 +30,11 @@
           dbcOptions = { replicationFactor: 2};
         }
         createSafe(databaseName,
-          dbname => {
-              db._flushCache();
-              db._createDatabase(dbname, dbcOptions);
-          }
+                   dbname => {
+                     db._useDatabase('_system');
+                     db._flushCache();
+                     db._createDatabase(dbname, dbcOptions);
+                   }
           );
       }
       return 0;

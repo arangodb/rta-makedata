@@ -16,7 +16,6 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`105: Makedata ${dbCount} ${loopCount}`);
-      db._useDatabase('_system');
       let c_zkd = db[`c_zkd_${dbCount}`];
 
       // Now the actual data writing:

@@ -263,8 +263,16 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
   while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
+    let database = '_system';
+    if (options.numberOfDBs + options.countOffset > 1) {
+      let c = zeroPad(dbCount + options.countOffset);
+      database = `${database}_${c}`;
+    }
     fns[0].forEach(func => {
-      db._useDatabase("_system");
+      db._useDatabase('_system');
+      if (db._databases().includes(database)) {
+        db._useDatabase(database);
+      }
       func(options,
            isCluster,
            enterprise,
@@ -277,6 +285,10 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
       progress('inner Loop start');
       print(`inner Loop start ${loopCount} ${dbCount}`);
       fns[1].forEach(func => {
+        db._useDatabase('_system');
+        if (db._databases().includes(database)) {
+          db._useDatabase(database);
+        }
         func(options,
              isCluster,
              enterprise,
