@@ -1,4 +1,4 @@
-/* global print, progress, createCollectionSafe, db, createSafe, semver  */
+/* global print, progress, createCollectionSafe, db, createUseDatabaseSafe, semver  */
 
 (function () {
   return {
@@ -27,18 +27,10 @@
         print(`900: skipping ${databaseName} - its already there.`);
         return 0;
       }
-      const created = createSafe(databaseName,
-                                 dbname => {
-                                   db._useDatabase('_system');
-                                   db._flushCache();
-                                   db._createDatabase(dbname, {sharding: "single"});
-                                   db._useDatabase(dbname);
-                                   return true;
-                                 }, dbname => {
-                                   db._useDatabase(dbname);
-                                   return db._properties().sharding === "single";
-                                 }
-                                );
+      const created = createUseDatabaseSafe(databaseName, {sharding: "single"});
+      if (db._properties().sharding === "single") {
+        throw new Error("900: created database isn't single shard!");
+      }
       if (!created) {
         // its already wrongly there - skip this one.
         throw new Error(`900: skipping ${databaseName} - it failed to be created, or it is not of type one-shard.`);

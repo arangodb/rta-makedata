@@ -1,4 +1,4 @@
-/* global fs, PWD, writeGraphData, getShardCount, getReplicationFactor,  print, progress, db, createSafe, _, semver */
+/* global fs, PWD, writeGraphData, getShardCount, getReplicationFactor,  print, progress, db, createSafe, _, semver,  createUseDatabaseSafe*/
 
 (function () {
   let egm;
@@ -9,8 +9,7 @@
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       // strip off -nightly etc:
       let ver = semver.parse(oldVersion.split('-')[0]);
-      // TODO: mitigate (to (a) fixed version(s)) "&& !options.singleShard" after BTS-1841 is fixed
-      return enterprise && (semver.gte(ver, "3.10.0")) && !options.singleShard;
+      return enterprise && (semver.gte(ver, "3.10.0"));
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       egm = require('@arangodb/enterprise-graph');
@@ -21,17 +20,7 @@
         baseName = "system";
       }
       const databaseName = `${baseName}_${dbCount}_entGraph`;
-      const created = createSafe(databaseName,
-                                 dbname => {
-                                   db._useDatabase('_system')
-                                   db._flushCache();
-                                   db._createDatabase(dbname);
-                                   db._useDatabase(dbname);
-                                   return true;
-                                 }, dbname => {
-                                   throw new Error("Creation of database ${databaseName} failed!");
-                                 }
-                                );
+      const created = createUseDatabaseSafe(databaseName, {});
       progress(`created database '${databaseName}'`);
       createSafe(`G_enterprise_${dbCount}`, graphName => {
         return egm._create(graphName,

@@ -1,4 +1,4 @@
-/* global arangodb, print,  db, zeroPad, createSafe, ERRORS, createSafe,progress  */
+/* global arangodb, print,  db, zeroPad, ERRORS, progress, createUseDatabaseSafe  */
 
 (function () {
   return {
@@ -23,16 +23,7 @@
         if (isCluster) {
           dbcOptions = { replicationFactor: 2};
         }
-        createSafe(database,
-                   dbname => {
-                     db._useDatabase('_system');
-                     db._flushCache();
-                     db._createDatabase(dbname, dbcOptions);
-                     return db._useDatabase(dbname);
-                   }, dbname => {
-                     return db._useDatabase(database);
-                   }
-                  );
+        createUseDatabaseSafe(database, dbcOptions);
       } else if (options.numberOfDBs > 1) {
         throw new Error("must specify a database prefix if want to work with multiple DBs.");
       }

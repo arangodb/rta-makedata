@@ -1,4 +1,4 @@
-/* global print, semver, db, progress, createSafe */
+/* global print, semver, db, progress, createUseDatabaseSafe */
 
 (function () {
   let extendedDbNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -29,13 +29,7 @@
         if (isCluster) {
           dbcOptions = { replicationFactor: 2};
         }
-        createSafe(databaseName,
-                   dbname => {
-                     db._useDatabase('_system');
-                     db._flushCache();
-                     db._createDatabase(dbname, dbcOptions);
-                   }
-          );
+        createUseDatabaseSafe(databaseName, dbcOptions);
       }
       return 0;
     },

@@ -1,4 +1,4 @@
-/* global print, db, assertTrue, semver, createSafe, zeroPad */
+/* global print, db, assertTrue, semver, createSafe, zeroPad, createUseDatabaseSafe */
 
 (function () {
   return {
@@ -26,16 +26,7 @@
         baseName = "system";
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
-      const created = createSafe(databaseName,
-                                 dbname => {
-                                   db._flushCache();
-                                   db._createDatabase(dbname);
-                                   db._useDatabase(dbname);
-                                   return true;
-                                 }, dbname => {
-                                   throw new Error("Creation of database ${databaseName} failed!");
-                                 }
-                                );
+      createUseDatabaseSafe(databaseName, {});
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
