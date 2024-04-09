@@ -1,6 +1,6 @@
 /* global print, ARGUMENTS, */
 // these come from makedata.js / checkdata.js / cleardata.js:
-/* global _, fs, enterprise, db, database, isCluster, progress, time */
+/* global _, fs, enterprise, db, database, isCluster, progress, time, zeroPad */
 // these are our state variables, we need to write them:
 /* global tStart:true, timeLine:true */
 //
@@ -113,6 +113,20 @@ function createSafe (name, fn1, fnErrorExists) {
   }
   console.error(`${name}: finally giving up anyways.`);
   throw new Error(`${name} creation failed!`);
+}
+
+function createUseDatabaseSafe(databaseName, dbOptions) {
+      return createSafe(databaseName,
+                        dbname => {
+                          db._useDatabase('_system');
+                          db._flushCache();
+                          db._createDatabase(dbname);
+                          db._useDatabase(dbname);
+                          return true;
+                        }, dbname => {
+                          throw new Error("Creation of database ${dbname} failed!");
+                        }
+                       );
 }
 
 function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {
