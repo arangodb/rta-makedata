@@ -49,6 +49,7 @@ let {
   getShardCount,
   getReplicationFactor,
   writeGraphData,
+  createUseDatabaseSafe,
   createCollectionSafe,
   createIndexSafe,
   runAqlQueryResultCount,

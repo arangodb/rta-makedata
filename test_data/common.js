@@ -417,6 +417,7 @@ exports.progress = progress;
 exports.getShardCount = getShardCount;
 exports.getReplicationFactor = getReplicationFactor;
 exports.writeGraphData = writeGraphData;
+exports.createUseDatabaseSafe = createUseDatabaseSafe;
 exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
 exports.runAqlQueryResultCount = runAqlQueryResultCount;

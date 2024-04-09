@@ -20,11 +20,6 @@
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
         progress('051: Start creating database ' + databaseName);
-        if (db._databases().includes(databaseName)) {
-        // its already there - skip this one.
-          print(`051: skipping ${databaseName} - its already there.`);
-          break;
-        }
         let dbcOptions = {};
         if (isCluster) {
           dbcOptions = { replicationFactor: 2};
