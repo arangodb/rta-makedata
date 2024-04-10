@@ -8,14 +8,14 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   try {
     const array = analyzers.toArray();
     for (let i = 0; i < array.length; i++) {
-      const name = array[i].name().replace('_system::', '');
+      const name = array[i].name().replace(`${arango.getDatabaseName()}::`, '');
       if (name === analyzerName) {
         analyzers.remove(analyzerName);
       }
     }
     // checking created analyzer is deleted or not
     if (analyzers.analyzer(analyzerName) != null) {
-      throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!`);
+      throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!  ${analyzers.toArray()}`);
     }
   } catch (e) {
     print(e);

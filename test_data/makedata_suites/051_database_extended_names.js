@@ -30,6 +30,8 @@
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       // check per DB
+      db._useDatabase('_system');
+      const allDatabases = db._databases();
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -39,7 +41,7 @@
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
         progress('051: Checking the existence of the database: ' + databaseName);
-        if (!(db._databases().includes(databaseName))) {
+        if (!(allDatabases.includes(databaseName))) {
           throw new Error("051: Database does not exist: " + databaseName + "have: " + db._databases());
         }
       }

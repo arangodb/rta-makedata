@@ -98,12 +98,15 @@ if ((args.length > 0) &&
 let opts = internal.parseArgv(args, 0);
 _.defaults(opts, optionsDefaults);
 setOptions(opts);
+if (options.collectionCountOffset !== 0 && database == '_system') {
+  throw new Error("must not specify count without different database.");
+}
 var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E + 1 | 0;
 
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
 const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', opts.excludePreviouslyExecutedTests);
-mainTestLoop(opts, isCluster, enterprise, fns, function(database) {
+mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
     db._create('_fishbowl', {
