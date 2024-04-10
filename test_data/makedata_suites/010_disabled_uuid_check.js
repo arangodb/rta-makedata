@@ -56,7 +56,7 @@
         collections_to_move.forEach(dbcol => {
           print(dbcol);
           db._useDatabase(dbcol[0]);
-          col = dbcol[1];
+          let col = dbcol[1];
           collectionData += "\n" + JSON.stringify(col) + ":\n" +
             JSON.stringify(db[col].shards(true)) + "\n" +
             JSON.stringify(db[col].properties());
