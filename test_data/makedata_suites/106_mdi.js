@@ -13,7 +13,6 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`106: Makedata ${dbCount} ${loopCount}`);
-      db._useDatabase('_system');
       let c_mdi = db[`c_mdi_${dbCount}`];
 
       // Now the actual data writing:

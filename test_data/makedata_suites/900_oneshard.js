@@ -1,4 +1,4 @@
-/* global print, progress, createCollectionSafe, db, createSafe, semver  */
+/* global print, progress, createCollectionSafe, db, createUseDatabaseSafe, semver  */
 
 (function () {
   return {
@@ -20,7 +20,6 @@
         baseName = "system";
       }
       progress('Start create OneShard DB');
-      db._useDatabase("_system");
       print('#ix');
       const databaseName = `${baseName}_${dbCount}_oneShard`;
       if (db._databases().includes(databaseName)) {
@@ -28,21 +27,13 @@
         print(`900: skipping ${databaseName} - its already there.`);
         return 0;
       }
-      const created = createSafe(databaseName,
-                                 dbname => {
-                                   db._flushCache();
-                                   db._createDatabase(dbname, {sharding: "single"});
-                                   db._useDatabase(dbname);
-                                   return true;
-                                 }, dbname => {
-                                   db._useDatabase(dbname);
-                                   return db._properties().sharding === "single";
-                                 }
-                                );
+      const created = createUseDatabaseSafe(databaseName, {sharding: "single"});
+      if (db._properties().sharding === "single") {
+        throw new Error("900: created database isn't single shard!");
+      }
       if (!created) {
         // its already wrongly there - skip this one.
-        print(`900: skipping ${databaseName} - it failed to be created, but it is no one-shard.`);
-        return 0;
+        throw new Error(`900: skipping ${databaseName} - it failed to be created, or it is not of type one-shard.`);
       }
       progress(`created OneShard DB '${databaseName}'`);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
@@ -77,7 +68,13 @@
       FOR x IN c_${ccount}_1
         RETURN {v1: testee.value, v2: x.value}
       `;
-        const result = db._query(query).toArray();
+        let result;
+        try {
+          result = db._query(query).toArray();
+        } catch (ex) {
+          print(`Failed to instanciate query ${query} -> ${ex}`);
+          throw ex;
+        }
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {
           throw new Error("DOCUMENT call in OneShard database does not return data " + JSON.stringify(result));
         }

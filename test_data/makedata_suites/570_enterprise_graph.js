@@ -1,4 +1,4 @@
-/* global fs, PWD, writeGraphData, getShardCount, getReplicationFactor,  print, progress, db, createSafe, _, semver */
+/* global fs, PWD, writeGraphData, getShardCount, getReplicationFactor,  print, progress, db, createSafe, _, semver,  createUseDatabaseSafe*/
 
 (function () {
   let egm;
@@ -20,16 +20,7 @@
         baseName = "system";
       }
       const databaseName = `${baseName}_${dbCount}_entGraph`;
-      const created = createSafe(databaseName,
-        dbname => {
-          db._flushCache();
-          db._createDatabase(dbname);
-          db._useDatabase(dbname);
-          return true;
-        }, dbname => {
-          throw new Error("Creation of database ${databaseName} failed!");
-        }
-      );
+      const created = createUseDatabaseSafe(databaseName, {});
       progress(`created database '${databaseName}'`);
       createSafe(`G_enterprise_${dbCount}`, graphName => {
         return egm._create(graphName,

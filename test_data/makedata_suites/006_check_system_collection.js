@@ -1,9 +1,8 @@
-/* global print, db, assertTrue, semver, createSafe, zeroPad */
+/* global print, db, assertTrue, semver, createSafe, zeroPad, createUseDatabaseSafe */
 
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
-      return false; // TODO: re-enable with BTS-1426 fixed
       if(currentVersion.includes("nightly")){
         let version = semver.parse(currentVersion.split('-')[0]);
         return (
@@ -27,16 +26,7 @@
         baseName = "system";
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
-      const created = createSafe(databaseName,
-                                 dbname => {
-                                   db._flushCache();
-                                   db._createDatabase(dbname);
-                                   db._useDatabase(dbname);
-                                   return true;
-                                 }, dbname => {
-                                   throw new Error("Creation of database ${databaseName} failed!");
-                                 }
-                                );
+      createUseDatabaseSafe(databaseName, {});
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {

@@ -23,13 +23,14 @@
         }
         i++;
       }
-      let collections_to_move = [];
+      let collections_to_move = [];igin/main
       print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
         let found = 0;
         collections.forEach((dbcol) => {
           db._useDatabase(dbcol[0]);
           let col = dbcol[1];
+          col = dbcol[1]
           let shards = db[col].shards(true);
           Object.values(shards).forEach((serverList) => {
             if (serverList.length > 0 && serverList[0] === options.disabledDbserverUUID) {

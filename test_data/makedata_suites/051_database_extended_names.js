@@ -1,4 +1,4 @@
-/* global print, semver, db, progress, createSafe */
+/* global print, semver, db, progress, createUseDatabaseSafe */
 
 (function () {
   let extendedDbNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -20,26 +20,18 @@
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
         progress('051: Start creating database ' + databaseName);
-        if (db._databases().includes(databaseName)) {
-        // its already there - skip this one.
-          print(`051: skipping ${databaseName} - its already there.`);
-          break;
-        }
         let dbcOptions = {};
         if (isCluster) {
           dbcOptions = { replicationFactor: 2};
         }
-        createSafe(databaseName,
-          dbname => {
-              db._flushCache();
-              db._createDatabase(dbname, dbcOptions);
-          }
-          );
+        createUseDatabaseSafe(databaseName, dbcOptions);
       }
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       // check per DB
+      db._useDatabase('_system');
+      const allDatabases = db._databases();
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -49,7 +41,7 @@
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
         progress('051: Checking the existence of the database: ' + databaseName);
-        if (!(db._databases().includes(databaseName))) {
+        if (!(allDatabases.includes(databaseName))) {
           throw new Error("051: Database does not exist: " + databaseName + "have: " + db._databases());
         }
       }
