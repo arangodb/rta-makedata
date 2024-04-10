@@ -9,7 +9,8 @@
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       // strip off -nightly etc:
       let ver = semver.parse(oldVersion.split('-')[0]);
-      return enterprise && (semver.gte(ver, "3.10.0"));
+      // TODO: mitigate (to (a) fixed version(s)) "&& !options.singleShard" after BTS-1841 is fixed
+      return enterprise && (semver.gte(ver, "3.10.0")) && !options.singleShard;
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       egm = require('@arangodb/enterprise-graph');
