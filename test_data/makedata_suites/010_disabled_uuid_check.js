@@ -10,24 +10,39 @@
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`010: checking data ${dbCount}`);
       let count = 0;
-      let collections = [];
+      databases = db._databases();
+      collections = [];
+      let i = 0;
+      while (i < databases.length) {
+        db._useDatabase(databases[i])
+        this_db_collections = db._collections().map((c) => c.name())
+        j = 0;
+        while (j < this_db_collections.length) {
+          collections.push([databases[i], this_db_collections[j]])
+          j++;
+        }
+        i++;
+      }
+      collections_to_move = [];
       print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
-        collections = [];
         let found = 0;
-        db._collections().map((c) => c.name()).forEach((c) => {
-          let shards = db[c].shards(true);
+        collections.forEach((dbcol) => {
+          db._useDatabase(dbcol[0]);
+          col = dbcol[1]
+          let shards = db[col].shards(true);
           Object.values(shards).forEach((serverList) => {
             if (serverList.length > 0 && serverList[0] === options.disabledDbserverUUID) {
               ++found;
-              collections.push(c);
+              collections_to_move.push(dbcol);
             }
           });
+          db._useDatabase("_system");
         });
         if (found > 0) {
           let coldump = ".";
-          if ((count  + 1 % 25 === 0) || (collections.length < 10)) {
-            coldump = " - " + JSON.stringify(collections);
+          if ((count + 1 % 25 === 0) || (collections_to_move.length < 10)) {
+            coldump = " - " + JSON.stringify(collections_to_move);
           }
           print('010: ' + found + ' found - Waiting' + coldump);
           internal.sleep(1);
@@ -38,14 +53,17 @@
       }
       if (count > 499) {
         let collectionData = "Still have collections bound to the failed server: ";
-        collections.forEach(col => {
-          print(col);
+        collections_to_move.forEach(dbcol => {
+          print(dbcol);
+          db._useDatabase(dbcol[0]);
+          col = dbcol[1]
           collectionData += "\n" + JSON.stringify(col) + ":\n" +
             JSON.stringify(db[col].shards(true)) + "\n" +
             JSON.stringify(db[col].properties());
+          db._useDatabase("_system");
         });
         print(collectionData);
-        throw("010: Still have collections bound to the failed server: " + JSON.stringify(collections));
+        throw ("010: Still have collections bound to the failed server: " + JSON.stringify(collections_to_move));
       }
       let shardDist = {};
       count = 0;
@@ -88,7 +106,7 @@
           print(col);
           let shardDistInfoForCol = "";
           if (shardDist.hasOwnProperty("results") &&
-              shardDist.results.hasOwnProperty(col)) {
+            shardDist.results.hasOwnProperty(col)) {
             shardDistInfoForCol = JSON.stringify(shardDist.results[col]);
           }
           collectionData += "\n" + JSON.stringify(col) + ":\n" +

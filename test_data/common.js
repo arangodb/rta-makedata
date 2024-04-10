@@ -1,6 +1,6 @@
 /* global print, ARGUMENTS, */
 // these come from makedata.js / checkdata.js / cleardata.js:
-/* global _, fs, enterprise, db, database, isCluster, progress, time */
+/* global _, fs, enterprise, db, database, isCluster, progress, time, zeroPad */
 // these are our state variables, we need to write them:
 /* global tStart:true, timeLine:true */
 //
@@ -113,6 +113,20 @@ function createSafe (name, fn1, fnErrorExists) {
   }
   console.error(`${name}: finally giving up anyways.`);
   throw new Error(`${name} creation failed!`);
+}
+
+function createUseDatabaseSafe(databaseName, dbOptions) {
+      return createSafe(databaseName,
+                        dbname => {
+                          db._useDatabase('_system');
+                          db._flushCache();
+                          db._createDatabase(dbname);
+                          db._useDatabase(dbname);
+                          return true;
+                        }, dbname => {
+                          throw new Error("Creation of database ${dbname} failed!");
+                        }
+                       );
 }
 
 function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {
@@ -263,8 +277,16 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
   while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
+    let database = '_system';
+    if (options.numberOfDBs + options.countOffset > 1) {
+      let c = zeroPad(dbCount + options.countOffset);
+      database = `${database}_${c}`;
+    }
     fns[0].forEach(func => {
-      db._useDatabase("_system");
+      db._useDatabase('_system');
+      if (db._databases().includes(database)) {
+        db._useDatabase(database);
+      }
       func(options,
            isCluster,
            enterprise,
@@ -277,6 +299,10 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
       progress('inner Loop start');
       print(`inner Loop start ${loopCount} ${dbCount}`);
       fns[1].forEach(func => {
+        db._useDatabase('_system');
+        if (db._databases().includes(database)) {
+          db._useDatabase(database);
+        }
         func(options,
              isCluster,
              enterprise,
@@ -391,6 +417,7 @@ exports.progress = progress;
 exports.getShardCount = getShardCount;
 exports.getReplicationFactor = getReplicationFactor;
 exports.writeGraphData = writeGraphData;
+exports.createUseDatabaseSafe = createUseDatabaseSafe;
 exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
 exports.runAqlQueryResultCount = runAqlQueryResultCount;

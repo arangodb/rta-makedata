@@ -52,7 +52,6 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`100: Makedata ${dbCount} ${loopCount}`);
-      db._useDatabase('_system');
       let c = db[`c_${dbCount}`];
       let chash = db[`chash_${dbCount}`];
       let cskip = db[`cskip_${dbCount}`];
