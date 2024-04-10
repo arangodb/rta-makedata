@@ -271,13 +271,13 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
   return fns;
 }
 
-function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
+function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopFN) {
   let dbCount = options.countOffset;
   let totalCount = options.countOffset + options.numberOfDBs;
   while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
-    let database = '_system';
+    let database = defaultDB;
     if (options.numberOfDBs + options.countOffset > 1) {
       let c = zeroPad(dbCount + options.countOffset);
       database = `${database}_${c}`;
@@ -293,7 +293,6 @@ function mainTestLoop(options, isCluster, enterprise, fns, endOfLoopFN) {
            database,
            dbCount);
     });
-
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
       progress('inner Loop start');

@@ -47,8 +47,11 @@
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       if (database !== "_system") {
+        print('..............................')
+        print(database)
         try {
-          db._useDatabase(database);
+          db._useDatabase('_system');
+          db._dropDatabase(database);
         } catch (x) {
           if (x.errorNum === ERRORS.ERROR_ARANGO_DATABASE_NOT_FOUND.code) {
             return 1;

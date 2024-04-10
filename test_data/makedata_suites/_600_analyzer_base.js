@@ -16,6 +16,7 @@ function createAnalyzer(testgroup, analyzerName, analyzerCreationQuery){
 
 
 function createAnalyzerSet(testgroup, test) {
+    print(arango.getDatabaseName())
   let q = analyzers.save(test.analyzerName,
                          ...test.analyzerProperties
                         );
@@ -59,6 +60,7 @@ function arraysEqual(analyzer_name, a, b) {
 
 // this function will check everything regarding given analyzer
 function checkAnalyzerSet(testgroup, test){
+    print(arango.getDatabaseName())
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult = db._query(test);
 
