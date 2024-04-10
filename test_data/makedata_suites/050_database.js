@@ -47,8 +47,6 @@
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       if (database !== "_system") {
-        print('..............................')
-        print(database)
         try {
           db._useDatabase('_system');
           db._dropDatabase(database);

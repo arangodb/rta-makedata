@@ -16,7 +16,6 @@ function createAnalyzer(testgroup, analyzerName, analyzerCreationQuery){
 
 
 function createAnalyzerSet(testgroup, test) {
-    print(arango.getDatabaseName())
   let q = analyzers.save(test.analyzerName,
                          ...test.analyzerProperties
                         );
@@ -60,7 +59,6 @@ function arraysEqual(analyzer_name, a, b) {
 
 // this function will check everything regarding given analyzer
 function checkAnalyzerSet(testgroup, test){
-    print(arango.getDatabaseName())
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult = db._query(test);
 
@@ -70,7 +68,7 @@ function checkAnalyzerSet(testgroup, test){
 
   progress(`${testgroup}: ${test.analyzerName} checking analyzer's name`);
   let testName = analyzers.analyzer(test.analyzerName).name();
-  let expectedName = `_system::${test.analyzerName}`;
+  let expectedName = `${arango.getDatabaseName()}::${test.analyzerName}`;
   if (testName !== expectedName) {
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer not found`);
   }
@@ -96,14 +94,14 @@ function checkAnalyzerSet(testgroup, test){
 function deleteAnalyzer(testgroup, analyzerName){
   const array = analyzers.toArray();
   for (let i = 0; i < array.length; i++) {
-    const name = array[i].name().replace('_system::', '');
+    const name = array[i].name().replace(`${arango.getDatabaseName()}::`, '');
     if (name === analyzerName) {
       analyzers.remove(analyzerName);
     }
   }
   // checking created text analyzer is deleted or not
   if (analyzers.analyzer(analyzerName) != null) {
-    throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet!`);
+    throw new Error(`${testgroup}: ${analyzerName} analyzer isn't deleted yet: ${analyzers.toArray()}`);
   }
   progress(`${testgroup}: deleted ${analyzerName}`);
 }

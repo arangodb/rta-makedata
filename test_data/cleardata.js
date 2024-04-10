@@ -138,7 +138,7 @@ mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
     print('#ix');
     db._useDatabase("_system");
     
-    if (database !== "_system") {
+    if ((database !== "_system") && db._databases().includes(databaseName) ) {
       db._dropDatabase(databaseName);
     }
     progress("mainTestLoop");
