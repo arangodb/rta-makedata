@@ -10,25 +10,26 @@
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`010: checking data ${dbCount}`);
       let count = 0;
-      databases = db._databases();
-      collections = [];
+      let databases = db._databases();
+      let collections = [];
       let i = 0;
       while (i < databases.length) {
-        db._useDatabase(databases[i])
-        this_db_collections = db._collections().map((c) => c.name())
-        j = 0;
+        db._useDatabase(databases[i]);
+        let this_db_collections = db._collections().map((c) => c.name());
+        let j = 0;
         while (j < this_db_collections.length) {
-          collections.push([databases[i], this_db_collections[j]])
+          collections.push([databases[i], this_db_collections[j]]);
           j++;
         }
         i++;
       }
-      collections_to_move = [];
+      let collections_to_move = [];igin/main
       print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
         let found = 0;
         collections.forEach((dbcol) => {
           db._useDatabase(dbcol[0]);
+          let col = dbcol[1];
           col = dbcol[1]
           let shards = db[col].shards(true);
           Object.values(shards).forEach((serverList) => {
@@ -56,7 +57,7 @@
         collections_to_move.forEach(dbcol => {
           print(dbcol);
           db._useDatabase(dbcol[0]);
-          col = dbcol[1]
+          let col = dbcol[1];
           collectionData += "\n" + JSON.stringify(col) + ":\n" +
             JSON.stringify(db[col].shards(true)) + "\n" +
             JSON.stringify(db[col].properties());

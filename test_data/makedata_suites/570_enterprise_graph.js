@@ -9,8 +9,7 @@
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       // strip off -nightly etc:
       let ver = semver.parse(oldVersion.split('-')[0]);
-      // TODO: mitigate (to (a) fixed version(s)) "&& !options.singleShard" after BTS-1841 is fixed
-      return enterprise && (semver.gte(ver, "3.10.0")) && !options.singleShard;
+      return enterprise && semver.gte(ver, "3.10.0") && (!options.singleShard || semver.lte(ver, "3.11.999") || semver.gte(ver, "3.12.1"));
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       egm = require('@arangodb/enterprise-graph');
@@ -25,27 +24,27 @@
       progress(`created database '${databaseName}'`);
       createSafe(`G_enterprise_${dbCount}`, graphName => {
         return egm._create(graphName,
-                           [
-                             {
-                                 "collection": `citations_enterprise_${dbCount}`,
-                                 "to": [`patents_enterprise_${dbCount}`],
-                                 "from": [`patents_enterprise_${dbCount}`]
-                              }
-                           ],
-                           [],
-                           {
-                             numberOfShards: getShardCount(3),
-                             replicationFactor: getReplicationFactor(2),
-                             isSmart: true
-                           });
+          [
+            {
+              "collection": `citations_enterprise_${dbCount}`,
+              "to": [`patents_enterprise_${dbCount}`],
+              "from": [`patents_enterprise_${dbCount}`]
+            }
+          ],
+          [],
+          {
+            numberOfShards: getShardCount(3),
+            replicationFactor: getReplicationFactor(2),
+            isSmart: true
+          });
       }, graphName => {
         return egm._graph(graphName);
       });
       progress('createEGraph2');
       writeGraphData(db._collection(`patents_enterprise_${dbCount}`),
-                     db._collection(`citations_enterprise_${dbCount}`),
-                     _.clone(vertices),
-                     _.clone(smartEdges));
+        db._collection(`citations_enterprise_${dbCount}`),
+        _.clone(vertices),
+        _.clone(smartEdges));
       progress('writeEGraph2');
       return 0;
     },
@@ -78,7 +77,7 @@
         throw new Error(`570: ${eColName} Citations smart count incomplete: want ${expectNoEdges} have: ${citationsSmart.count()}`);
       }
       let docIds = ['US:38582450', 'IL:60095520', 'US:60095410', 'US:49997870'];
-      if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1 ) {
+      if (options.dataMultiplier !== 1 || options.numberOfDBs !== 1) {
         [0, 1, 2, 3].forEach(i => {
           let doc = {};
           do {
