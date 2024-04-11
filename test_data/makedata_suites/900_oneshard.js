@@ -1,4 +1,4 @@
-/* global print, progress, createCollectionSafe, db, createUseDatabaseSafe, semver  */
+/* global print, progress, createCollectionSafe, db, createUseDatabaseSafe, semver , arango */
 
 (function () {
   return {

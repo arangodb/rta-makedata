@@ -1,4 +1,4 @@
-/* global print, semver, progress, createSafe, createCollectionSafe, db, analyzers, _ */
+/* global print, semver, progress, createSafe, createCollectionSafe, db, analyzers, _, arango */
 /*jslint maxlen: 100*/
 
 const analyzers = require("@arangodb/analyzers");
