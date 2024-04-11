@@ -24,7 +24,7 @@
         }
         i++;
       }
-      let collections_to_move = [];igin/main
+      let collections_to_move = [];
       print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
         let found = 0;
