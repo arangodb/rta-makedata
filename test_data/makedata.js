@@ -86,6 +86,7 @@ const optionsDefaults = {
   test: undefined,
   tempDataDir: "/tmp/makedata",
   excludePreviouslyExecutedTests: false,
+  forceOneShard: false
 };
 
 let args = _.clone(ARGUMENTS);

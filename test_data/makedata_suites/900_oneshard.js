@@ -22,14 +22,9 @@
       progress('Start create OneShard DB');
       print('#ix');
       const databaseName = `${baseName}_${dbCount}_oneShard`;
-      if (db._databases().includes(databaseName)) {
-        // its already there - skip this one.
-        print(`900: skipping ${databaseName} - its already there.`);
-        return 0;
-      }
       const created = createUseDatabaseSafe(databaseName, {sharding: "single"});
-      if (db._properties().sharding === "single") {
-        throw new Error("900: created database isn't single shard!");
+      if (db._properties().sharding !== "single") {
+        throw new Error(`900: created database ${databaseName} ==? ${arango.getDatabaseName()} isn't single shard: ${JSON.stringify(db._properties())}`);
       }
       if (!created) {
         // its already wrongly there - skip this one.
@@ -60,7 +55,6 @@
       progress("Test OneShard setup");
       const databaseName = `${baseName}_${dbCount}_oneShard`;
       print('900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
-      print(db._databases());
       db._useDatabase(databaseName);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
         const query = `

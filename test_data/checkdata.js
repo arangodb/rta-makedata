@@ -74,7 +74,8 @@ const optionsDefaults = {
   oldVersion: "3.5.0",
   test: undefined,
   passvoid: '',
-  printTimeMeasurement: false
+  printTimeMeasurement: false,
+  forceOneShard: false
 };
 
 let args = _.clone(ARGUMENTS);

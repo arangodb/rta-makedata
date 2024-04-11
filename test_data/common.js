@@ -116,17 +116,20 @@ function createSafe (name, fn1, fnErrorExists) {
 }
 
 function createUseDatabaseSafe(databaseName, dbOptions) {
-      return createSafe(databaseName,
-                        dbname => {
-                          db._useDatabase('_system');
-                          db._flushCache();
-                          db._createDatabase(dbname);
-                          db._useDatabase(dbname);
-                          return true;
-                        }, dbname => {
-                          throw new Error("Creation of database ${dbname} failed!");
-                        }
-                       );
+  if (options.forceOneShard) {
+    dbOptions["sharding"] = "single";
+  }
+  return createSafe(databaseName,
+                    dbname => {
+                      db._useDatabase('_system');
+                      db._flushCache();
+                      db._createDatabase(dbname, dbOptions);
+                      db._useDatabase(dbname);
+                      return true;
+                    }, dbname => {
+                      throw new Error("Creation of database ${dbname} failed!");
+                    }
+                   );
 }
 
 function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {

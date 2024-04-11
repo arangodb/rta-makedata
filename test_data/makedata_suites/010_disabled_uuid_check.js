@@ -10,6 +10,7 @@
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`010: checking data ${dbCount}`);
       let count = 0;
+      db._useDatabase('_system');
       let databases = db._databases();
       let collections = [];
       let i = 0;

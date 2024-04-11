@@ -70,7 +70,8 @@ const optionsDefaults = {
   passvoid: '',
   printTimeMeasurement: false,
   bigDoc: false,
-  test: undefined
+  test: undefined,
+  forceOneShard: false
 };
 
 let args = _.clone(ARGUMENTS);
