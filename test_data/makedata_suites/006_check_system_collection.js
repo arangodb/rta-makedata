@@ -24,6 +24,8 @@
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
+      } else {
+        return 0;
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
       createUseDatabaseSafe(databaseName, {});
@@ -37,6 +39,8 @@
         let baseName = database;
         if (baseName === "_system") {
           baseName = "system";
+        } else {
+          return 0;
         }
         const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
         let c = zeroPad(dbCount + options.countOffset);
@@ -55,6 +59,8 @@
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
+      } else {
+        return 0;
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
       db._useDatabase('_system');
