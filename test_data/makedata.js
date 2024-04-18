@@ -18,6 +18,7 @@
 // `--test                                 comma separated list of testcases to filter for
 // `--tempDataDir                          directory to store temporary data
 // `--excludePreviouslyExecutedTests       If enabled, information about which tests were ran will be saved in the temporary directory. These tests will be skipped during next run. Default: false.
+// `--createOneShardDatabase               When running in a custom database(not _system) whether this database must be created with sharding=single option. Default: false.
 'use strict';
 const fs = require('fs');
 const _ = require('lodash');
@@ -86,7 +87,8 @@ const optionsDefaults = {
   test: undefined,
   tempDataDir: "/tmp/makedata",
   excludePreviouslyExecutedTests: false,
-  forceOneShard: false
+  forceOneShard: false,
+  createOneShardDatabase: false,
 };
 
 let args = _.clone(ARGUMENTS);
@@ -98,6 +100,7 @@ if ((args.length > 0) &&
 
 let opts = internal.parseArgv(args, 0);
 _.defaults(opts, optionsDefaults);
+opts.tempDataDir = opts.tempDataDir + "/" + database
 setOptions(opts);
 if (opts.collectionCountOffset !== 0 && database === '_system') {
   throw new Error("must not specify count without different database.");

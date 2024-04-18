@@ -11,14 +11,14 @@ const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
 let rand = require("internal").rand;
 
-function isCharDigit(n){
+function isCharDigit(n) {
   return !!n.trim() && n > -1;
 }
 let options = {};
 let tStart = 0;
 let timeLine = [];
 
-function progress (gaugeName) {
+function progress(gaugeName) {
   if (gaugeName === undefined) {
     throw new Error("gauge name must be defined");
   }
@@ -35,14 +35,14 @@ function progress (gaugeName) {
   tStart = now;
 }
 
-function getShardCount (defaultShardCount) {
+function getShardCount(defaultShardCount) {
   if (options.singleShard) {
     return 1;
   }
   return defaultShardCount;
 }
 
-function getReplicationFactor (defaultReplicationFactor) {
+function getReplicationFactor(defaultReplicationFactor) {
   if (defaultReplicationFactor > options.maxReplicationFactor) {
     return options.maxReplicationFactor;
   }
@@ -53,7 +53,7 @@ function getReplicationFactor (defaultReplicationFactor) {
 }
 
 let bigDoc = '';
-function writeGraphData (V, E, vertices, edges) {
+function writeGraphData(V, E, vertices, edges) {
   if (options.bigDoc && bigDoc === '') {
     for (let i = 0; i < 100000; i++) {
       bigDoc += "abcde" + i;
@@ -78,7 +78,7 @@ function writeGraphData (V, E, vertices, edges) {
       print(".");
       let len = edges.length / 8;
       [0, 1, 2, 3, 4, 5, 6, 7].forEach(i => {
-        E.insert(edges.slice(len*i, len * (i+1)));
+        E.insert(edges.slice(len * i, len * (i + 1)));
       });
     } else {
       E.insert(edges);
@@ -87,7 +87,7 @@ function writeGraphData (V, E, vertices, edges) {
   }
 }
 
-function createSafe (name, fn1, fnErrorExists) {
+function createSafe(name, fn1, fnErrorExists) {
   let countDbRetry = 0;
   while (countDbRetry < 50) {
     try {
@@ -120,24 +120,24 @@ function createUseDatabaseSafe(databaseName, dbOptions) {
     dbOptions["sharding"] = "single";
   }
   return createSafe(databaseName,
-                    dbname => {
-                      db._useDatabase('_system');
-                      db._flushCache();
-                      db._createDatabase(dbname, dbOptions);
-                      db._useDatabase(dbname);
-                      return true;
-                    }, dbname => {
-                      throw new Error("Creation of database ${dbname} failed!");
-                    }
-                   );
+    dbname => {
+      db._useDatabase('_system');
+      db._flushCache();
+      db._createDatabase(dbname, dbOptions);
+      db._useDatabase(dbname);
+      return true;
+    }, dbname => {
+      throw new Error("Creation of database ${dbname} failed!");
+    }
+  );
 }
 
-function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {
+function createCollectionSafe(name, DefaultNumShards, DefaultReplFactor, otherOptions = {}) {
   let defaultOptions = {
     numberOfShards: getShardCount(DefaultNumShards),
     replicationFactor: getReplicationFactor(DefaultReplFactor)
   };
-  let options = {...defaultOptions, ...otherOptions};
+  let options = { ...defaultOptions, ...otherOptions };
   return createSafe(name, colName => {
     return db._create(colName, options);
   }, colName => {
@@ -145,7 +145,7 @@ function createCollectionSafe (name, DefaultNumShards, DefaultReplFactor, otherO
   });
 }
 
-function createIndexSafe (options) {
+function createIndexSafe(options) {
   let opts = _.clone(options);
   delete opts.col;
   return createSafe(options.col.name(), colname => {
@@ -169,18 +169,18 @@ function runAqlQueryResultCountMultiply(query, expectLength) {
   }
 }
 
-function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
+function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
   var EXECUTED_TEST_SUITES_FILE = "";
   var previously_executed_suites = [];
-  if(excludePreviouslyExecuted) {
+  if (excludePreviouslyExecuted) {
     EXECUTED_TEST_SUITES_FILE = fs.join(options.tempDataDir, "executed_test_suites.json");
-    if(!fs.exists(options.tempDataDir)){
+    if (!fs.exists(options.tempDataDir)) {
       fs.makeDirectoryRecursive(options.tempDataDir);
     }
-    
+
     try {
       previously_executed_suites = JSON.parse(fs.read(EXECUTED_TEST_SUITES_FILE));
-    } catch (exception) { } 
+    } catch (exception) { }
   }
 
   let tableColumnHeaders = [
@@ -189,8 +189,8 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
   let resultTable = new AsciiTable("");
   resultTable.setHeading(tableColumnHeaders);
 
-  let fns = [[],[]];
-  const FNChars = [ 'D', 'L'];
+  let fns = [[], []];
+  const FNChars = ['D', 'L'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
     filters = options.test.split(',');
@@ -238,17 +238,20 @@ function scanMakeDataPaths (options, PWD, oldVersion, newVersion, wantFunctions,
     let supported = "";
     let unsupported = "";
     let pseg = suitePath.split(fs.pathSeparator);
-    let suite_filename = pseg[pseg.length - 1];    
+    let suite_filename = pseg[pseg.length - 1];
     let suite = require("internal").load(suitePath);
     if (suite.isSupported(oldVersion, newVersion, options, enterprise, isCluster)) {
       let count = 0;
       wantFunctions.forEach(fn => {
         if (wantFunctions[count] in suite) {
-          column.push(' X');
           supported += FNChars[count];
-          if(!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted){
+          if (!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted) {
+            column.push(' X');
             fns[count].push(suite[fn]);
             executed_suites.push(suite_filename);
+          } else {
+            column.push(' S');
+            unsupported += " ";
           }
         } else {
           column.push(' ');
@@ -291,10 +294,10 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
         db._useDatabase(database);
       }
       func(options,
-           isCluster,
-           enterprise,
-           database,
-           dbCount);
+        isCluster,
+        enterprise,
+        database,
+        dbCount);
     });
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
@@ -306,14 +309,14 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
           db._useDatabase(database);
         }
         func(options,
-             isCluster,
-             enterprise,
-             dbCount,
-             loopCount);
+          isCluster,
+          enterprise,
+          dbCount,
+          loopCount);
       });
 
       progress('inner Loop End');
-      loopCount ++;
+      loopCount++;
     }
     progress('outer loop end');
 
@@ -325,7 +328,7 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
   }
 }
 
-function getMetricValue (text, name) {
+function getMetricValue(text, name) {
   let re = new RegExp("^" + name);
   let matches = text.split('\n').filter((line) => !line.match(/^#/)).filter((line) => line.match(re));
   if (!matches.length) {
@@ -334,7 +337,7 @@ function getMetricValue (text, name) {
   return Number(matches[0].replace(/^.*{.*}([0-9. ]+)$/, "$1"));
 }
 
-function makeRandomString (l) {
+function makeRandomString(l) {
   var r = rand();
   var d = rand();
   var s = "x";
@@ -345,38 +348,41 @@ function makeRandomString (l) {
   return s.slice(0, l);
 };
 
-function makeRandomNumber (low, high) {
+function makeRandomNumber(low, high) {
   return (Math.abs(rand()) % (high - low)) + low;
 };
 
-function makeRandomTimeStamp () {
+function makeRandomTimeStamp() {
   return new Date(rand() * 1000).toISOString();
 };
 
 let rcount = 1; // for uniqueness
-function resetRCount() { rcount = 1;}
-function makeRandomDoc () {
+function resetRCount() { rcount = 1; }
+function makeRandomDoc() {
   rcount += 1;
   let s = "";
   for (let i = 0; i < 10; ++i) {
     s += " " + makeRandomString(10);
   }
-  return { Type: makeRandomNumber(1000, 65535),
-           ID: makeRandomString(40),
-           OptOut: rand() > 0 ? 1 : 0,
-           Source: makeRandomString(14),
-           dateLast: makeRandomTimeStamp(),
-           a: "id" + rcount,
-           b: makeRandomString(20),
-           c: makeRandomString(40),
-           text: s,
-           position: {type: "Point",
-                      coordinates: [makeRandomNumber(0, 3600) / 10.0,
-                                    makeRandomNumber(-899, 899) / 10.0]
-                     }};
+  return {
+    Type: makeRandomNumber(1000, 65535),
+    ID: makeRandomString(40),
+    OptOut: rand() > 0 ? 1 : 0,
+    Source: makeRandomString(14),
+    dateLast: makeRandomTimeStamp(),
+    a: "id" + rcount,
+    b: makeRandomString(20),
+    c: makeRandomString(40),
+    text: s,
+    position: {
+      type: "Point",
+      coordinates: [makeRandomNumber(0, 3600) / 10.0,
+      makeRandomNumber(-899, 899) / 10.0]
+    }
+  };
 };
 
-function writeData (coll, n) {
+function writeData(coll, n) {
   let wcount = 0;
   while (wcount < options.dataMultiplier) {
     let l = [];
@@ -424,5 +430,5 @@ exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
 exports.runAqlQueryResultCount = runAqlQueryResultCount;
 exports.runAqlQueryResultCountMultiply = runAqlQueryResultCountMultiply;
-exports.setOptions = function (opts) { options = opts;};
+exports.setOptions = function (opts) { options = opts; };
 Object.defineProperty(exports, 'options', { get: () => options });
