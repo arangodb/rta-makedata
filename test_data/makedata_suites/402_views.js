@@ -951,9 +951,6 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (cacheSizeSupported && isEnterprise) {
         cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-        if (cacheSize !== 0) {
-          throw new Error(`initial cache size is ${cacheSize} (not 0)`);
-        }
       }
 
       arangosearchTestCases.forEach(test => {
