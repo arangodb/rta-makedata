@@ -25,6 +25,7 @@
       if (baseName === "_system") {
         baseName = "system";
       } else {
+        print(`skipping creation of per database data, since database is not _system`);
         return 0;
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
@@ -40,6 +41,7 @@
         if (baseName === "_system") {
           baseName = "system";
         } else {
+          print(`skipping checking of per database data, since database is not _system`);
           return 0;
         }
         const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
@@ -60,6 +62,7 @@
       if (baseName === "_system") {
         baseName = "system";
       } else {
+        print(`skipping deletion of per database data, since database is not _system`);
         return 0;
       }
       const databaseName = `${baseName}_${dbCount}${dbNameSuffix}`;
