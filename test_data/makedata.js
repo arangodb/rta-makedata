@@ -101,7 +101,7 @@ if ((args.length > 0) &&
 
 let opts = internal.parseArgv(args, 0);
 _.defaults(opts, optionsDefaults);
-opts.tempDataDir = pth.join(opts.tempDataDir, database)
+opts.tempDataDir = pth.join(opts.tempDataDir, database);
 setOptions(opts);
 if (opts.collectionCountOffset !== 0 && database === '_system') {
   throw new Error("must not specify count without different database.");
