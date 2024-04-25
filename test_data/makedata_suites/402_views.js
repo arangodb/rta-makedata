@@ -946,7 +946,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       let cacheSizeSupported = isCacheSizeSupported(currVersion, options);
 
-      const cacheSizeLimit = 10000;
+      const cacheSizeLimit = 5000;
       let cacheSize = 0;      
       let prevCacheSize = cacheSize;
 
