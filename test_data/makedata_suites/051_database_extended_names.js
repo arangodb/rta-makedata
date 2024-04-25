@@ -15,7 +15,7 @@
       if (baseName === "_system") {
         baseName = "system";
       } else {
-        print(`skipping creation of per database data, since database is not _system`);
+        print(`051: skipping creation of per database data, since database is not _system`);
         return 0;
       }
       db._useDatabase("_system");
@@ -39,7 +39,7 @@
       if (baseName === "_system") {
         baseName = "system";
       } else {
-        print(`skipping checking of per database data, since database is not _system`);
+        print(`051: skipping checking of per database data, since database is not _system`);
         return 0;
       }
       progress("051: Test databases with extended unicode symbols in the name");
@@ -59,7 +59,7 @@
       if (database === "_system") {
         database = "system";
       } else {
-        print(`skipping deletion of per database data, since database is not _system`);
+        print(`051: skipping deletion of per database data, since database is not _system`);
         return 0;
       }
       let baseName = database;
