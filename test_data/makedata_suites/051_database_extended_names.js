@@ -14,6 +14,9 @@
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
+      } else {
+        print(`051: skipping creation of per database data, since database is not _system`);
+        return 0;
       }
       db._useDatabase("_system");
       for (let i in extendedDbNames) {
@@ -35,6 +38,9 @@
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
+      } else {
+        print(`051: skipping checking of per database data, since database is not _system`);
+        return 0;
       }
       progress("051: Test databases with extended unicode symbols in the name");
       for (let i in extendedDbNames) {
@@ -52,6 +58,9 @@
       progress(`051: Delete databases with unicode symbols in the name ${database} ${dbCount}`);
       if (database === "_system") {
         database = "system";
+      } else {
+        print(`051: skipping deletion of per database data, since database is not _system`);
+        return 0;
       }
       let baseName = database;
       for (let i in extendedDbNames) {

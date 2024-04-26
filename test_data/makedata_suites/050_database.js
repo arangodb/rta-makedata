@@ -20,8 +20,10 @@
         }
         progress(`050: creating database ${database}`);
         let dbcOptions = {};
-        if (isCluster) {
+        if (isCluster && !options.createOneShardDatabase) {
           dbcOptions = { replicationFactor: 2};
+        } else if (options.createOneShardDatabase) {
+          dbcOptions = { sharding: "single"};
         }
         createUseDatabaseSafe(database, dbcOptions);
       } else if (options.numberOfDBs > 1) {

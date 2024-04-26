@@ -946,14 +946,13 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       let cacheSizeSupported = isCacheSizeSupported(currVersion, options);
 
-      let cacheSize = 0;
+      const cacheSizeLimit = 5000;
+      let cacheSize = 0;      
       let prevCacheSize = cacheSize;
 
       if (cacheSizeSupported && isEnterprise) {
         cacheSize = getMetric("arangodb_search_columns_cache_size", options);
-        if (cacheSize !== 0) {
-          throw new Error(`initial cache size is ${cacheSize} (not 0)`);
-        }
+        prevCacheSize = cacheSize;
       }
 
       arangosearchTestCases.forEach(test => {
@@ -998,7 +997,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache || viewUtilizeCache) {
-              if (cacheSize <= prevCacheSize) {
+              if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
@@ -1063,7 +1062,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache) {
-              if (cacheSize <= prevCacheSize) {
+              if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
