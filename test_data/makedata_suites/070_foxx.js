@@ -151,7 +151,7 @@ const crudTestServiceSource = {
       // All items created must contain dbCount
       testFoxxRoutingReady();
       testFoxxReady(aardvarkRoute);
-      print(`070: making per database data ${dbCount}`);
+      print(`070: making per database data ${database}`);
       print("070: installing Itzpapalotl");
       // installFoxx('/itz', itzpapalotlZip, "install", options);
 
