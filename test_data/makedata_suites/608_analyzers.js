@@ -71,7 +71,7 @@ function getTestData_608(dbCount) {
         analyzerName: `aqlFilter_${dbCount}`,
         "@testView": `aqlView_${dbCount}`
       },
-      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.value IN ['regular', 'irregular'], @analyzerName) RETURN doc.value",
+      query: "FOR doc IN @@testView SEARCH ANALYZER(doc.value IN ['regular', 'irregular'], @analyzerName) OPTIONS {waitForSync:true} RETURN doc.value",
       analyzerProperties: [
         "aql",
         {
