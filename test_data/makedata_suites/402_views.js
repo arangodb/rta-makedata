@@ -946,7 +946,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       let cacheSizeSupported = isCacheSizeSupported(currVersion, options);
 
-      const cacheSizeLimit = 5000;
+      const cacheSizeLimit = 4900;
       let cacheSize = 0;      
       let prevCacheSize = cacheSize;
 
@@ -997,11 +997,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache || viewUtilizeCache) {
-<<<<<<< Updated upstream
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
-=======
-              if (cacheSize <= prevCacheSize && cacheSize < 4900) {
->>>>>>> Stashed changes
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
@@ -1066,11 +1062,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache) {
-<<<<<<< Updated upstream
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
-=======
-              if (cacheSize <= prevCacheSize && cacheSize < 4900) {
->>>>>>> Stashed changes
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
