@@ -997,11 +997,15 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache || viewUtilizeCache) {
+<<<<<<< Updated upstream
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
+=======
+              if (cacheSize <= prevCacheSize && cacheSize < 4900) {
+>>>>>>> Stashed changes
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
-              if (cacheSize > prevCacheSize) {
+              if (cacheSize > prevCacheSize && cacheSize < 4900) {
                 throw new Error(`Cache size should not be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             }
@@ -1062,11 +1066,15 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // update cacheSize
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache) {
+<<<<<<< Updated upstream
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
+=======
+              if (cacheSize <= prevCacheSize && cacheSize < 4900) {
+>>>>>>> Stashed changes
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             } else {
-              if (cacheSize > prevCacheSize) {
+              if (cacheSize > prevCacheSize && cacheSize < 4900) {
                 throw new Error(`Cache size should not be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
               }
             }
