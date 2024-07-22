@@ -188,7 +188,7 @@ const crudTestServiceSource = {
 
       print("070: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
-      assertEqual(reply.code, "200");
+      assertEqual(reply.code, "200", JSON.stringify(reply));
       parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody, []);
 
@@ -206,17 +206,17 @@ const crudTestServiceSource = {
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
       if (options.readOnly) {
-        assertEqual(parsedBody, []);
+        assertEqual(parsedBody, [], JSON.stringify(reply));
       } else {
-        assertEqual(parsedBody.length, 1);
+        assertEqual(parsedBody.length, 1, JSON.stringify(reply));
       }
 
       print('070: Foxx: crud testing delete document');
       reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/test`);
       if (options.readOnly) {
-        assertEqual(reply.code, "400");
+        assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
-        assertEqual(reply.code, "204");
+        assertEqual(reply.code, "204", JSON.stringify(reply));
       }
       return 0;
     },

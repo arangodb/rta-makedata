@@ -100,22 +100,22 @@
 
       print("071: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
-      assertEqual(reply.code, "200");
+      assertEqual(reply.code, "200", JSON.stringify(reply));
       parsedBody = JSON.parse(reply.body);
-      assertEqual(parsedBody, []);
+      assertEqual(parsedBody, [], JSON.stringify(reply));
 
       print("071: Foxx: crud testing POST xxx");
 
       reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: "test"});
       if (options.readOnly) {
-        assertEqual(reply.code, "400");
+        assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
-        assertEqual(reply.code, "201");
+        assertEqual(reply.code, "201", JSON.stringify(reply));
       }
 
       print("071: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
-      assertEqual(reply.code, "200");
+      assertEqual(reply.code, "200", JSON.stringify(reply));
       parsedBody = JSON.parse(reply.body);
       if (options.readOnly) {
         assertEqual(parsedBody, []);
@@ -126,9 +126,9 @@
       print('071: Foxx: crud testing delete document');
       reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/` + 'test');
       if (options.readOnly) {
-        assertEqual(reply.code, "400");
+        assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
-        assertEqual(reply.code, "204");
+        assertEqual(reply.code, "204", JSON.stringify(reply));
       }
       return 0;
     },
