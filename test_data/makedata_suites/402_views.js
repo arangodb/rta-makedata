@@ -792,7 +792,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   let getMetricByName = function (name, tags) {
     let res = getRawMetrics(tags);
     if (res.code !== 200) {
-      print(`402: http result: ${JSON.stringify(res)}`);
+      print(`402: http result Name: ${name} Tags: ${tags} : ${JSON.stringify(res)}`);
       return 0;
     }
     return getMetricValue(res.body, name);
