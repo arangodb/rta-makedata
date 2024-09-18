@@ -18,16 +18,16 @@
       print(`802: VPack Sorting making data ${dbCount} ${loopCount}`);
       let c = db[`vpack_sorting_c_${dbCount}`];
 
-      // Insert test data:
+      // Insert test data with loopCount added as an attribute:
       progress('802: inserting test data');
       db._query(aql`
-        INSERT { _key: "1", value: [1152921504606846976, "z"] } INTO ${c}
+        INSERT { _key: "1", value: [1152921504606846976, "z"], loopCount: ${loopCount} } INTO ${c}
       `);
       db._query(aql`
-        INSERT { _key: "2", value: [1152921504606846977, "x"] } INTO ${c}
+        INSERT { _key: "2", value: [1152921504606846977, "x"], loopCount: ${loopCount} } INTO ${c}
       `);
       db._query(aql`
-        INSERT { _key: "3", value: [1.152921504606847e+18, "y"] } INTO ${c}
+        INSERT { _key: "3", value: [1.152921504606847e+18, "y"], loopCount: ${loopCount} } INTO ${c}
       `);
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -37,7 +37,6 @@
       const version = db._version();
       const currentVersionSemver = semver.parse(semver.coerce(version));
       const minVersionSemver = semver.parse(semver.coerce("3.12.2"));
-      const fallbackVersionSemver = semver.parse(semver.coerce("3.11.11"));
 
       // Check sorting before migration
       progress("802: checking sorting before migration");
@@ -45,8 +44,8 @@
       
       print("Actual sorting result:", JSON.stringify(resultBeforeFix, null, 2));
 
-      if (semver.lt(currentVersionSemver, fallbackVersionSemver) && semver.lt(currentVersionSemver, minVersionSemver)) {
-        // For versions older than 3.11.11 and 3.12.2, check the incorrect sorting order (z, x, y)
+      if (semver.lt(currentVersionSemver, minVersionSemver)) {
+        // For versions older than 3.12.2 or 3.11.11, check the incorrect sorting order (z then x then y)
         print("Expected incorrect sorting (z then x then y):");
         const expectedIncorrect = [
           { _key: "1", value: [1152921504606846976, "z"] },
@@ -59,7 +58,7 @@
           throw new Error("Sorting result does not match expected incorrect order!");
         }
       } else {
-        // For versions >= 3.11.11 or >= 3.12.2, check the correct sorting order (y, z, x)
+        // For versions 3.12.2 or 3.11.11 and newer, check the correct sorting order (y then z then x)
         print("Expected correct sorting (y then z then x):");
         const expectedCorrect = [
           { _key: "3", value: [1.152921504606847e+18, "y"] },
