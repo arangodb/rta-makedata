@@ -36,7 +36,8 @@
 
       const version = db._version();
       const currentVersionSemver = semver.parse(semver.coerce(version));
-      const minVersionSemver = semver.parse(semver.coerce("3.12.2"));
+      const minVersion311Semver = semver.parse(semver.coerce("3.11.11"));
+      const minVersion312Semver = semver.parse(semver.coerce("3.12.2"));
 
       // Check sorting before migration
       progress("802: checking sorting before migration");
@@ -44,8 +45,8 @@
       
       print("Actual sorting result:", JSON.stringify(resultBeforeFix, null, 2));
 
-      if (semver.lt(currentVersionSemver, minVersionSemver)) {
-        // For versions older than 3.12.2 or 3.11.11, check the incorrect sorting order (z then x then y)
+      if (semver.lt(currentVersionSemver, minVersion311Semver)) {
+        // For versions older than 3.11.11, check the incorrect sorting order (z then x then y)
         print("Expected incorrect sorting (z then x then y):");
         const expectedIncorrect = [
           { _key: "1", value: [1152921504606846976, "z"] },
@@ -57,8 +58,23 @@
         if (JSON.stringify(resultBeforeFix) !== JSON.stringify(expectedIncorrect)) {
           throw new Error("Sorting result does not match expected incorrect order!");
         }
+
+      } else if (semver.lt(currentVersionSemver, minVersion312Semver)) {
+        // For versions >= 3.11.11 but < 3.12.2, still expect incorrect sorting (z then x then y)
+        print("Expected incorrect sorting (z then x then y):");
+        const expectedIncorrect = [
+          { _key: "1", value: [1152921504606846976, "z"] },
+          { _key: "2", value: [1152921504606846977, "x"] },
+          { _key: "3", value: [1.152921504606847e+18, "y"] }
+        ];
+        print("Expected result:", JSON.stringify(expectedIncorrect, null, 2));
+
+        if (JSON.stringify(resultBeforeFix) !== JSON.stringify(expectedIncorrect)) {
+          throw new Error("Sorting result does not match expected incorrect order!");
+        }
+
       } else {
-        // For versions 3.12.2 or 3.11.11 and newer, check the correct sorting order (y then z then x)
+        // For versions 3.12.2 and newer, check the correct sorting order (y then z then x)
         print("Expected correct sorting (y then z then x):");
         const expectedCorrect = [
           { _key: "3", value: [1.152921504606847e+18, "y"] },
