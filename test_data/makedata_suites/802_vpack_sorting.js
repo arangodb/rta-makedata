@@ -44,17 +44,17 @@
       let ret;
       ret = db._query(aql`
         FOR doc in ${c} FILTER doc.value[0] == 1152921504606846976 return doc.value[1]
-      `);
+      `).toArray();
       assertEqual(ret.length, 1);
       assertEqual(ret[0], 'z');
       ret = db._query(aql`
         FOR doc in ${c} FILTER doc.value[0] == 1152921504606846977 return doc.value[1]
-      `);
+      `).toArray();
       assertEqual(ret.length, 1);
       assertEqual(ret[0], 'x');
       ret = db._query(aql`
         FOR doc in ${c} FILTER doc.value[0] == 1.152921504606847e+18 return doc.value[1]
-      `);
+      `).toArray();
       assertEqual(ret.length, 1);
       assertEqual(ret[0], 'y');
       // Check sorting before migration
