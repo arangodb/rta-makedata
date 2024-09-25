@@ -197,7 +197,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
   }
   let negFilters = [];
   if (options.hasOwnProperty('skip') && (typeof (options.skip) !== 'undefined')) {
-    negFilters = options.skip.split(',');
+    negFilters = String(options.skip).split(',');
   }
   let testDir = fs.join(PWD, 'makedata_suites');
   let suites = _.filter(
