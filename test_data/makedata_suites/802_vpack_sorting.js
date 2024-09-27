@@ -46,22 +46,6 @@
 
       // Print the version being tested
       progress(`Testing version: ${version}`);
-      let ret;
-      ret = db._query(aql`
-        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846976 return doc.value[1]
-      `).toArray();
-      assertEqual(ret.length, 1);
-      assertEqual(ret[0], 'z');
-      ret = db._query(aql`
-        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846977 return doc.value[1]
-      `).toArray();
-      assertEqual(ret.length, 1);
-      assertEqual(ret[0], 'x');
-      ret = db._query(aql`
-        FOR doc in ${c} FILTER doc.value[0] == 1.152921504606847e+18 return doc.value[1]
-      `).toArray();
-      assertEqual(ret.length, 1);
-      assertEqual(ret[0], 'y');
       // Check sorting before migration
       progress("802: checking sorting before migration");
       let resultBeforeFix = db._query(aql`FOR doc IN ${c} SORT doc.value RETURN { _key: doc._key, value: doc.value }`).toArray(); // Return only _key and value
@@ -93,6 +77,22 @@
         if (JSON.stringify(resultBeforeFix) !== JSON.stringify(expectedCorrect)) {
           throw new Error("Sorting result does not match expected correct order!");
         }
+        let ret;
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846976 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'z');
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846977 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'x');
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1.152921504606847e+18 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'y');
       }
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
