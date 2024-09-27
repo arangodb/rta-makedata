@@ -34,10 +34,15 @@
       print(`802: VPack Sorting checking per database data ${dbCount}`);
       let c = db._collection(`vpack_sorting_c_${dbCount}`);
 
-      const version = db._version();
-      const currentVersionSemver = semver.parse(semver.coerce(version));
+      const currentVersionSemver = semver.parse(semver.coerce(options.curVersion));
+      const oldVersionSemver = semver.parse(semver.coerce(options.oldVersion));
       const minVersion312Semver = semver.parse(semver.coerce("3.12.2"));
       const maxVersion311Semver = semver.parse(semver.coerce("3.11.11"));
+      let isVersionUncapable = function(versionToCheck) {
+        return (semver.lt(versionToCheck, maxVersion311Semver) || 
+                (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(currentVersionSemver, minVersion312Semver)));
+      }
+      let hasOldVersion = isVersionUncapable(currentVersionSemver) || isVersionUncapable(oldVersionSemver);
 
       // Print the version being tested
       progress(`Testing version: ${version}`);
@@ -62,9 +67,7 @@
       let resultBeforeFix = db._query(aql`FOR doc IN ${c} SORT doc.value RETURN { _key: doc._key, value: doc.value }`).toArray(); // Return only _key and value
       
       print("Actual sorting result:", JSON.stringify(resultBeforeFix, null, 2));
-
-      if (semver.lt(currentVersionSemver, maxVersion311Semver) || 
-          (semver.gte(currentVersionSemver, semver.parse("3.12.0")) && semver.lt(currentVersionSemver, minVersion312Semver))) {
+      if (hasOldVersion) {
         // For versions below 3.11.11 and versions in the range 3.12.0 to < 3.12.2, check the incorrect sorting order (z then x then y)
         print("Expected incorrect sorting (z then x then y):");
         const expectedIncorrect = [
