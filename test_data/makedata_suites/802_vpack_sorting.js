@@ -40,12 +40,12 @@
       const maxVersion311Semver = semver.parse(semver.coerce("3.11.11"));
       let isVersionUncapable = function(versionToCheck) {
         return (semver.lt(versionToCheck, maxVersion311Semver) || 
-                (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(currentVersionSemver, minVersion312Semver)));
+                (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(versionToCheck, minVersion312Semver)));
       }
       let hasOldVersion = isVersionUncapable(currentVersionSemver) || isVersionUncapable(oldVersionSemver);
 
       // Print the version being tested
-      progress(`Testing version: ${version}`);
+      progress(`Testing version: ${options.curVersion}`);
       // Check sorting before migration
       progress("802: checking sorting before migration");
       let resultBeforeFix = db._query(aql`FOR doc IN ${c} SORT doc.value RETURN { _key: doc._key, value: doc.value }`).toArray(); // Return only _key and value
