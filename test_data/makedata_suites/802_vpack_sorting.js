@@ -34,22 +34,24 @@
       print(`802: VPack Sorting checking per database data ${dbCount}`);
       let c = db._collection(`vpack_sorting_c_${dbCount}`);
 
-      const version = db._version();
-      const currentVersionSemver = semver.parse(semver.coerce(version));
+      const currentVersionSemver = semver.parse(semver.coerce(options.curVersion));
+      const oldVersionSemver = semver.parse(semver.coerce(options.oldVersion));
       const minVersion312Semver = semver.parse(semver.coerce("3.12.2"));
       const maxVersion311Semver = semver.parse(semver.coerce("3.11.11"));
+      let isVersionUncapable = function(versionToCheck) {
+        return (semver.lt(versionToCheck, maxVersion311Semver) || 
+                (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(currentVersionSemver, minVersion312Semver)));
+      }
+      let hasOldVersion = isVersionUncapable(currentVersionSemver) || isVersionUncapable(oldVersionSemver);
 
       // Print the version being tested
       progress(`Testing version: ${version}`);
-      
       // Check sorting before migration
       progress("802: checking sorting before migration");
       let resultBeforeFix = db._query(aql`FOR doc IN ${c} SORT doc.value RETURN { _key: doc._key, value: doc.value }`).toArray(); // Return only _key and value
       
       print("Actual sorting result:", JSON.stringify(resultBeforeFix, null, 2));
-
-      if (semver.lt(currentVersionSemver, maxVersion311Semver) || 
-          (semver.gte(currentVersionSemver, semver.parse("3.12.0")) && semver.lt(currentVersionSemver, minVersion312Semver))) {
+      if (hasOldVersion) {
         // For versions below 3.11.11 and versions in the range 3.12.0 to < 3.12.2, check the incorrect sorting order (z then x then y)
         print("Expected incorrect sorting (z then x then y):");
         const expectedIncorrect = [
@@ -75,6 +77,22 @@
         if (JSON.stringify(resultBeforeFix) !== JSON.stringify(expectedCorrect)) {
           throw new Error("Sorting result does not match expected correct order!");
         }
+        let ret;
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846976 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'z');
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1152921504606846977 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'x');
+        ret = db._query(aql`
+        FOR doc in ${c} FILTER doc.value[0] == 1.152921504606847e+18 return doc.value[1]
+      `).toArray();
+        assertEqual(ret.length, 1);
+        assertEqual(ret[0], 'y');
       }
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
