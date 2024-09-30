@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
+/* global print, assertEqual, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
 
 (function () {
   return {
@@ -41,7 +41,7 @@
       let isVersionUncapable = function(versionToCheck) {
         return (semver.lt(versionToCheck, maxVersion311Semver) || 
                 (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(versionToCheck, minVersion312Semver)));
-      }
+      };
       let hasOldVersion = isVersionUncapable(currentVersionSemver) || isVersionUncapable(oldVersionSemver);
 
       // Print the version being tested
