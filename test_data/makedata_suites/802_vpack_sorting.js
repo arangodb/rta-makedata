@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
+/* global print, assertEqual, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
 
 (function () {
   return {
@@ -38,12 +38,11 @@
       const oldVersionSemver = semver.parse(semver.coerce(options.oldVersion));
       const minVersion312Semver = semver.parse(semver.coerce("3.12.2"));
       const maxVersion311Semver = semver.parse(semver.coerce("3.11.11"));
-      let isVersionUncapable = function (versionToCheck) {
-        return (semver.lt(versionToCheck, maxVersion311Semver) ||
-          (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(versionToCheck, minVersion312Semver)));
-      }
+      let isVersionUncapable = function(versionToCheck) {
+        return (semver.lt(versionToCheck, maxVersion311Semver) || 
+                (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.lt(versionToCheck, minVersion312Semver)));
+      };
       let hasOldVersion = isVersionUncapable(currentVersionSemver) || isVersionUncapable(oldVersionSemver);
-
       // Print the version being tested
       progress(`Testing version: ${options.curVersion}`);
       // Check sorting before migration
