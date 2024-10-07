@@ -58,7 +58,7 @@
           { _key: "3", value: [1.152921504606847e+18, "y"] }
         ];
         print("Expected incorrect sorting (z then x then y):", JSON.stringify(expectedIncorrect, null, 2));
-        assertEqual(JSON.stringify(expectedIncorrect), JSON.stringify(actual), "Sorting result does not match expected incorrect order!")
+        assertEqual(JSON.stringify(expectedIncorrect), JSON.stringify(actual), "Sorting result does not match expected incorrect order!");
       } else {
         // For versions 3.11.11 and newer and versions >= 3.12.2, check the correct sorting order (y then z then x)
         const expectedCorrect = [
