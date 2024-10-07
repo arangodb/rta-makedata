@@ -1,1 +1,1 @@
-throw 'yipiahea motherfucker';
+throw 'thy shall not pass!';
