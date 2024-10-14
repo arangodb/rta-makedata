@@ -96,7 +96,7 @@
       progress('550: done');
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`550: checking data ${dbCount} ${dbCount}`);
+      print(`550: clearing data ${dbCount} ${dbCount}`);
     // Drop graph:
       let gsm = require("@arangodb/smart-graph");
       progress('550 dropping smart graph');

@@ -48,6 +48,7 @@
       print(`050: checking data ${dbCount} ${loopCount}`);
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      progress(`050: clearing database ${database}`);
       if (database !== "_system") {
         try {
           db._useDatabase('_system');

@@ -200,7 +200,7 @@ function getTestData_609(dbCount) {
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`609: checking data ${dbCount}`);
+      print(`609: clearing data ${dbCount}`);
       // deleting analyzer
       getTestData_609(dbCount).forEach(test => {
         deleteAnalyzerSet('609', test);

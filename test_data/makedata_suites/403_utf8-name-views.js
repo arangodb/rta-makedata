@@ -48,7 +48,7 @@
       progress(`403: checkdata done`);
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`403: checking data ${dbCount}`);
+      print(`403: cleaning up data ${dbCount}`);
 
       try {
         db._dropView(`old_view1_403_${dbCount}${extendedNames[6]}`);

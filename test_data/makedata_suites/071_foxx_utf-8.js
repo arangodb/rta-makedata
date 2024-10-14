@@ -133,14 +133,15 @@
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`071: clearing foxx services ${dbcount}`);
       // All items created must contain dbCount
       database = `${extendedNames[0]}FoxxTest${extendedNames[3]}_${dbCount}`;
-      print(`deleting foxx ${dbCount}${database}`);
+      print(`071: deleting foxx ${dbCount}${database}`);
       db._useDatabase(database);
-      print("uninstalling Itzpapalotl");
+      print("071: uninstalling Itzpapalotl");
       deleteFoxx(database, `/itz_${dbCount}`);
 
-      print("uninstalling crud");
+      print("071: uninstalling crud");
       deleteFoxx(database, `/crud_${dbCount}`);
       db._useDatabase('_system');
       db._dropDatabase(database);

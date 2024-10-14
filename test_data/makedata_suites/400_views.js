@@ -45,7 +45,7 @@
       progress("400: view properties");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`400: checking data ${dbCount}`);
+      print(`400: clearing data ${dbCount}`);
 
       try {
         db._dropView(`old_view1_${dbCount}`);

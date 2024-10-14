@@ -181,6 +181,7 @@
       db._useDatabase('_system');
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      print(`102: clearing ${dbcount}`);
       db._useDatabase('_system');
       baseName = database;
       if (baseName === "_system") {

@@ -49,7 +49,7 @@
       progress("401: check view");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`401: checking data ${dbCount}`);
+      print(`401: clearing data ${dbCount}`);
 
       try {
         db._dropView(`view1_${dbCount}`);

@@ -27,7 +27,7 @@
       return 0;
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      print(`000: checking data ${dbCount} ${loopCount}`);
+      print(`000: clearing data ${dbCount} ${loopCount}`);
     }
   };
 
