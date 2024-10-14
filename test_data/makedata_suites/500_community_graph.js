@@ -10,7 +10,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount 
-      progress(`500: making data ${dbCount}`);
+      print(`500: making data ${dbCount}`);
       createSafe(`G_naive_${dbCount}`, graphName => {
         return g._create(graphName,
                          [
@@ -81,7 +81,7 @@
       progress("500: done");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`500: clearing data ${dbCount} ${dbCount}`);
+      print(`500: clearing data ${dbCount} ${dbCount}`);
       progress("500: dropping graph");
       try {
         g._drop(`G_naive_${dbCount}`, true);

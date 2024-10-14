@@ -16,13 +16,13 @@
         baseName = "system";
       }
       baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
-      progress(`102: creating ${baseName}`);
+      print(`102: creating ${baseName}`);
       db._createDatabase(baseName);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
       // Create a few collections:
-      progress(`102: using ${baseName}`);
+      print(`102: using ${baseName}`);
       db._useDatabase(baseName);
       let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
       progress('102: createCollection1');
@@ -86,11 +86,11 @@
         baseName = "system";
       }
       baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
-      progress(`102: using ${baseName}`);
+      print(`102: using ${baseName}`);
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      progress(`102: checking data ${dbCount} ${loopCount}`);
-      progress(`102: using ${baseName}`);
+      print(`102: checking data ${dbCount} ${loopCount}`);
+      print(`102: using ${baseName}`);
       db._useDatabase(baseName);
       let cols = db._collections();
       let cnames = [];
@@ -112,7 +112,7 @@
            }
          });
          if (!foundOne) {
-           progress("Didn't find this collection: " + colname);
+           print("Didn't find this collection: " + colname);
            notFound.push(colname);
            allFound = false;
          }
@@ -181,7 +181,7 @@
       db._useDatabase('_system');
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`102: clearing ${dbcount}`);
+      print(`102: clearing ${dbcount}`);
       db._useDatabase('_system');
       baseName = database;
       if (baseName === "_system") {

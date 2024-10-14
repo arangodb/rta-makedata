@@ -196,14 +196,14 @@ function getTestData_610(dbCount) {
       // All items created must contain dbCount
       // documentation link: https://www.arangodb.com/docs/3.10/analyzers.html
 
-      progress(`610: making per database data ${dbCount}`);
+      print(`610: making per database data ${dbCount}`);
       getTestData_610(dbCount).forEach((test) => {
         createAnalyzerSet('610', test);
       });
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      progress(`610: checking data ${dbCount}`);
+      print(`610: checking data ${dbCount}`);
       progress(`610: checking data with ${dbCount}`);
 
       getTestData_610(dbCount).forEach(test => {
@@ -212,7 +212,7 @@ function getTestData_610(dbCount) {
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`610: clearing data ${dbCount}`);
+      print(`610: clearing data ${dbCount}`);
       getTestData_610(dbCount).forEach(test => {
         deleteAnalyzerSet('610', test);
       });

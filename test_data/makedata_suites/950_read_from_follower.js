@@ -22,7 +22,7 @@ const {
 let waitForStats = function (instances) {
   outerloop:
   for (let instance of instances) {
-    progress("Fetching statistics with the 'sync' flag from the server "
+    print("Fetching statistics with the 'sync' flag from the server "
       + instance["name"] + " to force statistics processing.");
     let ex;
     let sleepTime = 0.1;
@@ -37,18 +37,18 @@ let waitForStats = function (instances) {
         }
       } catch (e) {
         let ex = e;
-        progress(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
+        print(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
       }
       sleepTime *= 2;
       sleep(sleepTime);
     } while (sleepTime < 15);
-    progress(RED + "giving up!" + RESET);
+    print(RED + "giving up!" + RESET);
     throw ex;
   }
 };
 
 let getRawMetric = function (instance, user, tags) {
-  progress("Fetching metrics from the server " + instance["name"]);
+  print("Fetching metrics from the server " + instance["name"]);
   let ex;
   let sleepTime = 0.1;
   let opts = { "jwt": instance.JWT_header };
@@ -62,12 +62,12 @@ let getRawMetric = function (instance, user, tags) {
       }
     } catch (e) {
       let ex = e;
-      progress(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
+      print(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
     }
     sleepTime *= 2;
     sleep(sleepTime);
   } while (sleepTime < 5);
-  progress(RED + "giving up!" + RESET);
+  print(RED + "giving up!" + RESET);
   throw ex;
 };
 
@@ -100,7 +100,7 @@ let moveShard = function (database, collection, shard, fromServer, toServer, don
   }
   // Now wait until the job we triggered is finished:
   var count = 600;   // seconds
-  progress("Waiting until shard is moved...");
+  print("Waiting until shard is moved...");
   while (true) {
     var job = db._connection.GET(`/_admin/cluster/queryAgencyJob?id=${result.id}`);
     //console.error("Status of moveShard job:", JSON.stringify(job));
@@ -111,7 +111,7 @@ let moveShard = function (database, collection, shard, fromServer, toServer, don
       throw "Timeout in waiting for moveShard to complete: " + JSON.stringify(body);
     }
     wait(1.0);
-    if (count % 10 === 0) { progress("."); };
+    if (count % 10 === 0) { print("."); };
   }
 };
 
@@ -177,7 +177,7 @@ let restoreServerLoggingSettings = function (topic) {
       let keys = null;
       return {
         setUpAll: function () {
-          progress(`Setting up ReadDocsFromFollowerTestSuite for collection \"${collName}\".`);
+          print(`Setting up ReadDocsFromFollowerTestSuite for collection \"${collName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(collName);
           shards = coll.shards(true);
@@ -353,7 +353,7 @@ let restoreServerLoggingSettings = function (topic) {
       let vertices = [];
       return {
         setUpAll: function () {
-          progress(`Setting up ReadCommunityGraphFromFollowerTestSuite for collection \"${collName}\".`);
+          print(`Setting up ReadCommunityGraphFromFollowerTestSuite for collection \"${collName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(collName);
           shards = coll.shards(true);
@@ -434,7 +434,7 @@ let restoreServerLoggingSettings = function (topic) {
       let vertices = [];
       return {
         setUpAll: function () {
-          progress(`Setting up ReadSmartGraphFromFollowerTestSuite for edge collection \"${edgeCollName}\", vertex collection \"${vertexCollName}\".`);
+          print(`Setting up ReadSmartGraphFromFollowerTestSuite for edge collection \"${edgeCollName}\", vertex collection \"${vertexCollName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(vertexCollName);
           shards = coll.shards(true);
@@ -530,7 +530,7 @@ let restoreServerLoggingSettings = function (topic) {
     },
 
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      progress('asontehusaonteuhsanoetuhasoentuh');
+      print('asontehusaonteuhsanoetuhasoentuh');
       instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
       let failed = [];
       let docCollections = [
@@ -608,7 +608,7 @@ let restoreServerLoggingSettings = function (topic) {
     },
 
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      progress(`clearing data ${dbCount} ${loopCount}`);
+      print(`clearing data ${dbCount} ${loopCount}`);
       db._drop(`${testCollName}_${loopCount}`, true);
       return 0;
     },

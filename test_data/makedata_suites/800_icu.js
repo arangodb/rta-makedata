@@ -7,7 +7,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      progress(`ICU: making per database data ${dbCount}`);
+      print(`ICU: making per database data ${dbCount}`);
       let test = createCollectionSafe(`icu_test_${dbCount}`, 3, 2);
       progress('800: createICUCollection1');
 
@@ -32,14 +32,14 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      progress(`ICU: making data ${dbCount} ${loopCount}`);
+      print(`ICU: making data ${dbCount} ${loopCount}`);
       let test = db[`icu_test_${dbCount}`];
 
       // Now the actual data writing (not needed in this test setup):
       resetRCount();
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      progress(`ICU: checking per database data ${dbCount}`);
+      print(`ICU: checking per database data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
       [`icu_test_${dbCount}`].forEach(colname => {
@@ -50,7 +50,7 @@
           }
         });
         if (!foundOne) {
-          progress(`800: Didn't find this collection: ${colname}`);
+          print(`800: Didn't find this collection: ${colname}`);
           allFound = false;
         }
       });
@@ -99,13 +99,13 @@
       progress("800: ICU check done");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`ICU: clearing per database data ${dbCount}`);
+      print(`ICU: clearing per database data ${dbCount}`);
       try {
         db._drop(`icu_test_${dbCount}`);
       } catch (e) {}
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      progress(`ICU: clearing data ${dbCount} ${loopCount}`);
+      print(`ICU: clearing data ${dbCount} ${loopCount}`);
       try {
         db._drop(`icu_test_${loopCount}`);
       } catch (e) {}

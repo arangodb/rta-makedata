@@ -10,7 +10,7 @@
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
       // depends on the 550_enterprise_graph.js to be there
-      progress(`checking data ${dbCount} ${loopCount}`);
+      print(`checking data ${dbCount} ${loopCount}`);
       const ArangoError = require('@arangodb').ArangoError;
 
       try {

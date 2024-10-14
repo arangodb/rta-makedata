@@ -24,7 +24,7 @@ class testCursor {
       "options": {"stream": false, "allowRetry": true}
     };
     let ret = arango.POST_RAW('/_api/cursor', postData);
-    //progress(ret)
+    //print(ret)
     if (ret.code !== 201) {
       throw new Error(`960: Cursor for query '${this.query}' could not be created: ${JSON.stringify(ret)}`);
     }
@@ -44,7 +44,7 @@ class testCursor {
   getNext() {
     let url = `/_api/cursor/${this.cursorId}/${this.nextBatchId}`;
     let ret = arango.POST_RAW(url, "");
-    //progress(ret)
+    //print(ret)
     if (ret.code !== 200) {
       throw new Error(`960: Cursor could not be read from ${url} : ${JSON.stringify(ret)}`);
     }
@@ -58,7 +58,7 @@ class testCursor {
   getLast() {
     let url = `/_api/cursor/${this.cursorId}/${this.currentBatchId}`;
     let ret = arango.POST_RAW(url, "");
-    //progress(ret)
+    //print(ret)
     if (ret.code !== 200) {
       throw new Error(`960: Cursor could not be read from ${url}: ${JSON.stringify(ret)}`);
     }
@@ -66,10 +66,10 @@ class testCursor {
     this.hasMore = ret.parsedBody.hasMore;
     let reGotChunk = this.compressDocuments(ret.parsedBody.result);
     if (!_.isEqual(this.resultChunks[this.currentBatchId], reGotChunk)) {
-      progress(this.resultChunks);
-      progress(this.currentBatchId);
-      progress(this.resultChunks[this.currentBatchId]);
-      progress(reGotChunk);
+      print(this.resultChunks);
+      print(this.currentBatchId);
+      print(this.resultChunks[this.currentBatchId]);
+      print(reGotChunk);
       throw new Error("960: Chunks weren't as expected: " + url);
     }
     this.currentBatchId = this.nextBatchId;
@@ -141,21 +141,21 @@ class testCursor {
           }
         }
         while (cursors.length > 0) {
-          // progress(cursors.length)
+          // print(cursors.length)
           let c = Math.floor(Math.random() * cursors.length);
-          //progress('c: ' + c)
+          //print('c: ' + c)
           cursors[c].getLast();
           if (!cursors[c].getNext()) {
-            progress('960: regetting last');
+            print('960: regetting last');
             cursors[c].getLast();
-            progress('960: done with ' + c);
+            print('960: done with ' + c);
             let tail = cursors.splice(c + 1, cursors.length);
             cursors = cursors.splice(0, c).concat(tail);
           }
         }
       } catch (ex) {
-        progress(ex);
-        progress(ex.stack);
+        print(ex);
+        print(ex.stack);
         throw ex;
       }
       return 0;

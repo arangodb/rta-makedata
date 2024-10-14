@@ -10,11 +10,11 @@
       // All items created must contain dbCount
       let localCount = 0;
       if (database !== "_system") {
-        progress('050: #ix');
+        print('050: #ix');
         db._useDatabase('_system');
         if (db._databases().includes(database)) {
           // its already there - skip this one.
-          progress(`050: skipping ${database} - its already there.`);
+          print(`050: skipping ${database} - its already there.`);
           localCount++;
           return localCount;
         }
@@ -33,7 +33,7 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      progress(`050: making data ${dbCount} ${loopCount}`);
+      print(`050: making data ${dbCount} ${loopCount}`);
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // check per DB
@@ -45,7 +45,7 @@
       return 0;
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      progress(`050: checking data ${dbCount} ${loopCount}`);
+      print(`050: checking data ${dbCount} ${loopCount}`);
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress(`050: clearing database ${database}`);
@@ -57,7 +57,7 @@
           if (x.errorNum === ERRORS.ERROR_ARANGO_DATABASE_NOT_FOUND.code) {
             return 1;
           } else {
-            progress(`050: ${x}`);
+            print(`050: ${x}`);
           }
         }
       } else if (options.numberOfDBs > 1) {

@@ -17,7 +17,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and dbCount
-      progress(`550: making data ${dbCount} ${dbCount}`);
+      print(`550: making data ${dbCount} ${dbCount}`);
       // And now a smart graph (if enterprise):
       createSafe(`G_smart_${dbCount}`, graphName => {
         return gsm._create(graphName,
@@ -42,7 +42,7 @@
       progress('550: writeEGraph2 done');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      progress(`550: checking data ${dbCount} ${dbCount}`);
+      print(`550: checking data ${dbCount} ${dbCount}`);
       const vColName = `patents_smart_${dbCount}`;
       let expectNoDocs = options.dataMultiplier * 761;
       let patentsSmart = db._collection(vColName);
@@ -96,7 +96,7 @@
       progress('550: done');
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`550: clearing data ${dbCount} ${dbCount}`);
+      print(`550: clearing data ${dbCount} ${dbCount}`);
     // Drop graph:
       let gsm = require("@arangodb/smart-graph");
       progress('550 dropping smart graph');

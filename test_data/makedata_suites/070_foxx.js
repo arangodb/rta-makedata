@@ -23,7 +23,7 @@ function loadFoxxIntoZip (path) {
 }
 
 function installFoxx (database, mountpoint, which, mode, options) {
-  progress(`Installing Foxx  to ${mountpoint}`);
+  print(`Installing Foxx  to ${mountpoint}`);
   let headers = {};
   let content;
   if (which.type === 'js') {
@@ -67,7 +67,7 @@ function installFoxx (database, mountpoint, which, mode, options) {
       assertEqual(reply.code, 201, "Reply was: " + JSON.stringify(reply));
       crudResp = JSON.parse(reply.body);
     } catch (ex) {
-      progress(`070: installing foxx service threw an exception: ${ex}`);
+      print(`070: installing foxx service threw an exception: ${ex}`);
       throw ex;
     }
   }
@@ -112,12 +112,12 @@ const crudTestServiceSource = {
       try {
         let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
         if (reply.code === 404) {
-          progress("070: selfHeal was already executed - Foxx is ready!");
+          print("070: selfHeal was already executed - Foxx is ready!");
           return 0;
         }
-        progress(`070: Not yet ready, retrying: ${JSON.stringify(reply.parsedBody)}`);
+        print(`070: Not yet ready, retrying: ${JSON.stringify(reply.parsedBody)}`);
       } catch (e) {
-        progress("070: Caught - need to retry. " + JSON.stringify(e));
+        print("070: Caught - need to retry. " + JSON.stringify(e));
       }
       internal.sleep(3);
     }
@@ -128,16 +128,16 @@ const crudTestServiceSource = {
       try {
         let reply = arango.GET_RAW(route, onlyJson);
         if (reply.code === 200) {
-          progress("070: " + route + " OK");
+          print("070: " + route + " OK");
           return 0;
         }
         let msg = JSON.stringify(reply);
         if (reply.hasOwnProperty('parsedBody')) {
           msg = " '" + reply.parsedBody.errorNum + "' - " + reply.parsedBody.errorMessage;
         }
-        progress(route + " Not yet ready, retrying: " + msg);
+        print(route + " Not yet ready, retrying: " + msg);
       } catch (e) {
-        progress(route + " Caught - need to retry. " + JSON.stringify(e));
+        print(route + " Caught - need to retry. " + JSON.stringify(e));
       }
       internal.sleep(3);
     }
@@ -151,18 +151,18 @@ const crudTestServiceSource = {
       // All items created must contain dbCount
       testFoxxRoutingReady();
       testFoxxReady(aardvarkRoute);
-      progress(`070: making per database data ${database}`);
-      progress("070: installing Itzpapalotl");
+      print(`070: making per database data ${database}`);
+      print("070: installing Itzpapalotl");
       // installFoxx('/itz', itzpapalotlZip, "install", options);
 
       installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
-      progress("070: installing crud");
+      print("070: installing crud");
       installFoxx(database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      progress(`070: checking data ${dbCount} `);
+      print(`070: checking data ${dbCount} `);
       let reply;
       testFoxxRoutingReady();
       [
@@ -171,28 +171,28 @@ const crudTestServiceSource = {
         `/_db/${database}/crud_${dbCount}/xxx`
       ].forEach(route => testFoxxReady(route));
 
-      progress("070: Foxx: Itzpapalotl getting the root of the gods");
+      print("070: Foxx: Itzpapalotl getting the root of the gods");
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}`);
       assertEqual(reply.code, "307", JSON.stringify(reply));
 
-      progress('070: Foxx: Itzpapalotl getting index html with list of gods');
+      print('070: Foxx: Itzpapalotl getting index html with list of gods');
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}/index`);
       assertEqual(reply.code, "200", JSON.stringify(reply));
 
-      progress("070: Foxx: Itzpapalotl summoning Chalchihuitlicue");
+      print("070: Foxx: Itzpapalotl summoning Chalchihuitlicue");
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}/Chalchihuitlicue/summon`, onlyJson);
       assertEqual(reply.code, "200", JSON.stringify(reply));
       let parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody.name, "Chalchihuitlicue");
       assertTrue(parsedBody.summoned);
 
-      progress("070: Foxx: crud testing get xxx");
+      print("070: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200", JSON.stringify(reply));
       parsedBody = JSON.parse(reply.body);
       assertEqual(parsedBody, []);
 
-      progress("070: Foxx: crud testing POST xxx");
+      print("070: Foxx: crud testing POST xxx");
 
       reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: "test"});
       if (options.readOnly) {
@@ -201,7 +201,7 @@ const crudTestServiceSource = {
         assertEqual(reply.code, "201", JSON.stringify(reply));
       }
 
-      progress("070: Foxx: crud testing get xxx");
+      print("070: Foxx: crud testing get xxx");
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
@@ -211,7 +211,7 @@ const crudTestServiceSource = {
         assertEqual(parsedBody.length, 1, JSON.stringify(reply));
       }
 
-      progress('070: Foxx: crud testing delete document');
+      print('070: Foxx: crud testing delete document');
       reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/test`);
       if (options.readOnly) {
         assertEqual(reply.code, "400", JSON.stringify(reply));
@@ -222,11 +222,11 @@ const crudTestServiceSource = {
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      progress(`070: deleting foxx ${dbCount}`);
-      progress("070: uninstalling Itzpapalotl");
+      print(`070: deleting foxx ${dbCount}`);
+      print("070: uninstalling Itzpapalotl");
       deleteFoxx(database, `/itz_${dbCount}`);
 
-      progress("070: uninstalling crud");
+      print("070: uninstalling crud");
       deleteFoxx(database, `/crud_${dbCount}`);
       return 0;
     },

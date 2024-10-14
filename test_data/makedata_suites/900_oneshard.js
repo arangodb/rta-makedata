@@ -14,13 +14,13 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      progress(`900: oneShard making per database data ${dbCount}`);
+      print(`900: oneShard making per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
       }
       progress('Start create OneShard DB');
-      progress('#ix');
+      print('#ix');
       const databaseName = `${baseName}_${dbCount}_oneShard`;
       const created = createUseDatabaseSafe(databaseName, {sharding: "single"});
       if (db._properties().sharding !== "single") {
@@ -54,7 +54,7 @@
       }
       progress("Test OneShard setup");
       const databaseName = `${baseName}_${dbCount}_oneShard`;
-      progress('900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
+      print('900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
       db._useDatabase(databaseName);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
         const query = `
@@ -66,7 +66,7 @@
         try {
           result = db._query(query).toArray();
         } catch (ex) {
-          progress(`Failed to instanciate query ${query} -> ${ex}`);
+          print(`Failed to instanciate query ${query} -> ${ex}`);
           throw ex;
         }
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {

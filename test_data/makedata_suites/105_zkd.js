@@ -24,7 +24,7 @@
       progress('105: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      progress(`checking data ${dbCount}`);
+      print(`checking data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
       [`c_zkd_${dbCount}`].forEach(colname => {
@@ -35,7 +35,7 @@
            }
          });
          if (!foundOne) {
-           progress("105: Didn't find this collection: " + colname);
+           print("105: Didn't find this collection: " + colname);
            allFound = false;
          }
        });
@@ -64,7 +64,7 @@
       progress("105: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      progress(`clearing data ${dbCount} ${loopCount}`);
+      print(`clearing data ${dbCount} ${loopCount}`);
       progress("105: drop 1");
       try {
         db._drop(`c_zkd_${dbCount}`);
