@@ -7,13 +7,13 @@
       },
   
       makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-        print(`UDF: making per database data ${dbCount}`);
+        progress(`UDF: making per database data ${dbCount}`);
         let c = createCollectionSafe(`udf_test_${dbCount}`, 3, 2);
         progress('801: createUDFCollection');
       },
   
       makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-        print(`UDF: making data ${dbCount} ${loopCount}`);
+        progress(`UDF: making data ${dbCount} ${loopCount}`);
         var aqlfunctions = require("@arangodb/aql/functions");
   
         // Define and register the UDF
@@ -59,7 +59,7 @@
         ];
   
         var sortedCharacters = db._query(aql`RETURN MYFUNCTIONS::SORT_UNICODE(${unicodeCharacters})`).toArray();
-        print(`801: sorted characters: ${sortedCharacters}`);
+        progress(`801: sorted characters: ${sortedCharacters}`);
   
         // Store the sorted characters for verification later
         let c = db[`udf_test_${dbCount}`];
@@ -71,7 +71,7 @@
       },
   
       checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-        print(`UDF: checking per database data ${dbCount}`);
+        progress(`UDF: checking per database data ${dbCount}`);
         let c = db._collection(`udf_test_${dbCount}`);
         let allFound = true;
   
@@ -129,14 +129,14 @@
       },
   
       clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-        print(`UDF: clearing per database data ${dbCount}`);
+        progress(`UDF: clearing per database data ${dbCount}`);
         try {
           db._drop(`udf_test_${dbCount}`);
         } catch (e) {}
       },
   
       clearData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-        print(`UDF: clearing data ${dbCount} ${loopCount}`);
+        progress(`UDF: clearing data ${dbCount} ${loopCount}`);
         try {
           db._drop(`udf_test_${loopCount}`);
         } catch (e) {}

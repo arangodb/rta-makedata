@@ -24,7 +24,7 @@
       extended_scorers.push('BM25(@doc, 1, 1) DESC');
 
       for (const s of extended_scorers) {
-        print(`404: ${s}`);
+        progress(`404: ${s}`);
         let score = s.replace('@doc', 'd');
         let res1 = db._query(`FOR d IN ${viewName} SEARCH d.a == 'a' OPTIONS {waitForSync:true} SORT ${score} LIMIT 10 RETURN d`).toArray();
         assertEqual(res1.length, 10);
@@ -41,7 +41,7 @@
       },
       makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
         // All items created must contain dbCount and dbCount
-        print(`404: making data ${dbCount}`);
+        progress(`404: making data ${dbCount}`);
         let asViewWandName = `as_view_wand_${dbCount}`;
         let saViewWandName = `sa_view_wand_${dbCount}`;
         let collectionName0 = `collection_wand_0${dbCount}`;
@@ -94,7 +94,7 @@
         }
       },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-        print(`404: checking data ${dbCount} ${dbCount}`);
+        progress(`404: checking data ${dbCount} ${dbCount}`);
         let asViewWandName = `as_view_wand_${dbCount}`;
         let saViewWandName = `sa_view_wand_${dbCount}`;
         let collectionName0 = `collection_wand_0${dbCount}`;
@@ -151,7 +151,7 @@
         }
       },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-        print(`404: removing data ${dbCount}`);
+        progress(`404: removing data ${dbCount}`);
         let asViewWandName = `as_view_wand_${dbCount}`;
         let saViewWandName = `sa_view_wand_${dbCount}`;
         let collectionName0 = `collection_wand_0${dbCount}`;

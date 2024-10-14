@@ -112,13 +112,13 @@ function deleteAnalyzerSet(testgroup, test) {
     try {
       db._dropView(test.bindVars['@testView']);
     } catch (ex) {
-      print(ex);
+      progress(ex);
     }
     progress(`${testgroup}: deleting collection ${test.collection} `);
     try {
       db._drop(test.collection);
     } catch (ex) {
-      print(ex);
+      progress(ex);
     }
   }
   progress(`${testgroup}: deleting Analyzer ${test.analyzerName}`);

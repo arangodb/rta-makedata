@@ -8,7 +8,7 @@
       return (options.disabledDbserverUUID !== "");
     },
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
-      print(`010: checking data ${dbCount}`);
+      progress(`010: checking data ${dbCount}`);
       let count = 0;
       db._useDatabase('_system');
       let databases = db._databases();
@@ -25,7 +25,7 @@
         i++;
       }
       let collections_to_move = [];
-      print("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
+      progress("010: waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
       while (count < 500) {
         let found = 0;
         collections.forEach((dbcol) => {
@@ -46,7 +46,7 @@
           if ((count + 1 % 25 === 0) || (collections_to_move.length < 10)) {
             coldump = " - " + JSON.stringify(collections_to_move);
           }
-          print('010: ' + found + ' found - Waiting' + coldump);
+          progress('010: ' + found + ' found - Waiting' + coldump);
           internal.sleep(1);
           count += 1;
         } else {
@@ -56,7 +56,7 @@
       if (count > 499) {
         let collectionData = "Still have collections bound to the failed server: ";
         collections_to_move.forEach(dbcol => {
-          print(dbcol);
+          progress(dbcol);
           db._useDatabase(dbcol[0]);
           let col = dbcol[1];
           collectionData += "\n" + JSON.stringify(col) + ":\n" +
@@ -64,12 +64,12 @@
             JSON.stringify(db[col].properties());
           db._useDatabase("_system");
         });
-        print(collectionData);
+        progress(collectionData);
         throw ("010: Still have collections bound to the failed server: " + JSON.stringify(collections_to_move));
       }
       let shardDist = {};
       count = 0;
-      print("010: waiting for all new leaders to assume leadership");
+      progress("010: waiting for all new leaders to assume leadership");
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -88,14 +88,14 @@
                 collections.push([c, s]);
               }
             } catch (ex) {
-              print(s);
-              print(col);
-              print(ex);
+              progress(s);
+              progress(col);
+              progress(ex);
             }
           });
         });
         if (found > 0) {
-          print('010: ' + found + ' found - Waiting - ' + JSON.stringify(collections));
+          progress('010: ' + found + ' found - Waiting - ' + JSON.stringify(collections));
           internal.sleep(1);
           count += 1;
         } else {
@@ -105,7 +105,7 @@
       if (count > 499) {
         let collectionData = "Still have collections with incomplete failover: ";
         collections.forEach(col => {
-          print(col);
+          progress(col);
           let shardDistInfoForCol = "";
           if (shardDist.hasOwnProperty("results") &&
             shardDist.results.hasOwnProperty(col)) {
@@ -116,11 +116,11 @@
             JSON.stringify(db[col].properties()) + "\n" +
             shardDistInfoForCol;
         });
-        print(collectionData);
+        progress(collectionData);
         throw new Error("010: Still have collections with incomplete failover: " + JSON.stringify(collections));
       }
 
-      print("010: done - continuing test.");
+      progress("010: done - continuing test.");
       return 0;
     }
   };
