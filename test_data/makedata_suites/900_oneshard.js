@@ -14,7 +14,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      print(`900: oneShard making per database data ${dbCount}`);
+      print(`${Date()} 900: oneShard making per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -54,7 +54,7 @@
       }
       progress("Test OneShard setup");
       const databaseName = `${baseName}_${dbCount}_oneShard`;
-      print('900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
+      print('${Date()} 900: oneshard vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ' + databaseName);
       db._useDatabase(databaseName);
       for (let ccount = 0; ccount < options.collectionMultiplier; ++ccount) {
         const query = `
@@ -66,11 +66,11 @@
         try {
           result = db._query(query).toArray();
         } catch (ex) {
-          print(`Failed to instanciate query ${query} -> ${ex}`);
+          print(`${Date()} Failed to instanciate query ${query} -> ${ex}`);
           throw ex;
         }
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {
-          throw new Error("DOCUMENT call in OneShard database does not return data " + JSON.stringify(result));
+          throw new Error("900: DOCUMENT call in OneShard database does not return data " + JSON.stringify(result));
         }
       }
       db._useDatabase('_system');
@@ -78,7 +78,7 @@
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // check per DB
-      progress("900: Test OneShard teardown");
+      print(`${Date()} 900: Test OneShard teardown`);
       if (database === "_system") {
         database = "system";
       }

@@ -11,10 +11,10 @@
      return (options.disabledDbserverUUID !== "" && cluster);
     },
     checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
-      print(`checking data ${dbCount}`);
+      print(`${Date()} 015: checking data ${dbCount}`);
       let count = 0;
       let collections = [];
-      print("waiting for all shards on " + options.disabledDbserverUUID + " to be moved");
+      print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -28,7 +28,7 @@
           });
         });
         if (found > 0) {
-          print(found + ' found - Waiting - ' + JSON.stringify(collections));
+          print(`${Date()} 015: ${found} found - Waiting - ${JSON.stringify(collections)}`);
           internal.sleep(1);
           count += 1;
         } else {
@@ -38,15 +38,15 @@
       if (count > 499) {
         let collectionData = "Still have collections bound to the failed server: ";
         collections.forEach(col => {
-          print(col);
+          print(`${Date()} 015: ${col}`);
           collectionData += "\n" + JSON.stringify(col) + ":\n" +
             JSON.stringify(db[col].shards(true)) + "\n" +
             JSON.stringify(db[col].properties());
         });
-        print(collectionData);
+        print(`${Date()} 015: ${collectionData}`);
         throw ("Still have collections bound to the failed server: " + JSON.stringify(collections));
       }
-      print("done - continuing test.");
+      print(`${Date()} 015: done - continuing test.`);
       return 0;
     }
   };

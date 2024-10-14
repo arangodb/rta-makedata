@@ -10,12 +10,12 @@
     },
 
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print("051: Create databases with unicode symbols in the name");
+      print(`${Date()} 051: Create databases with unicode symbols in the name`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
       } else {
-        print(`051: skipping creation of per database data, since database is not _system`);
+        print(`${Date()} 051: skipping creation of per database data, since database is not _system`);
         return 0;
       }
       db._useDatabase("_system");
@@ -39,7 +39,7 @@
       if (baseName === "_system") {
         baseName = "system";
       } else {
-        print(`051: skipping checking of per database data, since database is not _system`);
+        print(`${Date()} 051: skipping checking of per database data, since database is not _system`);
         return 0;
       }
       progress("051: Test databases with extended unicode symbols in the name");
@@ -55,11 +55,11 @@
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      progress(`051: Delete databases with unicode symbols in the name ${database} ${dbCount}`);
+      print(`${Date()} 051: Delete databases with unicode symbols in the name ${database} ${dbCount}`);
       if (database === "_system") {
         database = "system";
       } else {
-        print(`051: skipping deletion of per database data, since database is not _system`);
+        print(`${Date()} 051: skipping deletion of per database data, since database is not _system`);
         return 0;
       }
       let baseName = database;
@@ -67,7 +67,7 @@
         let unicodeName = extendedDbNames[i];
         let databaseName = `${baseName}_${dbCount}_${unicodeName}`;
         db._useDatabase('_system');
-        print(`051: dropping ${databaseName}`);
+        print(`${Date()} 051: dropping ${databaseName}`);
         db._dropDatabase(databaseName);
       }
       return 0;

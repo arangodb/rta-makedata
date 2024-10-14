@@ -21,7 +21,7 @@
       progress('106: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`checking data ${dbCount}`);
+      print(`${Date()} 106: checking data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
       [`c_mdi_${dbCount}`].forEach(colname => {
@@ -32,7 +32,7 @@
            }
          });
          if (!foundOne) {
-           print("106: Didn't find this collection: " + colname);
+           print(`${Date()} 106: Didn't find this collection: ${colname}`);
            allFound = false;
          }
        });
@@ -62,11 +62,11 @@
       progress("106: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`clearing data ${dbCount} ${loopCount}`);
+      print(`${Date()} 106: clearing data ${dbCount} ${loopCount}`);
       progress("106: drop 1");
       try {
         db._drop(`c_mdi_${loopCount}`);
-      } catch (e) {}
+      } catch (ex) {}
       progress("106: drop done");
     }
   };

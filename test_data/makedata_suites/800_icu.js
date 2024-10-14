@@ -7,7 +7,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      print(`ICU: making per database data ${dbCount}`);
+      print(`${Date()} 800: ICU: making per database data ${dbCount}`);
       let test = createCollectionSafe(`icu_test_${dbCount}`, 3, 2);
       progress('800: createICUCollection1');
 
@@ -32,14 +32,14 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
-      print(`ICU: making data ${dbCount} ${loopCount}`);
+      print(`${Date()} 800: ICU: making data ${dbCount} ${loopCount}`);
       let test = db[`icu_test_${dbCount}`];
 
       // Now the actual data writing (not needed in this test setup):
       resetRCount();
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`ICU: checking per database data ${dbCount}`);
+      print(`${Date()} 800: ICU: checking per database data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
       [`icu_test_${dbCount}`].forEach(colname => {
@@ -50,7 +50,7 @@
           }
         });
         if (!foundOne) {
-          print(`800: Didn't find this collection: ${colname}`);
+          print(`${Date()} 800: Didn't find this collection: ${colname}`);
           allFound = false;
         }
       });
@@ -73,7 +73,7 @@
       }
 
       // Check data and sorting order:
-      progress("800: checking ICU data and sort order");
+      progress(`${Date()} 800: checking ICU data and sort order`);
       let queryResult = db._query(`FOR doc in ${test.name()} SORT doc.value, doc.value2 RETURN [doc.value, doc.value2]`).toArray();
       let expectedOrder = [
         ["–", 1],
@@ -99,16 +99,10 @@
       progress("800: ICU check done");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`ICU: clearing per database data ${dbCount}`);
+      print(`${Date()} ICU: clearing per database data ${dbCount}`);
       try {
         db._drop(`icu_test_${dbCount}`);
       } catch (e) {}
     },
-    clearData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      print(`ICU: clearing data ${dbCount} ${loopCount}`);
-      try {
-        db._drop(`icu_test_${loopCount}`);
-      } catch (e) {}
-    }
   };
 }());

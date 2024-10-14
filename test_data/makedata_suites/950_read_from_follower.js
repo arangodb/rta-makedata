@@ -22,8 +22,7 @@ const {
 let waitForStats = function (instances) {
   outerloop:
   for (let instance of instances) {
-    print("Fetching statistics with the 'sync' flag from the server "
-      + instance["name"] + " to force statistics processing.");
+    print(`${Date()} 950: Fetching statistics with the 'sync' flag from the server ${instance["name"]} to force statistics processing.`);
     let ex;
     let sleepTime = 0.1;
     let opts = { "jwt": instance.JWT_header };
@@ -37,18 +36,18 @@ let waitForStats = function (instances) {
         }
       } catch (e) {
         let ex = e;
-        print(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
+        print(`${RED}${Date()} 950: connecting to ${instance.url} failed - retrying (${ex})${RESET}`);
       }
       sleepTime *= 2;
       sleep(sleepTime);
     } while (sleepTime < 15);
-    print(RED + "giving up!" + RESET);
+    print(`${RED}${Date()} 950: giving up!${RESET}`);
     throw ex;
   }
 };
 
 let getRawMetric = function (instance, user, tags) {
-  print("Fetching metrics from the server " + instance["name"]);
+  print(`${Date()} 950: Fetching metrics from the server ${instance["name"]}`);
   let ex;
   let sleepTime = 0.1;
   let opts = { "jwt": instance.JWT_header };
@@ -56,18 +55,18 @@ let getRawMetric = function (instance, user, tags) {
     try {
       let resp = download(instance.url + '/_admin/metrics' + tags, '', opts);
       if (resp.code !== 200) {
-        throw "Error fetching metric. Server response:\n" + JSON.stringify(resp);
+        throw `${Date()} 950: Error fetching metric. Server response:\n${JSON.stringify(resp)}`;
       } else {
         return resp;
       }
     } catch (e) {
       let ex = e;
-      print(RED + "connecting to " + instance.url + " failed - retrying (" + ex + ")" + RESET);
+      print(`${RED}${Date()} 950: connecting to ${instance.url} failed - retrying (${ex})${RESET}`);
     }
     sleepTime *= 2;
     sleep(sleepTime);
   } while (sleepTime < 5);
-  print(RED + "giving up!" + RESET);
+  print(`${RED}${Date()} 950: giving up!${RESET}`);
   throw ex;
 };
 
@@ -89,7 +88,7 @@ let getInstanceById = function (id) {
       return instance;
     }
   }
-  throw "Can't find instance with such uuid: " + id;
+  throw `${Date()} 950: Can't find instance with such uuid: ${id}`;
 };
 
 let moveShard = function (database, collection, shard, fromServer, toServer, dontwait, expectedResult) {
@@ -100,7 +99,7 @@ let moveShard = function (database, collection, shard, fromServer, toServer, don
   }
   // Now wait until the job we triggered is finished:
   var count = 600;   // seconds
-  print("Waiting until shard is moved...");
+  print(`${Date()} 950: Waiting until shard is moved...`);
   while (true) {
     var job = db._connection.GET(`/_admin/cluster/queryAgencyJob?id=${result.id}`);
     //console.error("Status of moveShard job:", JSON.stringify(job));
@@ -108,7 +107,7 @@ let moveShard = function (database, collection, shard, fromServer, toServer, don
       return result;
     }
     if (count-- < 0) {
-      throw "Timeout in waiting for moveShard to complete: " + JSON.stringify(body);
+      throw `${Date()} 950: Timeout in waiting for moveShard to complete: ${JSON.stringify(body)}`;
     }
     wait(1.0);
     if (count % 10 === 0) { print("."); };
@@ -177,7 +176,7 @@ let restoreServerLoggingSettings = function (topic) {
       let keys = null;
       return {
         setUpAll: function () {
-          print(`Setting up ReadDocsFromFollowerTestSuite for collection \"${collName}\".`);
+          print(`${Date()} 950: Setting up ReadDocsFromFollowerTestSuite for collection \"${collName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(collName);
           shards = coll.shards(true);
@@ -353,7 +352,7 @@ let restoreServerLoggingSettings = function (topic) {
       let vertices = [];
       return {
         setUpAll: function () {
-          print(`Setting up ReadCommunityGraphFromFollowerTestSuite for collection \"${collName}\".`);
+          print(`${Date()} 950: Setting up ReadCommunityGraphFromFollowerTestSuite for collection \"${collName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(collName);
           shards = coll.shards(true);
@@ -434,7 +433,7 @@ let restoreServerLoggingSettings = function (topic) {
       let vertices = [];
       return {
         setUpAll: function () {
-          print(`Setting up ReadSmartGraphFromFollowerTestSuite for edge collection \"${edgeCollName}\", vertex collection \"${vertexCollName}\".`);
+          print(`${Date()} 950: Setting up ReadSmartGraphFromFollowerTestSuite for edge collection \"${edgeCollName}\", vertex collection \"${vertexCollName}\".`);
           instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
           coll = db._collection(vertexCollName);
           shards = coll.shards(true);
@@ -530,7 +529,6 @@ let restoreServerLoggingSettings = function (topic) {
     },
 
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print('asontehusaonteuhsanoetuhasoentuh');
       instanceInfo = JSON.parse(require('internal').env.INSTANCEINFO);
       let failed = [];
       let docCollections = [
@@ -608,7 +606,7 @@ let restoreServerLoggingSettings = function (topic) {
     },
 
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
-      print(`clearing data ${dbCount} ${loopCount}`);
+      print(`${Date()} 950: clearing data ${dbCount} ${loopCount}`);
       db._drop(`${testCollName}_${loopCount}`, true);
       return 0;
     },

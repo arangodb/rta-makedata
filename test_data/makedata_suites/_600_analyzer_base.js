@@ -108,20 +108,20 @@ function deleteAnalyzer(testgroup, analyzerName){
 
 function deleteAnalyzerSet(testgroup, test) {
   if (test.hasOwnProperty('collection')) {
-    progress(`${testgroup}: deleting view ${test.bindVars['@testView']} `);
+    print(`${testgroup}: deleting view ${test.bindVars['@testView']} `);
     try {
       db._dropView(test.bindVars['@testView']);
     } catch (ex) {
-      print(ex);
+      print(`${Date()} 600: ${ex} ${ex.stack}`);
     }
-    progress(`${testgroup}: deleting collection ${test.collection} `);
+    print(`${testgroup}: deleting collection ${test.collection} `);
     try {
       db._drop(test.collection);
     } catch (ex) {
-      print(ex);
+      print(`${Date()} 600: ${ex} ${ex.stack}`);
     }
   }
-  progress(`${testgroup}: deleting Analyzer ${test.analyzerName}`);
+  print(`${Date()} 600: ${testgroup}: deleting Analyzer ${test.analyzerName}`);
   deleteAnalyzer(testgroup, test.analyzerName);
 }
 

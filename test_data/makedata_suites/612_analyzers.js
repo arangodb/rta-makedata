@@ -114,14 +114,14 @@ function getTestData_612(dbCount) {
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
 
-      print(`612: making per database data ${dbCount}`);
+      print(`${Date()} 612: making per database data ${dbCount}`);
       getTestData_612(dbCount).forEach((test) => {
         createAnalyzerSet('612', test);
       });
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`612: checking data ${dbCount}`);
+      print(`${Date()} 612: checking data ${dbCount}`);
       progress(`612: checking data with ${dbCount}`);
 
       getTestData_612(dbCount).forEach(test => {
@@ -130,7 +130,7 @@ function getTestData_612(dbCount) {
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`612: clearing data ${dbCount}`);
+      print(`${Date()} 612: clearing data ${dbCount}`);
       getTestData_612(dbCount).forEach(test => {
         deleteAnalyzerSet('612', test);
       });

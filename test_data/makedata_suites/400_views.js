@@ -7,7 +7,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and loopCount
-      print(`400: making data ${dbCount}`);
+      print(`${Date()} 400: making data ${dbCount}`);
       let viewCollectionName = `old_cview1_${dbCount}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 2);
       progress('createView1');
@@ -36,7 +36,7 @@
       progress('createView3');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`400: checking data ${dbCount}`);
+      print(`${Date()} 400: checking data ${dbCount}`);
       // Check view:
       let view1 = db._view(`old_view1_${dbCount}`);
       if (!view1.properties().links.hasOwnProperty(`old_cview1_${dbCount}`)) {
@@ -45,18 +45,18 @@
       progress("400: view properties");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`400: clearing data ${dbCount}`);
+      print(`${Date()} 400: clearing data ${dbCount}`);
 
       try {
         db._dropView(`old_view1_${dbCount}`);
-      } catch (e) {
-        print(`400: ${e}`);
+      } catch (ex) {
+        print(`${Date()} 400: ${ex} ${ex.stack}`);
       }
       progress("400: drop view1");
       try {
         db._drop(`old_cview1_${dbCount}`);
-      } catch (e) {
-        print(`400: ${e}`);
+      } catch (ex) {
+        print(`${Date()} 400: ${ex} ${ex.stack}`);
       }
       progress("400: drop view2");
     }

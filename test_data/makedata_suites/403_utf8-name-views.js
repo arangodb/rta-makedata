@@ -10,7 +10,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
-      print(`403: making data ${dbCount}`);
+      print(`${Date()} 403: making data ${dbCount}`);
       let viewCollectionName = `old_cview1_${dbCount}${extendedNames[3]}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 1);
       progress('403: createView1');
@@ -39,7 +39,7 @@
       progress('403: createView3');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`403: checking data ${dbCount}`);
+      print(`${Date()} 403: checking data ${dbCount}`);
       // Check view:
       let view1 = db._view(`old_view1_403_${dbCount}${extendedNames[6]}`);
       if (!view1.properties().links.hasOwnProperty(`old_cview1_${dbCount}${extendedNames[3]}`)) {
@@ -48,19 +48,19 @@
       progress(`403: checkdata done`);
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`403: cleaning up data ${dbCount}`);
+      print(`${Date()} 403: cleaning up data ${dbCount}`);
 
       try {
         db._dropView(`old_view1_403_${dbCount}${extendedNames[6]}`);
       } catch (e) {
-        print(`403: dropping view didn't work: ${e}`);
+        print(`${Date()} 403: dropping view didn't work: ${e}`);
         throw e;
       }
       progress("403: dropping view");
       try {
         db._drop(`old_cview1_${dbCount}${extendedNames[3]}`);
       } catch (e) {
-        print(`403: cleanup caught ${e}`);
+        print(`${Date()} 403: cleanup caught ${e}`);
         throw e;
       }
       progress('403: cleanup done');

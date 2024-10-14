@@ -7,7 +7,7 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and dbCount
-      print(`401: making data ${dbCount}`);
+      print(`${Date()} 401: making data ${dbCount}`);
       let viewCollectionName = `cview1_${dbCount}`;
       let cview1 = createCollectionSafe(viewCollectionName, 3, 2);
       progress('createView1');
@@ -40,7 +40,7 @@
       progress('401: createView3');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`401: checking data ${dbCount}`);
+      print(`${Date()} 401: checking data ${dbCount}`);
       // Check view:
       let view1 = db._view(`view1_${dbCount}`);
       if (!view1.properties().links.hasOwnProperty(`cview1_${dbCount}`)) {
@@ -49,18 +49,18 @@
       progress("401: check view");
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`401: clearing data ${dbCount}`);
+      print(`${Date()} 401: clearing data ${dbCount}`);
 
       try {
         db._dropView(`view1_${dbCount}`);
-      } catch (e) {
-        print(e);
+      } catch (ex) {
+        print(`${Date()} 401: ${ex} ${ex.stack}`);
       }
       progress("401: drop view 1");
       try {
         db._drop(`cview1_${dbCount}`);
-      } catch (e) {
-        print(e);
+      } catch (ex) {
+        print(`${Date()} 401: ${ex} ${ex.stack}`);
       }
       progress("401: drop view 2");
     }

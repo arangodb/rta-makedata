@@ -14,7 +14,7 @@
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       egm = require('@arangodb/enterprise-graph');
       // All items created must contain dbCount
-      print(`570: making per database data ${dbCount}`);
+      print(`${Date()} 570: making per database data ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -49,7 +49,7 @@
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      print(`570: checking data in database ${database} dbCount: ${dbCount}`);
+      print(`${Date()} 570: checking data in database ${database} dbCount: ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
@@ -141,7 +141,7 @@
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
-      print(`570: Clearing data. Database: ${database}. DBCount: ${dbCount}`);
+      print(`${Date()} 570: Clearing data. Database: ${database}. DBCount: ${dbCount}`);
       let baseName = database;
       if (baseName === "_system") {
         baseName = "system";
