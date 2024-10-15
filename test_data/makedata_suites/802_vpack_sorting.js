@@ -79,11 +79,18 @@
       `).toArray();
         assertEqual(ret.length, 1);
         assertEqual(ret[0], 'x');
-        ret = db._query(aql`
-        FOR doc in ${c} FILTER TO_STRING(doc.value[0]) == '1152921504606846976.0' return doc.value[1]
-      `).toArray();
-        assertEqual(ret.length, 1);
-        assertEqual(ret[0], 'y');
+        let isVersionCapable = function(versionToCheck) {
+          return (semver.gt(versionToCheck, semver.parse(semver.coerce("3.11.12"))) || 
+                  (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.glt(versionToCheck, semver.parse(semver.coerce("3.12.3")))));
+        };
+        let hasNewVersion = isVersionCapable(currentVersionSemver) || isVersionCapable(oldVersionSemver);
+        if (hasNewVersion) {
+            ret = db._query(aql`
+            FOR doc in ${c} FILTER TO_STRING(doc.value[0]) == '1152921504606846976.0' return doc.value[1]
+            `).toArray();
+            assertEqual(ret.length, 1);
+            assertEqual(ret[0], 'y');
+        }
       }
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
