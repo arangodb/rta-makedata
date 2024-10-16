@@ -80,7 +80,7 @@
         assertEqual(ret.length, 1);
         assertEqual(ret[0], 'x');
         let isVersionCapable = function(versionToCheck) {
-          return (semver.gt(versionToCheck, semver.parse(semver.coerce("3.11.12"))) || 
+          return ((semver.gt(versionToCheck, semver.parse(semver.coerce("3.11.12"))) && semver.lt(versionToCheck, semver.parse(semver.coerce("3.12.0")))) ||
                   (semver.gte(versionToCheck, semver.parse("3.12.0")) && semver.gt(versionToCheck, semver.parse(semver.coerce("3.12.3")))));
         };
         let hasNewVersion = isVersionCapable(currentVersionSemver) || isVersionCapable(oldVersionSemver);
