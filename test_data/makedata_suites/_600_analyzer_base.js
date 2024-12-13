@@ -57,12 +57,28 @@ function arraysEqual(analyzer_name, a, b) {
   }
 }
 
+function dumpAnalyzerCollection() {
+  print(`${Date} Dumping analyzers`);
+  print("--------------------------------------------------------------------------------");
+  print(JSON.stringify(db._analyzers.toArray()));
+  print("--------------------------------------------------------------------------------");
+  print(`${Date} DONE`);
+}
+
 // this function will check everything regarding given analyzer
 function checkAnalyzerSet(testgroup, test){
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
-  let queryResult = db._query(test);
+  let queryResult;
+  try {
+    queryResult = db._query(test);
+  }
+  catch (ex) {
+    dumpAnalyzerCollection();
+    throw ex;
+  }
 
   if (analyzers.analyzer(test.analyzerName) === null) {
+    dumpAnalyzerCollection();
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer creation failed!`);
   }
 
@@ -70,12 +86,14 @@ function checkAnalyzerSet(testgroup, test){
   let testName = analyzers.analyzer(test.analyzerName).name();
   let expectedName = `${arango.getDatabaseName()}::${test.analyzerName}`;
   if (testName !== expectedName) {
+    dumpAnalyzerCollection();
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer not found`);
   }
 
   progress(`${testgroup}: ${test.analyzerName} checking analyzer's type`);
   let testType = analyzers.analyzer(test.analyzerName).type();
   if (testType !== test.analyzerType){
+    dumpAnalyzerCollection();
     throw new Error(`${testgroup}: ${test.analyzerName} analyzer type missmatched! ${testType} != ${test.analyzerType}`);
   }
 
