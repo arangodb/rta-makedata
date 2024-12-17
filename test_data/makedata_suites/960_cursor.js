@@ -33,10 +33,10 @@ class testCursor {
     this.resultChunks[this.currentBatchId] = this.compressDocuments(ret.parsedBody.result);
     this.cursorId = ret.parsedBody['id'];
     if (!this.hasMore) {
-      throw new Error(`960: failed to create the query '${JSON.stringify(postData)}' with cursor: ${JSON.stringify(ret)}`);
+      throw new Error(`960: failed to create the query (doesn't have more?) '${JSON.stringify(postData)}' with cursor: ${JSON.stringify(ret)}`);
     }
     if (this.cursorId === undefined) {
-      throw new Error(`960: failed to create the query '${JSON.stringify(postData)}' with cursor: ${JSON.stringify(ret)}`);
+      throw new Error(`960: failed to create the query (no cursor id?) '${JSON.stringify(postData)}' with cursor: ${JSON.stringify(ret)}`);
     }
     this.nextBatchId = ret.parsedBody['nextBatchId'];
     return this.hasMore;
