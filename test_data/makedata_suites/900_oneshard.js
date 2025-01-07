@@ -70,7 +70,7 @@
           throw ex;
         }
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {
-          throw new Error(`${Date()} 900: DOCUMENT call in OneShard database does not return data ${JSON.stringify(result))}`;
+          throw new Error(`${Date()} 900: DOCUMENT call in OneShard database does not return data ${JSON.stringify(result)}`);
         }
       }
       db._useDatabase('_system');
