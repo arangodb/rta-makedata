@@ -58,11 +58,11 @@ function arraysEqual(analyzer_name, a, b) {
 }
 
 function dumpAnalyzerCollection() {
-  print(`${Date} Dumping analyzers`);
+  print(`${Date()} Dumping analyzers`);
   print("--------------------------------------------------------------------------------");
   print(JSON.stringify(db._analyzers.toArray()));
   print("--------------------------------------------------------------------------------");
-  print(`${Date} DONE`);
+  print(`${Date()} DONE`);
 }
 
 // this function will check everything regarding given analyzer
