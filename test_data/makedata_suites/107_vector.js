@@ -6,20 +6,9 @@
       return true;
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
+      progress('107: createCollection');
       let c_vector = createCollectionSafe(`c_vector_${dbCount}`, 3, 2);
-      progress('107: createCollection2');
-      progress('107: createIndexHash1');
-      createIndexSafe({
-        col: c_vector,
-        type: "vector",
-        fields: ["Type"],
-        inBackground: false,
-        params: {
-          metric: "l2",
-          dimension: 500,
-          nLists: 1
-        },
-      });
+      progress('107: createIndexHash');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`107: Makedata ${dbCount} ${loopCount}`);
@@ -28,8 +17,20 @@
       // Now the actual data writing:
       resetRCount();
       writeData(c_vector, 1000);
-      print('xxxx')
-      print(c_vector.count())
+      if (c_vector.indexes().length === 1) {
+        createIndexSafe({
+          col: c_vector,
+          name: `i_vector_dbcount`,
+          type: "vector",
+          fields: ["TypeVec"],
+          inBackground: false,
+          params: {
+            metric: "l2",
+            dimension: 5,
+            nLists: 1
+          },
+        });
+      }
       progress('107: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -66,16 +67,12 @@
       if (c_vector.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 1000`); }
 
       // Check a few queries:
-      //progress("107: query 1");
-      runAqlQueryResultCount(aql`"FOR d IN ${c_vector.name}
-                 SORT APPROX_NEAR_L2(d.Type, 777, {nProbe: 10}) 
-                LIMIT 5 RETURN d`);
-      // Check a few queries:
-      //progress("107: query 1");
-      //runAqlQueryResultCount(aql`FOR x IN ${c_vector} FILTER x.a == "id1001" RETURN x`, 1);
-      //progress("107: query 2");
-      //runAqlQueryResultCount(aql`FOR x IN ${c_vector} FILTER x.a == "id10452" RETURN x`, 1);
-      //progress("107: queries done");
+      progress("107: query 1");
+      runAqlQueryResultCount(aql`
+           FOR d IN ${c_vector}
+               SORT APPROX_NEAR_L2(d.TypeVec,  [1,2,3,4,5], {nProbe: 5})
+                 LIMIT 5 RETURN d`, 5);
+      progress("107: queries done");
       progress("107: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
