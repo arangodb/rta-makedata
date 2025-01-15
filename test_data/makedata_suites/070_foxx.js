@@ -6,12 +6,6 @@ const utils = require('@arangodb/foxx/manager-utils');
 const download = internal.download;
 const path = require('path');
 
-const {
-  assertTrue,
-  assertFalse,
-  assertEqual
-} = require("jsunity").jsUnity.assertions;
-
 function loadFoxxIntoZip (path) {
   let zip = utils.zipDirectory(path);
   let content = fs.readFileSync(zip);
