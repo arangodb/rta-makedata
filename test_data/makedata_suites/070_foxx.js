@@ -1,4 +1,4 @@
-/* global print, fs, db, internal, arango, assertTrue */
+/* global print, fs, db, internal, arango, assertTrue, assertEqual, assertFalse */
 
 // inspired by shell-foxx-api-spec.js
 
