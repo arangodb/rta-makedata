@@ -64,6 +64,12 @@ let {
 } = require(fs.join(PWD, 'common'));
 
 const {
+  assertTrue,
+  assertFalse,
+  assertEqual
+} = require("jsunity").jsUnity.assertions;
+
+const {
   createAnalyzerSet,
   checkAnalyzerSet,
   deleteAnalyzerSet

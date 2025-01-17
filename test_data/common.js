@@ -366,6 +366,13 @@ function makeRandomDoc() {
   }
   return {
     Type: makeRandomNumber(1000, 65535),
+    TypeVec: [
+      makeRandomNumber(1000, 65535),
+      makeRandomNumber(1000, 65535),
+      makeRandomNumber(1000, 65535),
+      makeRandomNumber(1000, 65535),
+      makeRandomNumber(1000, 65535),
+    ],
     ID: makeRandomString(40),
     OptOut: rand() > 0 ? 1 : 0,
     Source: makeRandomString(14),
