@@ -2,7 +2,7 @@
 
 (function () {
   return {
-    isSupported: function (version, oldVersion, options, enterprise, cluster) {
+    isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
       return semver.gt(oldVersionSemver, "3.12.4");
