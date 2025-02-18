@@ -84,6 +84,11 @@ If you want to filter for the scripts you can specify a coma separated list:
 ./scripts/unittest rta_makedata --extremeVerbosity true --cluster true --makedata_args:bigDoc true --test '010,020,050'
 ```
 
+If you want to exclude scripts you can specify a coma separated list:
+``` bash
+./scripts/unittest rta_makedata --extremeVerbosity true --cluster true --makedata_args:bigDoc true --skip '010,020,050'
+```
+
 # test output
 It should be obvious whether a test is run in a scenario or not. Hence the list of executed tests is output:
 

@@ -16,6 +16,7 @@
 // `--progress [false]                     whether to output a keepalive indicator to signal the invoker that work is ongoing
 // `--bigDoc                               Increase size of the graph documents
 // `--test                                 comma separated list of testcases to filter for
+// `--skip                              comma separated list of testcases to filter out
 // `--tempDataDir                          directory to store temporary data
 // `--excludePreviouslyExecutedTests       If enabled, information about which tests were ran will be saved in the temporary directory. These tests will be skipped during next run. Default: false.
 // `--createOneShardDatabase               When running in a custom database(not _system) whether this database must be created with sharding=single option. Default: false.

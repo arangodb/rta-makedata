@@ -17,6 +17,7 @@
 // `--disabledDbserverUUID      this server is offline, wait for shards on it to be moved
 // `--readonly                  the SUT is readonly. fail if writing is successfull.
 // `--test                      comma separated list of testcases to filter for
+// `--skip                              comma separated list of testcases to filter out
 'use strict';
 const fs = require('fs');
 const _ = require('lodash');
@@ -77,6 +78,7 @@ const optionsDefaults = {
   printTimeMeasurement: false,
   bigDoc: false,
   test: undefined,
+  skip: undefined,
   forceOneShard: false
 };
 
