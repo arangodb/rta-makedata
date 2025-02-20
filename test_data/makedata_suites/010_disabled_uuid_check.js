@@ -28,6 +28,7 @@
       print(`${Date()} 010: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
       while (count < 500) {
         let found = 0;
+        let ccount = 0;
         collections.forEach((dbcol) => {
           db._useDatabase(dbcol[0]);
           let col = dbcol[1];
@@ -40,6 +41,10 @@
             }
           });
           db._useDatabase("_system");
+          ccount += 1;
+          if (ccount %10 === 0) {
+            print(`010: ccount: ${ccount}`);
+          }
         });
         if (found > 0) {
           let coldump = ".";
