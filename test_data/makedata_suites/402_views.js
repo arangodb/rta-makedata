@@ -1092,15 +1092,20 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
       if (isCacheSupported && isCacheSupportedOld && isEnterprise) {
         let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        print("402: got metric");
         if (cacheSize === 0) {
           throw new Error("cache size is equal to zero in checkData");
         }
       }
 
       let viewSVCache = db._view(`viewSVCache_${dbCount}`);
+      print(`402: got viewSVCache_${dbCount}`);
       let viewPKCache = db._view(`viewPKCache_${dbCount}`);
+      print(`402: got viewPKCache_${dbCount}`);
       let viewPSCache = db._view(`viewPSCache_${dbCount}`);
+      print(`402: got viewPSCache_${dbCount}`);
       let viewNoCache = db._view(`viewNoCache_${dbCount}`);
+      print(`402: got viewNoCache_${dbCount}`);
 
       print(`${Date()} 402: check different cache values in the views`);
       // for 3.10.0 and 3.10.1 we should verify that no cache is present
