@@ -978,13 +978,13 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           if (view === undefined) {
             return;
           }
-
+          print(`402: ${view}`);
           view.properties(meta);
 
           if (cacheSizeSupported && isEnterprise) {
             let utilizeCache = test["link"]["utilizeCache"]; // is cache utilized by link?
             let viewUtilizeCache = viewTest[1]; // is cache utilized by view?
-            
+            print(`402: querying ${collectionName}`);
             // sync view
             db._query(`
             let lines = GEO_MULTILINESTRING([
@@ -995,6 +995,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             ANALYZER(GEO_DISTANCE(d.geo_latlng, lines) < 100, "geo_point")
             OPTIONS {waitForSync: true} return d`);
             // update cacheSize
+            print('402: fetching metric');
             cacheSize = getMetric("arangodb_search_columns_cache_size", options);
             if (utilizeCache || viewUtilizeCache) {
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
@@ -1015,6 +1016,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         invertedIndexTestCases.forEach(test => {
           // This collection was created on previous step. Just extract the name.
           let collectionName = `${test["collectionName"]}_ii_${dbCount}`; // collection for testing inverted index
+          print(`402: ${collectionName}`);
           createCollectionSafe(collectionName, 3, 2);
 
           db._collection(collectionName).insert([
