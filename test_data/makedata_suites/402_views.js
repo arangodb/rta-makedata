@@ -978,7 +978,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           if (view === undefined) {
             return;
           }
-          print(`402: ${JSON.stringify(view)}`);
+          print(`402: view in process: ${JSON.stringify(view)}`);
           view.properties(meta);
 
           if (cacheSizeSupported && isEnterprise) {
