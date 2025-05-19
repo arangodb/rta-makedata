@@ -7,8 +7,8 @@ let secondIndexCreate = false;
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      secondIndexCreate = (semver.ge(oldVersionSemver, "3.12.5") &&
-              semver.ge(currentVersionSemver, "3.12.5"));
+      secondIndexCreate = (semver.gt(oldVersionSemver, "3.12.5") &&
+              semver.gt(currentVersionSemver, "3.12.5"));
       return (semver.gt(oldVersionSemver, "3.12.4") &&
               semver.gt(currentVersionSemver, "3.12.4"));
     },
@@ -70,7 +70,8 @@ let secondIndexCreate = false;
       // Check indexes:
       progress("107: checking indices");
 
-      if (c_vector.getIndexes().length !== 2 || c_vector.getIndexes()[1].type !== "vector") {
+      const indexExpectCount = (secondIndexCreate) ? 3:2;
+      if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector.getIndexes().length} `);
       }
 
