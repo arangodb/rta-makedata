@@ -34,6 +34,8 @@
           },
         });
       }
+      createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+
       progress('107: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
