@@ -70,7 +70,8 @@ let secondIndexCreate = false;
       // Check indexes:
       progress("107: checking indices");
 
-      if (c_vector.getIndexes().length !== 2 || c_vector.getIndexes()[1].type !== "vector") {
+      const indexExpectCount = (secondIndexCreate) ? 3:2;
+      if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector.getIndexes().length} `);
       }
 
