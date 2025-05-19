@@ -1,10 +1,14 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
 
+let secondIndexCreate = false;
+
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
+      secondIndexCreate = (semver.ge(oldVersionSemver, "3.12.5") &&
+              semver.ge(currentVersionSemver, "3.12.5"));
       return (semver.gt(oldVersionSemver, "3.12.4") &&
               semver.gt(currentVersionSemver, "3.12.4"));
     },
@@ -33,7 +37,12 @@
             nLists: 1
           },
         });
+        if (secondIndexCreate) {
+          print('107: creating second index');
+          createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+        }
       }
+
       progress('107: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
