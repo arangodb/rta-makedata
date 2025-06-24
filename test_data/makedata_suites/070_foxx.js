@@ -165,11 +165,11 @@ const crudTestServiceSource = {
         `/_db/${database}/crud_${dbCount}/xxx`
       ].forEach(route => testFoxxReady(route));
 
-      print(`${Date()} 070: Foxx: Itzpapalotl getting the root of the gods`);
+      print(`${Date()} 070: Foxx: Itzpapalotl GETting the root of the gods`);
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}`);
       assertEqual(reply.code, "307", JSON.stringify(reply));
 
-      print(`${Date()} 070: Foxx: Itzpapalotl getting index html with list of gods`);
+      print(`${Date()} 070: Foxx: Itzpapalotl GETting index html with list of gods`);
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}/index`);
       assertEqual(reply.code, "200", JSON.stringify(reply));
 
@@ -180,7 +180,7 @@ const crudTestServiceSource = {
       assertEqual(parsedBody.name, "Chalchihuitlicue");
       assertTrue(parsedBody.summoned);
 
-      print(`${Date()} 070: Foxx: crud testing get xxx`);
+      print(`${Date()} 070: Foxx: crud testing GET xxx`);
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200", JSON.stringify(reply));
       parsedBody = JSON.parse(reply.body);
@@ -188,14 +188,15 @@ const crudTestServiceSource = {
 
       print(`${Date()} 070: Foxx: crud testing POST xxx`);
 
-      reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: "test"});
+      let testKey = "test" + internal.md5(Date());
+      reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: testKey});
       if (options.readOnly) {
         assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
         assertEqual(reply.code, "201", JSON.stringify(reply));
       }
 
-      print(`${Date()} 070: Foxx: crud testing get xxx`);
+      print(`${Date()} 070: Foxx: crud testing GET xxx`);
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
@@ -205,8 +206,8 @@ const crudTestServiceSource = {
         assertEqual(parsedBody.length, 1, JSON.stringify(reply));
       }
 
-      print(`${Date()} 070: Foxx: crud testing delete document`);
-      reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/test`);
+      print(`${Date()} 070: Foxx: crud testing DELETE document`);
+      reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/${testKey}`);
       if (options.readOnly) {
         assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
