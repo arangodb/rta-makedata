@@ -190,7 +190,7 @@ const crudTestServiceSource = {
 
       let testKey = "test" + internal.md5(Date());
       reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: testKey});
-      if (options.readOnly) {
+      if (readOnly) {
         assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
         assertEqual(reply.code, "201", JSON.stringify(reply));
@@ -200,7 +200,7 @@ const crudTestServiceSource = {
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
       assertEqual(reply.code, "200");
       parsedBody = JSON.parse(reply.body);
-      if (options.readOnly) {
+      if (readOnly) {
         assertEqual(parsedBody, [], JSON.stringify(reply));
       } else {
         assertEqual(parsedBody.length, 1, JSON.stringify(reply));
@@ -208,7 +208,7 @@ const crudTestServiceSource = {
 
       print(`${Date()} 070: Foxx: crud testing DELETE document`);
       reply = arango.DELETE_RAW(`/_db/${database}/crud_${dbCount}/xxx/${testKey}`);
-      if (options.readOnly) {
+      if (readOnly) {
         assertEqual(reply.code, "400", JSON.stringify(reply));
       } else {
         assertEqual(reply.code, "204", JSON.stringify(reply));

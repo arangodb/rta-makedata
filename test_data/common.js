@@ -294,10 +294,11 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
         db._useDatabase(database);
       }
       func(options,
-        isCluster,
-        enterprise,
-        database,
-        dbCount);
+           isCluster,
+           enterprise,
+           database,
+           dbCount,
+           options.readOnly);
     });
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
@@ -309,10 +310,11 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
           db._useDatabase(database);
         }
         func(options,
-          isCluster,
-          enterprise,
-          dbCount,
-          loopCount);
+             isCluster,
+             enterprise,
+             dbCount,
+             loopCount,
+             options.readOnly);
       });
 
       progress('inner Loop End');
