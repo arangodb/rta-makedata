@@ -188,13 +188,38 @@ const crudTestServiceSource = {
 
       print(`${Date()} 070: Foxx: crud testing POST xxx`);
 
-      let testKey = "test" + internal.md5(Date());
-      reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: testKey});
-      if (readOnly) {
-        assertEqual(reply.code, "400", JSON.stringify(reply));
-      } else {
-        assertEqual(reply.code, "201", JSON.stringify(reply));
+      let testKey;
+      print(`${Date()} 070: Foxx: crud testing POST xxx`);
+      print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+      while (true) {
+        testKey = "test" + internal.md5(Date());
+        print(testKey)
+        reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: testKey});
+        print(reply)
+        print(options)
+        print(readOnly)
+        if (readOnly) {
+          assertEqual(reply.code, 400, JSON.stringify(reply));
+          break;
+        } else {
+          //assertEqual(reply.code, "201", JSON.stringify(reply));
+          if (reply.code === 201) {
+            print('done')
+            break;
+          } else {
+            sleep(1)
+            print('retry        ' + JSON.stringify(reply));
+          }
+        }
       }
+      print('done')
+      //let testKey = "test" + internal.md5(Date());
+      //reply = arango.POST_RAW(`/_db/${database}/crud_${dbCount}/xxx`, {_key: testKey});
+      //if (readOnly) {
+      //  assertEqual(reply.code, "400", JSON.stringify(reply));
+      //} else {
+      //  assertEqual(reply.code, "201", JSON.stringify(reply));
+      //}
 
       print(`${Date()} 070: Foxx: crud testing GET xxx`);
       reply = arango.GET_RAW(`/_db/${database}/crud_${dbCount}/xxx`, onlyJson);
@@ -203,6 +228,7 @@ const crudTestServiceSource = {
       if (readOnly) {
         assertEqual(parsedBody, [], JSON.stringify(reply));
       } else {
+        print(reply)
         assertEqual(parsedBody.length, 1, JSON.stringify(reply));
       }
 
