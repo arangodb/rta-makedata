@@ -80,6 +80,7 @@ const optionsDefaults = {
   curVersion: dbVersion,
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
+  readOnly: false,
   numberOfDBs: 1,
   countOffset: 0,
   dataMultiplier: 1,

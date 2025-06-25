@@ -68,7 +68,7 @@ const optionsDefaults = {
   disabledDbserverUUID: "",
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
-  readonly: false,
+  readOnly: false,
   bigDoc: false,
   numberOfDBs: 1,
   countOffset: 0,
