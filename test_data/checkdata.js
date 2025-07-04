@@ -71,6 +71,7 @@ const optionsDefaults = {
   readOnly: false,
   bigDoc: false,
   numberOfDBs: 1,
+  mixed: false,
   countOffset: 0,
   dataMultiplier: 1,
   collectionMultiplier: 1,

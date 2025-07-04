@@ -853,7 +853,12 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
   let isCacheSizeSupported = function (version, options) {
     // when in bulk mode, cache size is dynamic.
-    return options.numberOfDBs === 1 && semver.gte(version, "3.9.5") && semver.neq(version, "3.10.0") && semver.neq(version, "3.10.1");
+    // mixed mode deployments will restore, and be broken.
+    return (!options.mixed &&
+            options.numberOfDBs === 1 &&
+            semver.gte(version, "3.9.5") &&
+            semver.neq(version, "3.10.0") &&
+            semver.neq(version, "3.10.1");
   };
   return {
     isSupported: function (version, oldVersion, enterprise, cluster) {
