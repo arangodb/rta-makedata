@@ -30,7 +30,7 @@ const time = internal.time;
 const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
 let v = db._version(true);
-const enterprise = v.license === "enterprise";
+let enterprise = v.license === "enterprise";
 const dbVersion = db._version();
 
 let PWDRE = /.*at (.*)checkdata.js.*/;
@@ -99,6 +99,11 @@ _.defaults(opts, optionsDefaults);
 setOptions(opts);
 if (opts.collectionCountOffset !== 0 && database === '_system') {
   throw new Error("must not specify count without different database.");
+}
+
+if (opts.mixed) {
+  print("Disabling enterprise in mixed environment");
+  enterprise = false;
 }
 
 var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E + 1 | 0;
