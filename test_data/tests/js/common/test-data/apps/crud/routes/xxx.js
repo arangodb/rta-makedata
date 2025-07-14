@@ -7,7 +7,6 @@ const errors = require('@arangodb').errors;
 const createRouter = require('@arangodb/foxx/router');
 const Xxx = require('../models/xxx');
 
-const xxxItems = module.context.collection('xxx');
 const keySchema = joi.string().required()
 .description('The key of the xxx');
 
@@ -26,6 +25,7 @@ router.tag('xxx');
 
 
 router.get(function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   res.send(xxxItems.all());
 }, 'list')
 .response([Xxx], 'A list of xxxItems.')
@@ -36,6 +36,7 @@ router.get(function (req, res) {
 
 
 router.post(function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   console.log(process.env);
   const xxx = req.body;
   console.log("posting %s", JSON.stringify(xxx));
@@ -76,6 +77,7 @@ router.post(function (req, res) {
 
 
 router.get(':key', function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   const key = req.pathParams.key;
   console.log("getting %s", key);
   let xxx;
@@ -98,6 +100,7 @@ router.get(':key', function (req, res) {
 
 
 router.put(':key', function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   const key = req.pathParams.key;
   console.log("putting %s", key);
   const xxx = req.body;
@@ -127,6 +130,7 @@ router.put(':key', function (req, res) {
 
 
 router.patch(':key', function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   const key = req.pathParams.key;
   console.log("patching %s", key);
   const patchData = req.body;
@@ -156,6 +160,7 @@ router.patch(':key', function (req, res) {
 
 
 router.delete(':key', function (req, res) {
+  const xxxItems = module.context.collection('xxx');
   const key = req.pathParams.key;
   try {
     xxxItems.remove(key);
