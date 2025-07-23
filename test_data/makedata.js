@@ -42,6 +42,9 @@ let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 const wantFunctions = ['makeDataDB', 'makeData'];
 
+print(process.env)
+print(fs.makeAbsolute("."))
+
 let {
   options,
   setOptions,
@@ -80,7 +83,6 @@ const optionsDefaults = {
   curVersion: dbVersion,
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
-  readOnly: false,
   numberOfDBs: 1,
   countOffset: 0,
   dataMultiplier: 1,
