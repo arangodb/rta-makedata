@@ -1,4 +1,4 @@
-/* global semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual */
+/* global semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual, semver */
 
 // this method will declare all the collection name with proper dbCount
 let collections_names_declaration = (dbCount) => {
@@ -375,10 +375,12 @@ function compareProperties(name, obj1, obj2) {
         }
       });
 
+      let currVersion = db._version();
+      const consolidationIntervalMsec = semver.gt(currVersion, "3.12.5") ? 5000 : 1000;
       let expected_output = {
         "cleanupIntervalStep" : 2,
         "commitIntervalMsec" : 1000,
-        "consolidationIntervalMsec" : 1000,
+        "consolidationIntervalMsec" : consolidationIntervalMsec,
         "consolidationPolicy" : {
           "type" : "tier",
           "segmentsBytesFloor" : 2097152,
