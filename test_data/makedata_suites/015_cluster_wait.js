@@ -57,6 +57,7 @@
         let found = 0;
         let shardDist = arango.GET("/_admin/cluster/shardDistribution");
         if (shardDist.code !== 200 || typeof shardDist.results !== "object") {
+          ++count;
           continue;
         }
         let cols = Object.keys(shardDist.results);
