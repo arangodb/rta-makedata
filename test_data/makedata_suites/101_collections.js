@@ -377,16 +377,20 @@ function compareProperties(name, obj1, obj2) {
 
       let currVersion = db._version();
       const consolidationIntervalMsec = semver.gt(currVersion, "3.12.5") ? 5000 : 1000;
+      const segmentsMin = semver.gt(currVersion, "3.12.5") ? 50 : 1;
+      const segmentsMax = semver.gt(currVersion, "3.12.5") ? 200 : 10;
+      const segmentsBytesFloor = semver.gt(currVersion, "3.12.5") ? 25165824 : 2097152;
+      const segmentsBytesMax = semver.gt(currVersion, "3.12.5") ? 8589934592 : 5368709120;
       let expected_output = {
         "cleanupIntervalStep" : 2,
         "commitIntervalMsec" : 1000,
         "consolidationIntervalMsec" : consolidationIntervalMsec,
         "consolidationPolicy" : {
           "type" : "tier",
-          "segmentsBytesFloor" : 2097152,
-          "segmentsBytesMax" : 5368709120,
-          "segmentsMax" : 10,
-          "segmentsMin" : 1,
+          "segmentsBytesFloor" : segmentsBytesFloor,
+          "segmentsBytesMax" : segmentsBytesMax,
+          "segmentsMax" : segmentsMax,
+          "segmentsMin" : segmentsMin,
           "minScore" : 0
         },
         "primarySort" : [ ],
