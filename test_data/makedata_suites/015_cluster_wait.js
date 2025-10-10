@@ -15,7 +15,7 @@
       let count = 0;
       let collections = [];
       print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
-      print(`Wait for all collections to get updated servers for shards`)
+      print(`${Date()} 015: Wait for all collections to get updated servers for shards`)
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -45,12 +45,12 @@
               JSON.stringify(db[col].properties());
           });
           print(`${Date()} 015: ${collectionData}`);
-          throw ("Still have collections bound to the failed server: " + JSON.stringify(collections));
+            throw ("015: Still have collections bound to the failed server: " + JSON.stringify(collections));
         }
       }
       print(`${Date()} 015: first check done - shards moved.`);
 
-      print(`Wait for for current and plan the become the same`)
+      print(`${Date()} 015: Wait for for current and plan the become the same`)
       count = 0;
       while (count < 500) {
         collections = [];
@@ -83,15 +83,15 @@
         } else {
           break;
         }
-        if (count > 499) {
-          let collectionData = "Still have collections with mismatched leaders: ";
-          collections.forEach(col => {
-            print(`${Date()} 015: ${JSON.stringify(col)}`);
-            collectionData += "\n" + JSON.stringify(col);
-          });
-          print(`${Date()} 015: ${collectionData}`);
-          throw ("Still have collections with mismatched leaders: " + JSON.stringify(collections));
-        }
+      }
+      if (count >= 500) {
+        let collectionData = "Still have collections with mismatched leaders: ";
+        collections.forEach(col => {
+          print(`${Date()} 015: ${JSON.stringify(col)}`);
+          collectionData += "\n" + JSON.stringify(col);
+        });
+        print(`${Date()} 015: ${collectionData}`);
+        throw ("015: Still have collections with mismatched leaders: " + JSON.stringify(collections));
       }
       print(`${Date()} 015: second check done - plan and current are synced.`);
       print(`${Date()} 015: all checks done - continuing test.`);
