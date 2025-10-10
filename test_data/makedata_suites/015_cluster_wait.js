@@ -15,7 +15,7 @@
       let count = 0;
       let collections = [];
       print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
-      print(`${Date()} 015: Wait for all collections to get updated servers for shards`)
+      print(`${Date()} 015: Wait for all collections to get updated servers for shards`);
       while (count < 500) {
         collections = [];
         let found = 0;
@@ -36,21 +36,21 @@
         } else {
           break;
         }
-        if (count > 499) {
-          let collectionData = "Still have collections bound to the failed server: ";
-          collections.forEach(col => {
-            print(`${Date()} 015: ${col}`);
-            collectionData += "\n" + JSON.stringify(col) + ":\n" +
-              JSON.stringify(db[col].shards(true)) + "\n" +
-              JSON.stringify(db[col].properties());
-          });
-          print(`${Date()} 015: ${collectionData}`);
-            throw ("015: Still have collections bound to the failed server: " + JSON.stringify(collections));
-        }
+      }
+      if (count >= 500) {
+        let collectionData = "Still have collections bound to the failed server: ";
+        collections.forEach(col => {
+          print(`${Date()} 015: ${col}`);
+          collectionData += "\n" + JSON.stringify(col) + ":\n" +
+            JSON.stringify(db[col].shards(true)) + "\n" +
+            JSON.stringify(db[col].properties());
+        });
+        print(`${Date()} 015: ${collectionData}`);
+        throw ("015: Still have collections bound to the failed server: " + JSON.stringify(collections));
       }
       print(`${Date()} 015: first check done - shards moved.`);
 
-      print(`${Date()} 015: Wait for for current and plan the become the same`)
+      print(`${Date()} 015: Wait for current and plan to become the same`);
       count = 0;
       while (count < 500) {
         collections = [];
@@ -70,9 +70,9 @@
                 collections.push([c, s]);
               }
             } catch (ex) {
-              print(s);
-              print(col);
-              print(ex);
+              print(`${Date()} 015: ${s}`);
+              print(`${Date()} 015: ${JSON.stringify(col)}`);
+              print(`${Date()} 015: ${ex}`);
             }
           });
         });
