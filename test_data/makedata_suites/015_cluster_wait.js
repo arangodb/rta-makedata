@@ -15,9 +15,11 @@
       let count = 0;
       let collections = [];
       print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
+      print(`${Date()} 015: Wait for all collections to get updated servers for shards`);
       while (count < 500) {
         collections = [];
         let found = 0;
+
         db._collections().map((c) => c.name()).forEach((c) => {
           let shards = db[c].shards(true);
           Object.values(shards).forEach((serverList) => {
@@ -35,7 +37,7 @@
           break;
         }
       }
-      if (count > 499) {
+      if (count >= 500) {
         let collectionData = "Still have collections bound to the failed server: ";
         collections.forEach(col => {
           print(`${Date()} 015: ${col}`);
@@ -44,9 +46,56 @@
             JSON.stringify(db[col].properties());
         });
         print(`${Date()} 015: ${collectionData}`);
-        throw ("Still have collections bound to the failed server: " + JSON.stringify(collections));
+        throw ("015: Still have collections bound to the failed server: " + JSON.stringify(collections));
       }
-      print(`${Date()} 015: done - continuing test.`);
+      print(`${Date()} 015: first check done - shards moved.`);
+
+      print(`${Date()} 015: Wait for current and plan to become the same`);
+      count = 0;
+      while (count < 500) {
+        collections = [];
+        let found = 0;
+        let shardDist = arango.GET("/_admin/cluster/shardDistribution");
+        if (shardDist.code !== 200 || typeof shardDist.results !== "object") {
+          ++count;
+          continue;
+        }
+        let cols = Object.keys(shardDist.results);
+        cols.forEach((c) => {
+          let col = shardDist.results[c];
+          let shards = Object.keys(col.Plan);
+          shards.forEach((s) => {
+            try {
+              if (col.Current.hasOwnProperty(s) && (col.Plan[s].leader !== col.Current[s].leader)) {
+                ++found;
+                collections.push([c, s]);
+              }
+            } catch (ex) {
+              print(`${Date()} 015: ${s}`);
+              print(`${Date()} 015: ${JSON.stringify(col)}`);
+              print(`${Date()} 015: ${ex}`);
+            }
+          });
+        });
+        if (found > 0) {
+          print(`${Date()} 015: ${found} found - Waiting - ${JSON.stringify(collections)}`);
+          internal.sleep(1);
+          count += 1;
+        } else {
+          break;
+        }
+      }
+      if (count >= 500) {
+        let collectionData = "Still have collections with mismatched leaders: ";
+        collections.forEach(col => {
+          print(`${Date()} 015: ${JSON.stringify(col)}`);
+          collectionData += "\n" + JSON.stringify(col);
+        });
+        print(`${Date()} 015: ${collectionData}`);
+        throw ("015: Still have collections with mismatched leaders: " + JSON.stringify(collections));
+      }
+      print(`${Date()} 015: second check done - plan and current are synced.`);
+      print(`${Date()} 015: all checks done - continuing test.`);
       return 0;
     }
   };
