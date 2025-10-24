@@ -63,12 +63,30 @@
         RETURN {v1: testee.value, v2: x.value}
       `;
         let result;
-        try {
-          result = db._query(query).toArray();
-        } catch (ex) {
-          print(`${Date()} Failed to instanciate query ${query} -> ${ex}`);
-          throw ex;
+        const maxRetries = 5;
+        const backoff = 0.1; // 0.1s
+        let lastError;
+        let success = false;
+
+        for (let retry = 0; retry < maxRetries; ++retry) {
+          try {
+            result = db._query(query).toArray();
+            success = true;
+            break;
+          } catch (ex) {
+            lastError = ex;
+            print(`${Date()} Failed to instanciate query ${query} (attempt ${retry + 1}/${maxRetries}) -> ${ex}`);
+            if (retry < maxRetries - 1) {
+              require('internal').sleep(backoff);
+            }
+          }
         }
+
+        if (!success) {
+          print(`${Date()} Failed to instanciate query ${query} after ${maxRetries} retries -> ${lastError}`);
+          throw lastError;
+        }
+
         if (result.length !== 1 || result[0].v1 !== "success" || result[0].v2 !== "success") {
           throw new Error(`${Date()} 900: DOCUMENT call in OneShard database does not return data ${JSON.stringify(result)}`);
         }
