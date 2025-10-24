@@ -75,7 +75,7 @@
             break;
           } catch (ex) {
             lastError = ex;
-            print(`${Date()} Failed to instanciate query ${query} (attempt ${retry + 1}/${maxRetries}) -> ${ex}`);
+            print(`${Date()} 900: Failed to instanciate query ${query} (attempt ${retry + 1}/${maxRetries}) -> ${ex}`);
             if (retry < maxRetries - 1) {
               require('internal').sleep(backoff);
             }
@@ -83,7 +83,7 @@
         }
 
         if (!success) {
-          print(`${Date()} Failed to instanciate query ${query} after ${maxRetries} retries -> ${lastError}`);
+          print(`${Date()} 900: Failed to instanciate query ${query} after ${maxRetries} retries -> ${lastError}`);
           throw lastError;
         }
 
