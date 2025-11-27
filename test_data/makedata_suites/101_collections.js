@@ -377,9 +377,15 @@ function compareProperties(name, obj1, obj2) {
 
       let currVersion = db._version();
       const consolidationIntervalMsec = semver.gt(currVersion, "3.12.5") ? 5000 : 1000;
-      const segmentsMin = semver.gt(currVersion, "3.12.5") && semver.lt(currVersion, "3.12.7") ? 50 : 1;
-      const segmentsMax = semver.gt(currVersion, "3.12.5") && semver.lt(currVersion, "3.12.7") ? 200 : 10;
-      const segmentsBytesFloor = semver.gt(currVersion, "3.12.5") && semver.lt(currVersion, "3.12.7") ? 25165824 : 2097152;
+
+      //  old consolidation policy properties.
+      //  They're applicable only until v3.12.6.
+      //  v3.12.7 onwards, these 3 properties (and minScore) will be obsolete.
+      //  We introduce 2 new properties, maxSkewThreshold and minDeletionRatio, in v3.12.7.
+      const segmentsMin = semver.gt(currVersion, "3.12.5") ? 50 : 1;
+      const segmentsMax = semver.gt(currVersion, "3.12.5") ? 200 : 10;
+      const segmentsBytesFloor = semver.gt(currVersion, "3.12.5") ? 25165824 : 2097152;
+
       const segmentsBytesMax = semver.gt(currVersion, "3.12.5") ? 8589934592 : 5368709120;
 
       let consolidationPolicy = {};
