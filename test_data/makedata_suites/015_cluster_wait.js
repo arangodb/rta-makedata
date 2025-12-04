@@ -102,6 +102,9 @@
             return;
           }
         });
+        if (dbs.length === dbsOk) {
+          break;
+        }
       }
       if (count >= 500) {
         let collectionData = "Still have collections with mismatched leaders: ";
