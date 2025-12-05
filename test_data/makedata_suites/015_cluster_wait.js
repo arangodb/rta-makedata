@@ -14,6 +14,7 @@
       print(`${Date()} 015: checking data ${dbCount}`);
       let count = 0;
       let collections = [];
+      db._useDatabase("_system");
       let dbs = db._databases();
       print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
       print(`${Date()} 015: Wait for all collections to get updated servers for shards`);
