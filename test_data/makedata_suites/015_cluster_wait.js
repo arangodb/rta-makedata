@@ -18,7 +18,8 @@
       let dbs = db._databases();
       print(`${Date()} 015: waiting for all shards on ${options.disabledDbserverUUID} to be moved`);
       print(`${Date()} 015: Wait for all collections to get updated servers for shards`);
-      while (count < 500) {
+      const maxCount = (versionHas('tsan') || versionHas('asan')) ? 2000:500;
+      while (count < maxCount) {
         let dbsOk = 0;
         dbs.forEach(oneDb => {
           db._useDatabase(oneDb);
@@ -47,7 +48,7 @@
           break;
         }
       }
-      if (count >= 500) {
+      if (count >= maxCount) {
         let collectionData = "Still have collections bound to the failed server: ";
         dbs.forEach(oneDb => {
           db._useDatabase(oneDb);
@@ -66,7 +67,7 @@
 
       print(`${Date()} 015: Wait for current and plan to become the same`);
       count = 0;
-      while (count < 500) {
+      while (count < maxCount) {
         let dbsOk = 0;
         dbs.forEach(oneDb => {
           db._useDatabase(oneDb);
@@ -107,7 +108,7 @@
           break;
         }
       }
-      if (count >= 500) {
+      if (count >= maxCount) {
         let collectionData = "Still have collections with mismatched leaders: ";
         collections.forEach(col => {
           print(`${Date()} 015: ${JSON.stringify(col)}`);
