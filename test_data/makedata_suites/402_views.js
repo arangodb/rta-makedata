@@ -781,16 +781,19 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     jwt_key = obj["jwt"];
   };
 
-  let getRawMetrics = function (tags = "") {
+  let getRawMetrics = function (tags = "", version) {
     let headers = {};
     headers['accept'] = 'application/json';
     headers["Authorization"] = `Bearer ${jwt_key}`;
-    let reply = arango.GET_RAW(`/_admin/metrics/v2${tags}`, headers);
+    // In ArangoDB 4.0+ the metrics endpoint is /_admin/metrics
+    // In earlier versions it's /_admin/metrics/v2 or /_admin/metrics
+    let metricsEndpoint = semver.gte(version, "4.0.0") ? "/_admin/metrics" : "/_admin/metrics/v2";
+    let reply = arango.GET_RAW(`${metricsEndpoint}${tags}`, headers);
     return reply;
   };
 
-  let getMetricByName = function (name, tags) {
-    let res = getRawMetrics(tags);
+  let getMetricByName = function (name, tags, version) {
+    let res = getRawMetrics(tags, version);
     if (res.code !== 200) {
       print(`${Date()} 402: http result Name: ${name} Tags: ${tags} : ${JSON.stringify(res)}`);
       return 0;
@@ -798,11 +801,11 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return getMetricValue(res.body, name);
   };
 
-  let getMetricSingle = function (name) {
-    return getMetricByName(name, "");
+  let getMetricSingle = function (name, version) {
+    return getMetricByName(name, "", version);
   };
 
-  let getMetricCluster = function (name) {
+  let getMetricCluster = function (name, version) {
     {
       // trigger cluster metrics
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=write_global", {accept: "application/json"});
@@ -836,18 +839,18 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let value = 0;
     for (let i = 0; i < serversId.length; i++) {
-      value += getMetricByName(name, `?serverId=${serversId[i]}`);
+      value += getMetricByName(name, `?serverId=${serversId[i]}`, version);
     }
 
     return value;
   };
 
-  let getMetric = function (name, options) {
+  let getMetric = function (name, options, version) {
     generateJWT(options);
     if (isCluster) {
-      return getMetricCluster(name);
+      return getMetricCluster(name, version);
     } else {
-      return getMetricSingle(name);
+      return getMetricSingle(name, version);
     }
   };
 
@@ -956,7 +959,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let prevCacheSize = cacheSize;
 
       if (cacheSizeSupported && isEnterprise) {
-        cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
         prevCacheSize = cacheSize;
       }
 
@@ -1001,7 +1004,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             OPTIONS {waitForSync: true} return d`);
             // update cacheSize
             print('402: fetching metric');
-            cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+            cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
             if (utilizeCache || viewUtilizeCache) {
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
@@ -1067,7 +1070,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             db._query(query);
         
             // update cacheSize
-            cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+            cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
             if (utilizeCache) {
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
@@ -1098,7 +1101,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let isCacheSupported = isCacheSizeSupported(currVersion, options);
 
       if (isCacheSupported && isCacheSupportedOld && isEnterprise) {
-        let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        let cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
         print("402: got metric");
         if (cacheSize === 0) {
           throw new Error("cache size is equal to zero in checkData");
