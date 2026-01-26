@@ -18,7 +18,7 @@ let options = {};
 let tStart = 0;
 let timeLine = [];
 
-let versionHas = function (attribute) {
+function versionHas(attribute) {
   if (global.hasOwnProperty('ARANGODB_CLIENT_VERSION')) {
     return global.ARANGODB_CLIENT_VERSION(true)[attribute] === 'true';
   } else {
