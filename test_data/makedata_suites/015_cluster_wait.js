@@ -1,4 +1,4 @@
-/* global print, db, internal, arango, semver */
+/* global print, db, internal, arango, semver, versionHas */
 
 /* This handler is here to wait for every shard of every collection to have an appropriate number of
  follower nodes(e.g. if replicationFactor parameter is set to 2 for a collection, then each shard
@@ -25,7 +25,7 @@
           db._useDatabase(oneDb);
           collections = [];
           let found = 0;
-          
+
           db._collections().map((c) => c.name()).forEach((c) => {
             let shards = db[c].shards(true);
             Object.values(shards).forEach((serverList) => {
