@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, getIndexTypes */
 
 let secondIndexCreate = false;
 
@@ -39,7 +39,8 @@ let secondIndexCreate = false;
         });
         if (secondIndexCreate) {
           print('107: creating second index');
-          createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+          let idxTypes = getIndexTypes(db._version());
+          createIndexSafe({col: c_vector, type: idxTypes.hash, fields: ["a"], unique: false});
         }
       }
 

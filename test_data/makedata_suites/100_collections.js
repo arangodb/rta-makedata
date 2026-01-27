@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, resetRCount, writeData, getIndexTypes */
 
 (function () {
   return {
@@ -7,6 +7,9 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and loopCount
+      let currVersion = db._version();
+      let idxTypes = getIndexTypes(currVersion);
+
       // Create a few collections:
       let c = createCollectionSafe(`c_${dbCount}`, 3, 2);
       progress('100: createCollection1');
@@ -27,28 +30,36 @@
       // create a special collection, which will store only one document - current arangodb version
       // version is required for 402_views.js test case
       let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 2);
-      version_coll.insert({"version": db._version()});
+      version_coll.insert({"version": currVersion});
 
       // Create some indexes:
       progress('100: createCollection8');
-      createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
-      progress('100: createIndexHash1');
-      createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
-      progress('100: createIndexSkiplist2');
-      createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
-      progress('100: createIndexFulltext3');
+      createIndexSafe({col: chash, type: idxTypes.hash, fields: ["a"], unique: false});
+      progress('100: createIndex1');
+      createIndexSafe({col: cskip, type: idxTypes.skiplist, fields: ["a"], unique: false});
+      progress('100: createIndex2');
+      if (idxTypes.fulltext === "inverted") {
+        createIndexSafe({col: cfull, type: "inverted", fields: ["text"]});
+      } else {
+        createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
+      }
+      progress('100: createIndex3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
       progress('100: createIndexGeo4');
-      createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
+      createIndexSafe({col: cunique, type: idxTypes.hash, fields: ["a"], unique: true});
       progress('100: createIndex5');
-      createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false});
+      createIndexSafe({col: cmulti, type: idxTypes.hash, fields: ["a"], unique: false});
       progress('100: createIndex6');
-      createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"]});
+      createIndexSafe({col: cmulti, type: idxTypes.skiplist, fields: ["b", "c"]});
       progress('100: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
       progress('100: createIndexGeo8');
-      createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
-      progress('100: createIndexFulltext9');
+      if (idxTypes.fulltext === "inverted") {
+        createIndexSafe({col: cmulti, type: "inverted", fields: ["text"]});
+      } else {
+        createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
+      }
+      progress('100: createIndex9');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`100: Makedata ${dbCount} ${loopCount}`);
@@ -119,13 +130,17 @@
       // Check indexes:
       progress("100: checking indices");
 
+      // Get expected index types based on current version
+      let currVersion = db._version();
+      let idxTypes = getIndexTypes(currVersion);
+
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
-      if (chash.getIndexes()[1].type !== 'hash') { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
+      if (chash.getIndexes()[1].type !== idxTypes.expectedHash) { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
-      if (cskip.getIndexes()[1].type !== 'skiplist') { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
+      if (cskip.getIndexes()[1].type !== idxTypes.expectedSkiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
       if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      if (cfull.getIndexes()[1].type !== idxTypes.expectedFulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
       if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }

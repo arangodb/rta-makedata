@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount, getIndexTypes */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -41,25 +41,37 @@
       let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
 
       // Create some indexes:
+      // Get index types based on version
+      let currVersion = db._version();
+      let idxTypes = getIndexTypes(currVersion);
+
       progress('102: createCollection8');
-      createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false, name: extendedNames[1]});
-      progress('102: createIndexHash1');
-      createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false, name: extendedNames[2]});
-      progress('102: createIndexSkiplist2');
-      createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4, name: extendedNames[3]});
-      progress('102: createIndexFulltext3');
+      createIndexSafe({col: chash, type: idxTypes.hash, fields: ["a"], unique: false, name: extendedNames[1]});
+      progress('102: createIndex1');
+      createIndexSafe({col: cskip, type: idxTypes.skiplist, fields: ["a"], unique: false, name: extendedNames[2]});
+      progress('102: createIndex2');
+      if (idxTypes.fulltext === "inverted") {
+        createIndexSafe({col: cfull, type: "inverted", fields: ["text"], name: extendedNames[3]});
+      } else {
+        createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4, name: extendedNames[3]});
+      }
+      progress('102: createIndex3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[4]});
       progress('102: createIndexGeo4');
-      createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true, name: extendedNames[5]});
+      createIndexSafe({col: cunique, type: idxTypes.hash, fields: ["a"], unique: true, name: extendedNames[5]});
       progress('102: createIndex5');
-      createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false, name: extendedNames[6]});
+      createIndexSafe({col: cmulti, type: idxTypes.hash, fields: ["a"], unique: false, name: extendedNames[6]});
       progress('102: createIndex6');
-      createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"], name: extendedNames[7]});
+      createIndexSafe({col: cmulti, type: idxTypes.skiplist, fields: ["b", "c"], name: extendedNames[7]});
       progress('102: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[8]});
       progress('102: createIndexGeo8');
-      createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
-      progress('102: createIndexFulltext9');
+      if (idxTypes.fulltext === "inverted") {
+        createIndexSafe({col: cmulti, type: "inverted", fields: ["text"], name: extendedNames[0]});
+      } else {
+        createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
+      }
+      progress('102: createIndex9');
 
       // Now the actual data writing:
       resetRCount();
@@ -133,13 +145,17 @@
       // Check indexes:
       progress("102: checking indices");
 
+      // Get expected index types based on current version
+      let currVersion = db._version();
+      let idxTypes = getIndexTypes(currVersion);
+
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
-      if (chash.getIndexes()[1].type !== 'hash') { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
+      if (chash.getIndexes()[1].type !== idxTypes.expectedHash) { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
-      if (cskip.getIndexes()[1].type !== 'skiplist') { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
+      if (cskip.getIndexes()[1].type !== idxTypes.expectedSkiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
       if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      if (cfull.getIndexes()[1].type !== idxTypes.expectedFulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
       if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }

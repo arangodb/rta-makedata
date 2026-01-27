@@ -7,6 +7,7 @@
 const internal = require('internal');
 const AsciiTable = require('ascii-table');
 const arangodb = require("@arangodb");
+const semver = require("semver");
 const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
 let rand = require("internal").rand;
@@ -428,6 +429,23 @@ function writeData(coll, n) {
   }
 };
 
+// Helper to determine index types based on version
+// In ArangoDB 4.0+, hash/skiplist are replaced by persistent, fulltext by inverted
+function getIndexTypes(version) {
+  let versionCoerced = semver.coerce(version);
+  let isV4 = semver.gte(versionCoerced, "4.0.0");
+  return {
+    hash: isV4 ? "persistent" : "hash",
+    skiplist: isV4 ? "persistent" : "skiplist",
+    fulltext: isV4 ? "inverted" : "fulltext",
+    // Expected types when checking (in 4.0+, hash/skiplist return as persistent)
+    expectedHash: isV4 ? "persistent" : "hash",
+    expectedSkiplist: isV4 ? "persistent" : "skiplist",
+    expectedFulltext: isV4 ? "inverted" : "fulltext"
+  };
+}
+
+exports.getIndexTypes = getIndexTypes;
 exports.makeRandomString = makeRandomString;
 exports.makeRandomNumber = makeRandomNumber;
 exports.makeRandomTimeStamp = makeRandomTimeStamp;
