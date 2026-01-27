@@ -38,13 +38,9 @@
       progress('100: createIndex1');
       createIndexSafe({col: cskip, type: idxTypes.skiplist, fields: ["a"], unique: false});
       progress('100: createIndex2');
-      if (idxTypes.fulltext === "inverted") {
-        createIndexSafe({col: cfull, type: "inverted", fields: ["text"]});
-      } else {
-        createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
-      }
+      createIndexSafe({col: cfull, type: idxTypes.fulltext, fields: ["text"], minLength: 4});
       progress('100: createIndex3');
-      createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
+      createIndexSafe({col: cgeo, type: idxTypes.geo, fields: ["position"], geoJson: true});
       progress('100: createIndexGeo4');
       createIndexSafe({col: cunique, type: idxTypes.hash, fields: ["a"], unique: true});
       progress('100: createIndex5');
@@ -52,13 +48,9 @@
       progress('100: createIndex6');
       createIndexSafe({col: cmulti, type: idxTypes.skiplist, fields: ["b", "c"]});
       progress('100: createIndex7');
-      createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
+      createIndexSafe({col: cmulti, type: idxTypes.geo, fields: ["position"], geoJson: true});
       progress('100: createIndexGeo8');
-      if (idxTypes.fulltext === "inverted") {
-        createIndexSafe({col: cmulti, type: "inverted", fields: ["text"]});
-      } else {
-        createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
-      }
+      createIndexSafe({col: cmulti, type: idxTypes.fulltext, fields: ["text"], minLength: 6});
       progress('100: createIndex9');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
@@ -140,9 +132,9 @@
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
       if (cskip.getIndexes()[1].type !== idxTypes.expectedSkiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
       if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== idxTypes.expectedFulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      if (cfull.getIndexes()[1].type !== idxTypes.fulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
-      if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
+      if (cgeo.getIndexes()[1].type !== idxTypes.geo) { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
       if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }

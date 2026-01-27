@@ -50,13 +50,9 @@
       progress('102: createIndex1');
       createIndexSafe({col: cskip, type: idxTypes.skiplist, fields: ["a"], unique: false, name: extendedNames[2]});
       progress('102: createIndex2');
-      if (idxTypes.fulltext === "inverted") {
-        createIndexSafe({col: cfull, type: "inverted", fields: ["text"], name: extendedNames[3]});
-      } else {
-        createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4, name: extendedNames[3]});
-      }
+      createIndexSafe({col: cfull, type: idxTypes.fulltext, fields: ["text"], minLength: 4, name: extendedNames[3]});
       progress('102: createIndex3');
-      createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[4]});
+      createIndexSafe({col: cgeo, type: idxTypes.geo, fields: ["position"], geoJson: true, name: extendedNames[4]});
       progress('102: createIndexGeo4');
       createIndexSafe({col: cunique, type: idxTypes.hash, fields: ["a"], unique: true, name: extendedNames[5]});
       progress('102: createIndex5');
@@ -64,13 +60,9 @@
       progress('102: createIndex6');
       createIndexSafe({col: cmulti, type: idxTypes.skiplist, fields: ["b", "c"], name: extendedNames[7]});
       progress('102: createIndex7');
-      createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[8]});
+      createIndexSafe({col: cmulti, type: idxTypes.geo, fields: ["position"], geoJson: true, name: extendedNames[8]});
       progress('102: createIndexGeo8');
-      if (idxTypes.fulltext === "inverted") {
-        createIndexSafe({col: cmulti, type: "inverted", fields: ["text"], name: extendedNames[0]});
-      } else {
-        createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
-      }
+      createIndexSafe({col: cmulti, type: idxTypes.fulltext, fields: ["text"], minLength: 6, name: extendedNames[0]});
       progress('102: createIndex9');
 
       // Now the actual data writing:
@@ -155,9 +147,9 @@
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
       if (cskip.getIndexes()[1].type !== idxTypes.expectedSkiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
       if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== idxTypes.expectedFulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      if (cfull.getIndexes()[1].type !== idxTypes.fulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
-      if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
+      if (cgeo.getIndexes()[1].type !== idxTypes.geo) { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
       if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }

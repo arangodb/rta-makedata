@@ -430,18 +430,20 @@ function writeData(coll, n) {
 };
 
 // Helper to determine index types based on version
-// In ArangoDB 4.0+, hash/skiplist are replaced by persistent, fulltext by inverted
+// In ArangoDB 4.0+, hash/skiplist indexes are removed and replaced by persistent
 function getIndexTypes(version) {
   let versionCoerced = semver.coerce(version);
   let isV4 = semver.gte(versionCoerced, "4.0.0");
   return {
+    // Deprecated in 4.0 - replaced by persistent
     hash: isV4 ? "persistent" : "hash",
     skiplist: isV4 ? "persistent" : "skiplist",
-    fulltext: isV4 ? "inverted" : "fulltext",
-    // Expected types when checking (in 4.0+, hash/skiplist return as persistent)
-    expectedHash: isV4 ? "persistent" : "hash",
-    expectedSkiplist: isV4 ? "persistent" : "skiplist",
-    expectedFulltext: isV4 ? "inverted" : "fulltext"
+    // Not deprecated - always the same
+    fulltext: "fulltext",
+    geo: "geo",
+    persistent: "persistent",
+    ttl: "ttl",
+    inverted: "inverted"
   };
 }
 
