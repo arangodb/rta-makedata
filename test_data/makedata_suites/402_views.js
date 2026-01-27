@@ -28,7 +28,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
   const {
     getMetricValue
   } = require(fs.join(PWD, 'common'));
-  
+
 
   let arangosearchTestCases = [
     {
@@ -591,8 +591,8 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     5 possible cases when we should omit 'cache' value from link/index definition:
           1) ____                2)  ___
                  ____                  'cache': false
-  
-  
+
+
           3)'cache': false    4) 'cache': false     5) 'cache': true
                   ____               'cache': false         'cache': true
     */
@@ -739,7 +739,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     let version = db._version();
 
     if (isPKAndPSNotSupported(version, oldVersion)) {
-      // Bug SEARCH-466 is not fixed until versions 3.9.11 and 3.10.7. 
+      // Bug SEARCH-466 is not fixed until versions 3.9.11 and 3.10.7.
       // So we will delete these fields manualy
 
       if (expected.hasOwnProperty("primarySortCache")) {
@@ -760,7 +760,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     if (type === "arangosearch") {
       return _.isEqual(actual, expected);
     } else if (type === "index") {
-      // We want to be sure that 'cache' fields are exist or not exist simultaneously for 'actual' and 'expected' 
+      // We want to be sure that 'cache' fields are exist or not exist simultaneously for 'actual' and 'expected'
       let res = actual.hasOwnProperty("cache") ^ expected.hasOwnProperty("cache");
       return !res && _.isMatch(actual, expected);
     } else {
@@ -781,16 +781,22 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     jwt_key = obj["jwt"];
   };
 
-  let getRawMetrics = function (tags = "") {
+  let getRawMetrics = function (tags = "", version) {
     let headers = {};
     headers['accept'] = 'application/json';
     headers["Authorization"] = `Bearer ${jwt_key}`;
-    let reply = arango.GET_RAW(`/_admin/metrics/v2${tags}`, headers);
+    // In ArangoDB 4.0+ the metrics endpoint is /_admin/metrics
+    // In earlier versions it's /_admin/metrics/v2
+    // Use semver.coerce to handle prerelease versions like "4.0.0-devel"
+    let versionCoerced = semver.coerce(version);
+    let metricsEndpoint = semver.gte(versionCoerced, "4.0.0") ? "/_admin/metrics" : "/_admin/metrics/v2";
+    print(`Using endpoint: ${metricsEndpoint}${tags}`);
+    let reply = arango.GET_RAW(`${metricsEndpoint}${tags}`, headers);
     return reply;
   };
 
-  let getMetricByName = function (name, tags) {
-    let res = getRawMetrics(tags);
+  let getMetricByName = function (name, tags, version) {
+    let res = getRawMetrics(tags, version);
     if (res.code !== 200) {
       print(`${Date()} 402: http result Name: ${name} Tags: ${tags} : ${JSON.stringify(res)}`);
       return 0;
@@ -798,11 +804,11 @@ function deleteAnalyzer_400(testgroup, analyzerName){
     return getMetricValue(res.body, name);
   };
 
-  let getMetricSingle = function (name) {
-    return getMetricByName(name, "");
+  let getMetricSingle = function (name, version) {
+    return getMetricByName(name, "", version);
   };
 
-  let getMetricCluster = function (name) {
+  let getMetricCluster = function (name, version) {
     {
       // trigger cluster metrics
       arango.GET_RAW("/_db/_system/_admin/metrics?mode=write_global", {accept: "application/json"});
@@ -836,18 +842,18 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
     let value = 0;
     for (let i = 0; i < serversId.length; i++) {
-      value += getMetricByName(name, `?serverId=${serversId[i]}`);
+      value += getMetricByName(name, `?serverId=${serversId[i]}`, version);
     }
 
     return value;
   };
 
-  let getMetric = function (name, options) {
+  let getMetric = function (name, options, version) {
     generateJWT(options);
     if (isCluster) {
-      return getMetricCluster(name);
+      return getMetricCluster(name, version);
     } else {
-      return getMetricSingle(name);
+      return getMetricSingle(name, version);
     }
   };
 
@@ -902,7 +908,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         let viewNamePKCache = `viewPKCache_${dbCount}`;
         viewPKCache = createSafe(viewNamePKCache,
           viewNamePKCache => {
-            return db._createView(viewNamePKCache, "arangosearch", { 
+            return db._createView(viewNamePKCache, "arangosearch", {
               "primaryKeyCache": true
             });
           }, viewNamePKCache => {
@@ -915,12 +921,12 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         let viewNamePSCache = `viewPSCache_${dbCount}`;
         viewPSCache = createSafe(viewNamePSCache,
           viewNamePSCache => {
-            return db._createView(viewNamePSCache, "arangosearch", { 
-              "primarySort": [ 
-                { "field": "animal", "direction": "desc" }, 
+            return db._createView(viewNamePSCache, "arangosearch", {
+              "primarySort": [
+                { "field": "animal", "direction": "desc" },
                 { "field": "name", "direction": "asc" }
-              ],  
-              "primarySortCache": true 
+              ],
+              "primarySortCache": true
             });
           }, viewNamePSCache => {
             throw new Error(`Can't create view ${viewNamePSCache}`);
@@ -933,14 +939,14 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let viewNameNoCache = `viewNoCache_${dbCount}`;
       let viewNoCache = createSafe(viewNameNoCache,
         viewNameNoCache => {
-          return db._createView(viewNameNoCache, "arangosearch", { 
+          return db._createView(viewNameNoCache, "arangosearch", {
             "storedValues": [
               { "fields": ["animal", "name"], "cache": false }
             ],
-            "primarySort": [ 
-              { "field": "animal", "direction": "desc" }, 
+            "primarySort": [
+              { "field": "animal", "direction": "desc" },
               { "field": "name", "direction": "asc" }
-            ],  
+            ],
             "primarySortCache": false,
             "primaryKeyCache": false
           });
@@ -952,11 +958,11 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let cacheSizeSupported = isCacheSizeSupported(currVersion, options);
 
       const cacheSizeLimit = 4900;
-      let cacheSize = 0;      
+      let cacheSize = 0;
       let prevCacheSize = cacheSize;
 
       if (cacheSizeSupported && isEnterprise) {
-        cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
         prevCacheSize = cacheSize;
       }
 
@@ -995,13 +1001,13 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             let lines = GEO_MULTILINESTRING([
               [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
               [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]])
-            for d in ${view.name()} search ANALYZER(d.animal == tokens("cat", "AqlAnalyzerHash")[0], "AqlAnalyzerHash") OR 
+            for d in ${view.name()} search ANALYZER(d.animal == tokens("cat", "AqlAnalyzerHash")[0], "AqlAnalyzerHash") OR
             ANALYZER(GEO_DISTANCE(d.geo_location, lines) < 100, "geo_json") OR
             ANALYZER(GEO_DISTANCE(d.geo_latlng, lines) < 100, "geo_point")
             OPTIONS {waitForSync: true} return d`);
             // update cacheSize
             print('402: fetching metric');
-            cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+            cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
             if (utilizeCache || viewUtilizeCache) {
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. View: ${view.name()}. CollectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
@@ -1016,7 +1022,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
         });
       });
 
-      // cache for inverted index is exists only since 3.10.2 
+      // cache for inverted index is exists only since 3.10.2
       if (semver.gte(currVersion, "3.10.2")) {
         invertedIndexTestCases.forEach(test => {
           // This collection was created on previous step. Just extract the name.
@@ -1030,7 +1036,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             { "animal": "dog1", "name": "harry2", "geo_location": { "type": "Point", "coordinates": [6.27, 55.81] }, "geo_latlng": { "lat": 50.9, "lng": 7 } },
             { "version": currVersion }
           ]);
-  
+
           progress(`402: ensuring index for collection : ${collectionName}`);
 
           let status = db._collection(collectionName).ensureIndex(test);
@@ -1048,7 +1054,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
                 [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
                 [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]
               ])
-              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true}
               filter GEO_DISTANCE(d.geo_location, lines) < 3000
               return d`;
             } else if (collectionName.includes("geopoint")) {
@@ -1056,18 +1062,18 @@ function deleteAnalyzer_400(testgroup, analyzerName){
                 [[ 37.614323, 55.705898 ], [ 37.615825, 55.705898 ]],
                 [[ 37.614323, 55.70652 ], [ 37.615825, 55.70652 ]]
               ])
-              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true}
               filter GEO_DISTANCE(d.geo_latlng, lines) < 3000
               return d`;
             } else {
-              query = `for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true} 
+              query = `for d in ${collectionName} OPTIONS { indexHint: "${test["name"]}", forceIndexHint: true, waitForSync: true}
               filter d.animal == "cat"
               return d`;
             }
             db._query(query);
-        
+
             // update cacheSize
-            cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+            cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
             if (utilizeCache) {
               if (cacheSize <= prevCacheSize && cacheSize < cacheSizeLimit) {
                 throw new Error(`Cache size should be increased. collectionName: ${collectionName}. cacheSize: ${cacheSize}. prevCacheSize: ${prevCacheSize}`);
@@ -1098,7 +1104,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       let isCacheSupported = isCacheSizeSupported(currVersion, options);
 
       if (isCacheSupported && isCacheSupportedOld && isEnterprise) {
-        let cacheSize = getMetric("arangodb_search_columns_cache_size", options);
+        let cacheSize = getMetric("arangodb_search_columns_cache_size", options, currVersion);
         print("402: got metric");
         if (cacheSize === 0) {
           throw new Error("cache size is equal to zero in checkData");
@@ -1130,7 +1136,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           throw new Error(`viewPSCache: cache value for primarySort is present! oldVersion:${oldVersion}, newVersion:${currVersion}`);
         }
       } else {
-        // current and previous versions are aware of 'cache'. 
+        // current and previous versions are aware of 'cache'.
         // Check that value is present and equal to value from previous version
         if (viewSVCache.properties()["storedValues"][0]["cache"] !== true) {
           throw new Error("cache value for storedValues is not 'true'!");
@@ -1165,9 +1171,9 @@ function deleteAnalyzer_400(testgroup, analyzerName){
           return;
         }
         let actualLinks = view.properties().links;
-        
+
         print(`${Date()} 402: check view: ${view.name()}`);
-        
+
         arangosearchTestCases.forEach(test => {
           // get link for each collection
           let collectionName = `${test["collectionName"]}_as_${dbCount}`;
@@ -1177,33 +1183,33 @@ function deleteAnalyzer_400(testgroup, analyzerName){
             // in previous version 'cache' was not supported.
             // So it means that in current version there should be NO 'cache' fields
             if (linkFromView.hasOwnProperty('cache')) {
-              throw new Error(`cache value on root level in link should not present! view: ${view.name()}. 
+              throw new Error(`cache value on root level in link should not present! view: ${view.name()}.
               collection: ${collectionName}, oldVersion:${oldVersion}, newVersion:${currVersion}`);
             }
             if (linkFromView["fields"].hasOwnProperty("animal")) {
               if (linkFromView["fields"]["animal"].hasOwnProperty('cache')) {
-                throw new Error(`cache value on field level in link should not present! view: ${view.name()}. 
+                throw new Error(`cache value on field level in link should not present! view: ${view.name()}.
                 collection: ${collectionName}, oldVersion:${oldVersion}, newVersion:${currVersion}`);
               }
             }
             if (linkFromView["fields"].hasOwnProperty("geo_location")) {
               if (linkFromView["fields"]["geo_location"].hasOwnProperty('cache')) {
-                throw new Error(`cache value on field level in link should not present! view: ${view.name()}. 
+                throw new Error(`cache value on field level in link should not present! view: ${view.name()}.
                 collection: ${collectionName}, oldVersion:${oldVersion}, newVersion:${currVersion}`);
               }
             }
             if (linkFromView["fields"].hasOwnProperty("geo_latlng")) {
               if (linkFromView["fields"]["geo_latlng"].hasOwnProperty('cache')) {
-                throw new Error(`cache value on field level in link should not present! view: ${view.name()}. 
+                throw new Error(`cache value on field level in link should not present! view: ${view.name()}.
                 collection: ${collectionName}, oldVersion:${oldVersion}, newVersion:${currVersion}`);
               }
             }
           } else {
-            // current and previous versions are aware of 'cache'. 
+            // current and previous versions are aware of 'cache'.
             // Check that value is present and equal to value from previous version
             let expectedLink = test["link"];
             if (!compare(isCacheSupported, "arangosearch", linkFromView, expectedLink, oldVersion)) {
-              let msg = `View: ${view.name()}: Links for collection ${collectionName} are not equal! 
+              let msg = `View: ${view.name()}: Links for collection ${collectionName} are not equal!
               Link from view: ${JSON.stringify(linkFromView)}, Expected link: ${JSON.stringify(expectedLink)}`;
               throw new Error(msg);
             }
@@ -1226,7 +1232,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
 
           } else {
             if (!compare(isCacheSupported, "index", actualIndex, expectedIndex, oldVersion)) {
-              let msg = `Indexes for collection ${collectionName} are not equal! 
+              let msg = `Indexes for collection ${collectionName} are not equal!
               Index from collection: ${JSON.stringify(actualIndex)}, Expected index: ${JSON.stringify(expectedIndex)}`;
               throw new Error(msg);
             }

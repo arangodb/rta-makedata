@@ -25,7 +25,7 @@
           db._useDatabase(oneDb);
           collections = [];
           let found = 0;
-          
+
           db._collections().map((c) => c.name()).forEach((c) => {
             let shards = db[c].shards(true);
             Object.values(shards).forEach((serverList) => {

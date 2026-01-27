@@ -48,7 +48,8 @@ let {
   runAqlQueryResultCount,
   runAqlQueryResultCountMultiply,
   scanMakeDataPaths,
-  mainTestLoop
+  mainTestLoop,
+  versionHas
 } = require(fs.join(PWD, 'common'));
 
 const {
