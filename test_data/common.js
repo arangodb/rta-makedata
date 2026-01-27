@@ -438,6 +438,7 @@ exports.scanMakeDataPaths = scanMakeDataPaths;
 exports.mainTestLoop = mainTestLoop;
 exports.getMetricValue = getMetricValue;
 exports.createSafe = createSafe;
+exports.versionHas = versionHas;
 exports.progress = progress;
 exports.getShardCount = getShardCount;
 exports.getReplicationFactor = getReplicationFactor;
