@@ -128,9 +128,9 @@
 
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
-      if (chash.getIndexes()[1].type !== idxTypes.expectedHash) { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
+      if (chash.getIndexes()[1].type !== idxTypes.hash) { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
-      if (cskip.getIndexes()[1].type !== idxTypes.expectedSkiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
+      if (cskip.getIndexes()[1].type !== idxTypes.skiplist) { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
       if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
       if (cfull.getIndexes()[1].type !== idxTypes.fulltext) { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
