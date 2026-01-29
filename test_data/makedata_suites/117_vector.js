@@ -1,8 +1,7 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
 
-let secondIndexCreate = false;
-
 (function () {
+  let secondIndexCreate = false;
   return {
     // 4.0+ version of 107_vector.js using persistent instead of hash
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {

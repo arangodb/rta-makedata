@@ -1,8 +1,7 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
 
-let secondIndexCreate = false;
-
 (function () {
+  let secondIndexCreate = false;
   return {
     // hash index is deprecated in 4.0, use 117_vector.js for 4.0+
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {

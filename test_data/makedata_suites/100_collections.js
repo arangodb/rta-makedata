@@ -1,9 +1,13 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, semver */
+
+// This file uses hash and skiplist indexes which are deprecated in 4.0+
+// For 4.0+, use 110_collections.js instead which uses persistent indexes
 
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
-      return true;
+      let versionSemver = semver.parse(semver.coerce(version));
+      return semver.lt(versionSemver, "4.0.0");
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount and loopCount

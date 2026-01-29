@@ -4,10 +4,12 @@
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
   let baseName;
   return {
+    // This file uses hash and skiplist indexes which are deprecated in 4.0+
+    // For 4.0+, use 112_collection_utf8.js instead which uses persistent indexes
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
+      return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0") && semver.lt(currentVersionSemver, "4.0.0");
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       db._useDatabase('_system');
