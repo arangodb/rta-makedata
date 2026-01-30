@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
 
 (function () {
   let secondIndexCreate = false;
@@ -16,34 +16,33 @@
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('107: createCollection');
       let c_vector = createCollectionSafe(`c_vector_${dbCount}`, 3, 2);
-      progress('107: createIndexHash');
+
+      // Create indexes in makeDataDB (called once per dbCount)
+      progress('107: createIndexVector');
+      createIndexSafe({
+        col: c_vector,
+        name: `i_vector_dbcount`,
+        type: "vector",
+        fields: ["TypeVec"],
+        inBackground: false,
+        params: {
+          metric: "l2",
+          dimension: 5,
+          nLists: 1
+        },
+      });
+      if (secondIndexCreate) {
+        print('107: creating hash index');
+        createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+      }
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`107: Makedata ${dbCount} ${loopCount}`);
       let c_vector = db[`c_vector_${dbCount}`];
 
-      // Now the actual data writing:
+      // Only data writing here (called per dbCount AND loopCount)
       resetRCount();
       writeData(c_vector, 1000);
-      if (c_vector.indexes().length === 1) {
-        createIndexSafe({
-          col: c_vector,
-          name: `i_vector_dbcount`,
-          type: "vector",
-          fields: ["TypeVec"],
-          inBackground: false,
-          params: {
-            metric: "l2",
-            dimension: 5,
-            nLists: 1
-          },
-        });
-        if (secondIndexCreate) {
-          print('107: creating second index');
-          createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
-        }
-      }
-
       progress('107: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -71,7 +70,7 @@
       // Check indexes:
       progress("107: checking indices");
 
-      const indexExpectCount = (secondIndexCreate) ? 3:2;
+      const indexExpectCount = (secondIndexCreate) ? 3 : 2;
       if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector.getIndexes().length} `);
       }
