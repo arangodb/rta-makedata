@@ -156,10 +156,10 @@
       progress("112: query 3");
       runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       progress("112: query 4");
-      let searchId = "id" + (20473 * options.dataMultiplier);
+      let searchId = "id" + (15000 * options.dataMultiplier);
       runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("112: query 5");
-      searchId = "id" + (32236 * options.dataMultiplier);
+      searchId = "id" + (27000 * options.dataMultiplier);
       runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchId} RETURN x`, 1);
       progress("112: query 6");
       searchId = "id" + (32847 * options.dataMultiplier);

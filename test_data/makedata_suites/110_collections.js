@@ -145,9 +145,9 @@
       runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       if (options.dataMultiplier === 1) {
         progress("110: query 4");
-        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`, 1);
+        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id15000" RETURN x`, 1);
         progress("110: query 5");
-        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`, 1);
+        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id27000" RETURN x`, 1);
         progress("110: query 6");
         runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`, 1);
       }
