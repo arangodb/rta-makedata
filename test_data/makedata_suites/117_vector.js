@@ -1,19 +1,17 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+
+// This is the ArangoDB 4.0+ version of 107_vector.js
+// Uses persistent instead of hash for secondary index
 
 (function () {
-  let secondIndexCreate = false;
   return {
-    // 4.0+ version of 107_vector.js using persistent instead of hash
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
-      let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      secondIndexCreate = true; // Always create second index in 4.0+
       return semver.gte(currentVersionSemver, "4.0.0");
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('117: createCollection');
       let c_vector = createCollectionSafe(`c_vector_${dbCount}`, 3, 2);
-      progress('117: createIndexHash');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`117: Makedata ${dbCount} ${loopCount}`);
@@ -35,10 +33,8 @@
             nLists: 1
           },
         });
-        if (secondIndexCreate) {
-          print('117: creating second index');
-          createIndexSafe({col: c_vector, type: "persistent", fields: ["a"], unique: false});
-        }
+        print('117: creating persistent index');
+        createIndexSafe({col: c_vector, type: "persistent", fields: ["a"], unique: false});
       }
 
       progress('117: writeData1');
@@ -65,11 +61,10 @@
 
       let c_vector = db._collection(`c_vector_${dbCount}`);
 
-      // Check indexes:
+      // Check indexes (vector + persistent = 3 including primary):
       progress("117: checking indices");
 
-      const indexExpectCount = (secondIndexCreate) ? 3:2;
-      if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
+      if (c_vector.getIndexes().length !== 3 || c_vector.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector.getIndexes().length} `);
       }
 
