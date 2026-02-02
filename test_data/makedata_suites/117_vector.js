@@ -11,7 +11,9 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('117: createCollection');
-      let c_vector = createCollectionSafe(`c_vector_${dbCount}`, 3, 2);
+      // Only create the collection here - indexes are created in makeData after documents are written
+      // because vector indexes require documents to be present for training
+      createCollectionSafe(`c_vector_${dbCount}`, 3, 2);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`117: Makedata ${dbCount} ${loopCount}`);
