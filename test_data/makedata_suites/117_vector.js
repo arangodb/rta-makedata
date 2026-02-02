@@ -34,9 +34,26 @@
       progress(`117: Makedata ${dbCount} ${loopCount}`);
       let c_vector = db[`c_vector_${dbCount}`];
 
-      // Only data writing here (called per dbCount AND loopCount)
+      // Now the actual data writing:
       resetRCount();
       writeData(c_vector, 1000);
+      if (c_vector.indexes().length === 1) {
+        createIndexSafe({
+          col: c_vector,
+          name: `i_vector_dbcount`,
+          type: "vector",
+          fields: ["TypeVec"],
+          inBackground: false,
+          params: {
+            metric: "l2",
+            dimension: 5,
+            nLists: 1
+          },
+        });
+        print('117: creating persistent index');
+        createIndexSafe({col: c_vector, type: "persistent", fields: ["a"], unique: false});
+      }
+
       progress('117: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
