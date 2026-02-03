@@ -77,6 +77,11 @@ const {
   deleteAnalyzerSet
 } = require(fs.join(PWD, 'makedata_suites', '_600_analyzer_base'));
 
+const {
+  randomNumberGeneratorFloat,
+  randomInteger
+} = require("@arangodb/testutils/seededRandom");
+
 const optionsDefaults = {
   curVersion: dbVersion,
   minReplicationFactor: 1,
