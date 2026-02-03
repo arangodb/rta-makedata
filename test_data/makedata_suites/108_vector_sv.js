@@ -14,14 +14,14 @@
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`108: Makedata ${dbCount} ${loopCount}`);
-      progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       const docNumber = 1000;
 
       // Fill collection with documents:
       let docs = [];
       let gen = randomNumberGeneratorFloat(randomInteger());
-      for (let i = 0; i < docNumber; ++i) {
+      
+      for (let i = 0; i < docNumber * options.dataMultiplier; ++i) {
         const vector = Array.from({ length: 20}, () => gen());
         docs.push({
           vector,
@@ -39,6 +39,7 @@
       }
       c_vector_sv.insert(docs);
       // create vector index with stored values
+      progress('108: createIndex');
       if (c_vector_sv.indexes().length === 1) {
         print('108: creating vector index with stored values');
         createIndexSafe({
