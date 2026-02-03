@@ -61,7 +61,7 @@ let {
   makeRandomTimeStamp,
   makeRandomDoc,
   writeData,
-  resetRCount,
+  resetRCount
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -75,6 +75,11 @@ const {
   checkAnalyzerSet,
   deleteAnalyzerSet
 } = require(fs.join(PWD, 'makedata_suites', '_600_analyzer_base'));
+
+const {
+  randomNumberGeneratorFloat,
+  randomInteger
+} = require("@arangodb/testutils/seededRandom");
 
 const optionsDefaults = {
   curVersion: dbVersion,
