@@ -61,7 +61,8 @@ let {
   makeRandomTimeStamp,
   makeRandomDoc,
   writeData,
-  resetRCount
+  resetRCount,
+  getIndexTypes,
 } = require(fs.join(PWD, 'common'));
 
 const {
