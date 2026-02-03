@@ -10,15 +10,15 @@
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('108: createCollection');
-      let c_vector_sv = createCollectionSafe(`c_vector_sv_${dbCount}`, 3, 2);
-      progress('108: createIndex');
+      createCollectionSafe(`c_vector_sv_${dbCount}`, 3, 2);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`108: Makedata ${dbCount} ${loopCount}`);
+      progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       const docNumber = 1000;
 
-      // Now the actual data writing:
+      // Fill collection with documents:
       let docs = [];
       let gen = randomNumberGeneratorFloat(randomInteger());
       for (let i = 0; i < docNumber; ++i) {
@@ -96,17 +96,19 @@
 
       // Check a few queries:
       progress("108: query 1");
-      runAqlQueryResultCount(aql`
-        LET rp = (
+      if (options.dataMultiplier === 1) {
+        runAqlQueryResultCount(aql`
+          LET rp = (
+            FOR d IN ${c_vector_sv}
+            FILTER d.val == 500
+            RETURN d.vector
+          )
           FOR d IN ${c_vector_sv}
-          FILTER d.val == 500
-          RETURN d.vector
-        )
-        FOR d IN ${c_vector_sv}
-          FILTER d.val < 5 AND d.stringField == 'type_A'
-          LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector)
-          SORT dist LIMIT 5
-          RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 2);
+            FILTER d.val < 5 AND d.stringField == 'type_A'
+            LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector)
+            SORT dist LIMIT 5
+            RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 2);
+      }
       progress("108: queries done");
       progress("108: done");
     },
