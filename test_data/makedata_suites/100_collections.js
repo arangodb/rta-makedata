@@ -39,6 +39,8 @@
       progress('100: createIndexHash1');
       createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
       progress('100: createIndexSkiplist2');
+      createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
+      progress('100: createIndexFulltext3');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
       progress('100: createIndexGeo4');
       createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
@@ -49,6 +51,8 @@
       progress('100: createIndex7');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
       progress('100: createIndexGeo8');
+      createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
+      progress('100: createIndexFulltext9');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`100: Makedata ${dbCount} ${loopCount}`);
@@ -124,12 +128,13 @@
       if (chash.getIndexes()[1].type !== 'hash') { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
       if (cskip.getIndexes()[1].type !== 'skiplist') { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
-      if (cfull.getIndexes().length !== 1) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
+      if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
+      if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
       if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
-      if (cmulti.getIndexes().length !== 4) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
+      if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
       if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
