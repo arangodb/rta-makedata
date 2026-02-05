@@ -62,6 +62,7 @@ let {
   makeRandomDoc,
   writeData,
   resetRCount,
+  getIndexTypes,
 } = require(fs.join(PWD, 'common'));
 
 const {
