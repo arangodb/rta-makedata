@@ -192,14 +192,13 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
   }
 
   let tableColumnHeaders = [
-    "DB", "loop", "testname"
+    "DB", "loop", "finalize", "testname"
   ];
   let resultTable = new AsciiTable("");
   resultTable.setHeading(tableColumnHeaders);
-  const lastColumnNumber = tableColumnHeaders.length - 1;
 
   let fns = Array.from(wantFunctions, () => [])
-  const FNChars = ['D', 'L'];
+  const FNChars = ['D', 'L', 'F'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
     filters = options.test.split(',');
@@ -254,7 +253,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
       wantFunctions.forEach(fn => {
         let char = '';
         if (wantFunctions[count] in suite) {
-          if(count < lastColumnNumber) supported += FNChars[count];
+          supported += FNChars[count];
           if (!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted) {
             char = ' X';
             fns[count].push(suite[fn]);
@@ -267,12 +266,11 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
           char = ' ';
           unsupported += " ";
         }
-        if(count < lastColumnNumber) column.push(char);
+        column.push(char);
         count += 1;
       });
     } else {
-      column.push(' ');
-      column.push(' ');
+      for (let i = 0; i < wantFunctions.length; i++) column.push(' ');
       supported = " ";
       unsupported = " ";
     }
