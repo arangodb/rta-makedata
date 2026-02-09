@@ -331,20 +331,17 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
       progress('inner Loop End');
       loopCount++;
     }
-    // support for 3rd wantedFunctions hook (like makeDataIndex)
-    if(fns.length === 3 && fns[2].length > 0) {
-      fns[2].forEach(func => {
-        db._useDatabase('_system');
-        if (db._databases().includes(database)) {
-          db._useDatabase(database);
-        }
-        func(options,
-            isCluster,
-            enterprise,
-            dbCount,
-            options.readOnly);
-      });
-    }
+    fns[2].forEach(func => {
+      db._useDatabase('_system');
+      if (db._databases().includes(database)) {
+        db._useDatabase(database);
+      }
+      func(options,
+          isCluster,
+          enterprise,
+          dbCount,
+          options.readOnly);
+    });
     progress('outer loop end');
 
     endOfLoopFN(database);

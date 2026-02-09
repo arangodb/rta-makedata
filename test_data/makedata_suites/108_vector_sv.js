@@ -40,7 +40,7 @@
       c_vector_sv.insert(docs);
       progress('108: writeData1');
     },
-    makeDataIndex: function (options, isCluster, isEnterprise, dbCount) {
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
       progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
