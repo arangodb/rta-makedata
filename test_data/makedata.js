@@ -40,7 +40,7 @@ let stack = new Error().stack;
 let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
-const wantFunctions = ['makeDataDB', 'makeData'];
+const wantFunctions = ['makeDataDB', 'makeData', 'makeDataIndex'];
 
 let {
   options,

@@ -20,7 +20,7 @@
       // Fill collection with documents:
       let docs = [];
       let gen = randomNumberGeneratorFloat(randomInteger());
-      
+
       for (let i = 0; i < docNumber * options.dataMultiplier; ++i) {
         const vector = Array.from({ length: 20}, () => gen());
         docs.push({
@@ -38,8 +38,11 @@
         });
       }
       c_vector_sv.insert(docs);
-      // create vector index with stored values
+      progress('108: writeData1');
+    },
+    makeDataIndex: function (options, isCluster, isEnterprise, dbCount) {
       progress('108: createIndex');
+      let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
         print('108: creating vector index with stored values');
         createIndexSafe({
@@ -58,7 +61,6 @@
           }
         });
       }
-      progress('108: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 108: checking data ${dbCount}`);
