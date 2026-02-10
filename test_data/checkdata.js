@@ -40,7 +40,7 @@ let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 let databaseName;
 
-const wantFunctions = ['checkDataDB', 'checkData'];
+const wantFunctions = ['checkDataDB', 'checkData', 'checkDataFinalize'];
 
 let {
   options,

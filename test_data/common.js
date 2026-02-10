@@ -192,13 +192,13 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
   }
 
   let tableColumnHeaders = [
-    "DB", "loop", "testname"
+    "DB", "loop", "finalize", "testname"
   ];
   let resultTable = new AsciiTable("");
   resultTable.setHeading(tableColumnHeaders);
 
-  let fns = [[], []];
-  const FNChars = ['D', 'L'];
+  let fns = Array.from(wantFunctions, () => [])
+  const FNChars = ['D', 'L', 'F'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
     filters = options.test.split(',');
@@ -251,25 +251,26 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
     if (suite.isSupported(oldVersion, newVersion, options, enterprise, isCluster)) {
       let count = 0;
       wantFunctions.forEach(fn => {
+        let char = '';
         if (wantFunctions[count] in suite) {
           supported += FNChars[count];
           if (!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted) {
-            column.push(' X');
+            char = ' X';
             fns[count].push(suite[fn]);
             executed_suites.push(suite_filename);
           } else {
-            column.push(' S');
+            char = ' S';
             unsupported += " ";
           }
         } else {
-          column.push(' ');
+          char = ' ';
           unsupported += " ";
         }
+        column.push(char);
         count += 1;
       });
     } else {
-      column.push(' ');
-      column.push(' ');
+      for (let i = 0; i < wantFunctions.length; i++) column.push(' ');
       supported = " ";
       unsupported = " ";
     }
@@ -328,6 +329,17 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
       progress('inner Loop End');
       loopCount++;
     }
+    fns[2].forEach(func => {
+      db._useDatabase('_system');
+      if (db._databases().includes(database)) {
+        db._useDatabase(database);
+      }
+      func(options,
+          isCluster,
+          enterprise,
+          dbCount,
+          options.readOnly);
+    });
     progress('outer loop end');
 
     endOfLoopFN(database);

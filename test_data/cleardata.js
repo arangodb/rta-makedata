@@ -40,7 +40,7 @@ let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 let databaseName;
 
-const wantFunctions = ['clearDataDB', 'clearData'];
+const wantFunctions = ['clearDataDB', 'clearData', 'clearDataFinalize'];
 
 let {
   options,
@@ -142,6 +142,7 @@ function getReplicationFactor (defaultReplicationFactor) {
 let fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'clearData', false);
 fns[0] = fns[0].reverse();
 fns[1] = fns[1].reverse();
+fns[2] = fns[2].reverse();
 mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
   // Drop database:
   if (database !== "_system") {

@@ -26,7 +26,12 @@
       // Write data first
       resetRCount();
       writeData(c_vector, 1000);
-      
+
+      progress('107: writeData1');
+    },
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
+      progress('107: createIndex');
+      let c_vector = db[`c_vector_${dbCount}`];
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
         progress('107: createIndexVector');
@@ -47,7 +52,6 @@
           createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
         }
       }
-      progress('107: writeData1');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 107: checking data ${dbCount}`);
