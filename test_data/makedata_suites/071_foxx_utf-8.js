@@ -69,6 +69,12 @@
       installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
       print(`${Date()} 071: installing crud`);
+      const minimalWorkingZip = loadFoxxIntoZip(minimalWorkingServicePath);
+      const minimalWorkingZipDev = {
+        buffer: minimalWorkingZip.buffer,
+        devmode: true,
+        type: minimalWorkingZip.type
+      };
       installFoxx(database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
       db._useDatabase('_system');
       return 0;

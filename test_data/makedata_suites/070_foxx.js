@@ -79,12 +79,6 @@ function deleteFoxx (database, mountpoint) {
 const itzpapalotlPath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'itzpapalotl');
 
 const minimalWorkingServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'crud');
-const minimalWorkingZip = loadFoxxIntoZip(minimalWorkingServicePath);
-const minimalWorkingZipDev = {
-  buffer: minimalWorkingZip.buffer,
-  devmode: true,
-  type: minimalWorkingZip.type
-};
 const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'service-service', 'index.js');
 const crudTestServiceSource = {
   type: 'js',
@@ -150,6 +144,12 @@ const crudTestServiceSource = {
       installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
       print(`${Date()} 070: installing crud`);
+      const minimalWorkingZip = loadFoxxIntoZip(minimalWorkingServicePath);
+      const minimalWorkingZipDev = {
+        buffer: minimalWorkingZip.buffer,
+        devmode: true,
+        type: minimalWorkingZip.type
+      };
       installFoxx(database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
       return 0;
     },
