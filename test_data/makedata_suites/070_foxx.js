@@ -80,10 +80,10 @@ const itzpapalotlPath = path.resolve(internal.pathForTesting('common'), 'test-da
 
 const minimalWorkingServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'crud');
 const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'service-service', 'index.js');
-const crudTestServiceSource = {
-  type: 'js',
-  buffer: fs.readFileSync(serviceServicePath)
-};
+//const crudTestServiceSource = {
+//  type: 'js',
+//  buffer: fs.readFileSync(serviceServicePath)
+//};
 
 (function () {
   let aardvarkRoute = '/_db/_system/_admin/aardvark/index.html';
