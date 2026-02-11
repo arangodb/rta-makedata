@@ -64,6 +64,7 @@
       print(`${Date()} 071: making per database data ${dbCount}`);
       print(`${Date()} 071: installing Itzpapalotl`);
       // installFoxx('/itz', itzpapalotlZip, "install", options);
+      const itzpapalotlZip = loadFoxxIntoZip(itzpapalotlPath);
 
       installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
