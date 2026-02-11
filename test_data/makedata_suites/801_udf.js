@@ -3,7 +3,7 @@
 (function () {
     return {
       isSupported: function (version, oldVersion, options, enterprise, cluster) {
-        return true; // Assuming UDF is supported in all environments
+        return options.testFoxx;
       },
   
       makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
