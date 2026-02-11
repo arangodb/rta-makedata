@@ -2,11 +2,11 @@
 
 // inspired by shell-foxx-api-spec.js
 
-const utils = require('@arangodb/foxx/manager-utils');
 const download = internal.download;
 const path = require('path');
 
 function loadFoxxIntoZip (path) {
+  const utils = require('@arangodb/foxx/manager-utils');
   let zip = utils.zipDirectory(path);
   let content = fs.readFileSync(zip);
   fs.remove(zip);
@@ -86,8 +86,6 @@ const minimalWorkingZipDev = {
   devmode: true,
   type: minimalWorkingZip.type
 };
-const minimalWorkingZipPath = utils.zipDirectory(minimalWorkingServicePath);
-
 const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'service-service', 'index.js');
 const crudTestServiceSource = {
   type: 'js',
