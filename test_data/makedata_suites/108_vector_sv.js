@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, randomInteger, randomNumberGeneratorFloat */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount */
 
 (function () {
   return {
@@ -13,6 +13,10 @@
       createCollectionSafe(`c_vector_sv_${dbCount}`, 3, 2);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
+      const {
+        randomNumberGeneratorFloat,
+        randomInteger
+      } = require("@arangodb/testutils/seededRandom");
       progress(`108: Makedata ${dbCount} ${loopCount}`);
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       const docNumber = 1000;
