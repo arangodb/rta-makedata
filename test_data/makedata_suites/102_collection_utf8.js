@@ -4,12 +4,10 @@
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
   let baseName;
   return {
-    // This file uses hash and skiplist indexes which are deprecated in 4.0+
-    // For 4.0+, use 112_collection_utf8.js instead which uses persistent indexes
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0") && semver.lt(currentVersionSemver, "4.0.0");
+      return semver.gte(currentVersionSemver, "3.11.0") && semver.gte(oldVersionSemver, "3.11.0");
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       db._useDatabase('_system');
@@ -134,19 +132,37 @@
 
       // Check indexes:
       progress("102: checking indices");
+      let currentVersionSemver = semver.parse(semver.coerce(options.curVersion));
+      let fulltextSupported = semver.lt(currentVersionSemver, "4.0.0");
 
       if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
       if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
       if (chash.getIndexes()[1].type !== 'hash') { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
       if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
       if (cskip.getIndexes()[1].type !== 'skiplist') { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
-      if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      if (fulltextSupported) {
+        if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
+        if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
+      } else {
+        // Fulltext indexes are removed in 4.0, only primary index should remain
+        if (cfull.getIndexes().length !== 1) { throw new Error(`Mango expected 1 index (fulltext removed in 4.0) but got ${cfull.getIndexes().length}`); }
+        cfull.getIndexes().forEach(idx => {
+          if (idx.type === 'fulltext') { throw new Error('Fulltext index still exists on cfull after upgrade to 4.0!'); }
+        });
+      }
       if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
       if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
       if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
-      if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
+      if (fulltextSupported) {
+        if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
+      } else {
+        // cmulti had: primary + hash + skiplist + geo + fulltext = 5, without fulltext = 4
+        if (cmulti.getIndexes().length !== 4) { throw new Error(`Leek expected 4 indexes (fulltext removed in 4.0) but got ${cmulti.getIndexes().length}`); }
+        cmulti.getIndexes().forEach(idx => {
+          if (idx.type === 'fulltext') { throw new Error('Fulltext index still exists on cmulti after upgrade to 4.0!'); }
+        });
+      }
       if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
