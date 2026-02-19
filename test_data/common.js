@@ -197,7 +197,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
   let resultTable = new AsciiTable("");
   resultTable.setHeading(tableColumnHeaders);
 
-  let fns = Array.from(wantFunctions, () => [])
+  let fns = Array.from(wantFunctions, () => []);
   const FNChars = ['D', 'L', 'F'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
@@ -296,7 +296,7 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
       timetable[id] = [0,0,0];
     }
     timetable[id][index] = value;
-  }
+  };
   while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
