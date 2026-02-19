@@ -22,20 +22,23 @@ const {
 let waitForStats = function (instances) {
   outerloop:
   for (let instance of instances) {
-    print(`${Date()} 950: Fetching statistics with the 'sync' flag from the server ${instance["name"]} to force statistics processing.`);
+    print(`${Date()} 950: Fetching metrics from the server ${instance["name"]} to ensure statistics are available.`);
     let ex;
     let sleepTime = 0.1;
     let opts = { "jwt": instance.JWT_header };
     do {
       try {
-        let resp = download(instance.url + '/_admin/statistics?sync=true', '', opts);
+        let resp = download(instance.url + '/_admin/metrics', '', opts);
         if (resp.code !== 200) {
-          throw "Error fetching statistics with the 'sync' flag. Server response:\n" + JSON.stringify(resp);
-        } else {
-          continue outerloop;
+          throw "Error fetching metrics. Server response:\n" + JSON.stringify(resp);
         }
+        let uptime = getMetricValue(resp.body, 'arangodb_server_statistics_server_uptime_total');
+        if (typeof uptime !== 'number' || uptime < 0) {
+          throw "Invalid uptime in metrics response";
+        }
+        continue outerloop;
       } catch (e) {
-        let ex = e;
+        ex = e;
         print(`${RED}${Date()} 950: connecting to ${instance.url} failed - retrying (${ex})${RESET}`);
       }
       sleepTime *= 2;
