@@ -1,4 +1,4 @@
-/* global print, assertTrue, assertFalse, assertEqual, db, versionHas, semver, download, sleep, fs, arango, PWD, _ */
+/* global print, assertTrue, assertFalse, assertEqual, db, isInstrumented, semver, download, sleep, fs, arango, PWD, _ */
 
 class testCursor {
   constructor(query, bindvars, batchSize) {
@@ -90,7 +90,7 @@ class testCursor {
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      const divisor = (versionHas('tsan') || versionHas('asan')) ? 3:1;
+      const divisor = isInstrumented ? 3:1;
 
       // check per DB
       let cursors = [];

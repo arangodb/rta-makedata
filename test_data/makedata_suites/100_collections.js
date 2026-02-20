@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, semver */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, getValue, semver */
 
 // This file uses hash and skiplist indexes which are deprecated in 4.0+
 // For 4.0+, use 110_collections.js instead which uses persistent indexes
