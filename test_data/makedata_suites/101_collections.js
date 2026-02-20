@@ -625,7 +625,7 @@ function compareProperties(name, obj1, obj2) {
         col.save(docs, { silent: true });
 
         //this cmd will find one docs from the collection
-        let has_cv_field = col.all().toArray();
+        let has_cv_field = db._query(`FOR doc IN ${col.name} LIMIT 10 RETURN doc`).toArray();
         // checking computed value field exit on the collection's doc
         if (col === c0 || col === c1 || col === c6 || col === c7 || col === c8 || col === c10) {
           if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
