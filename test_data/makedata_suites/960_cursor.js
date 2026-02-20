@@ -90,7 +90,7 @@ class testCursor {
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
-      const divisor = (versionHas('tsan') || versionHas('asan')) ? 2:1;
+      const divisor = (versionHas('tsan') || versionHas('asan')) ? 3:1;
 
       // check per DB
       let cursors = [];
