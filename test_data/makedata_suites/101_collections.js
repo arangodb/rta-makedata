@@ -617,12 +617,12 @@ function compareProperties(name, obj1, obj2) {
       // inserting data to all collection
       let data_array = [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10];
       let docsAsStr = fs.read(`${PWD}/makedata_suites/101_collections_data.json`);
-
+      let docs = JSON.parse(docsAsStr), { silent: true };
       // this function will read and insert and check all the neccessary data for the respective collection
       data_array.forEach(col => {
 
         progress(`101: Insert docs into collection ${col.name()} with computed values`);
-        col.save(JSON.parse(docsAsStr), { silent: true });
+        col.save(docs);
 
         //this cmd will find one docs from the collection
         let has_cv_field = col.all().toArray();
