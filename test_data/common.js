@@ -26,6 +26,17 @@ function versionHas(attribute) {
   }
 };
 
+const isInstrumented = (versionHas('tsan') || versionHas('asan'));
+
+function getValue(defVal) {
+  if (isInstrumented) {
+    return Math.trunc(defVal / 10);
+  }
+  else {
+    return defVal;
+  }
+}
+
 function progress(gaugeName) {
   if (gaugeName === undefined) {
     throw new Error("gauge name must be defined");
@@ -35,9 +46,9 @@ function progress(gaugeName) {
   timeLine.push(delta);
   if (options.progress) {
     if (options.printTimeMeasurement) {
-      print(`# - ${gaugeName},${tStart},${delta}`);
+      print(`# ${Date()} - ${gaugeName},${tStart},${delta}`);
     } else {
-      print(`# - ${gaugeName}`);
+      print(`# ${Date()} - ${gaugeName}`);
     }
   }
   tStart = now;

@@ -54,19 +54,19 @@
 
       // Now the actual data writing:
       resetRCount();
-      writeData(c, 1000);
+      writeData(c, getValue(1000));
       progress('102: writeData1');
-      writeData(chash, 12345);
+      writeData(chash, getValue(12345));
       progress('102: writeData2');
-      writeData(cskip, 2176);
+      writeData(cskip, getValue(2176));
       progress('102: writeData3');
-      writeData(cgeo, 5245);
+      writeData(cgeo, getValue(5245));
       progress('102: writeData4');
-      writeData(cfull, 6253);
+      writeData(cfull, getValue(6253));
       progress('102: writeData5');
-      writeData(cunique, 5362);
+      writeData(cunique, getValue(5362));
       progress('102: writeData6');
-      writeData(cmulti, 12346);
+      writeData(cmulti, getValue(12346));
       progress('102: writeData7');
       db._useDatabase('_system');
     },
@@ -174,14 +174,14 @@
 
       // Check data:
       progress("102: checking counts");
-      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== getValue(1000) * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== getValue(12345) * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== getValue(2176) * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== getValue(5245) * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== getValue(6253) * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== getValue(5362) * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
 
       // Check a few queries:
       progress("102: query 1");
