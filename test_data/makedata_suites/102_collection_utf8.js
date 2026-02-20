@@ -20,6 +20,7 @@
       baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
       print(`${Date()} 102: creating ${baseName}`);
       db._createDatabase(baseName);
+      db._useDatabase(baseName);
       let c = createCollectionSafe(`c_${dbCount}${extendedNames[0]}`, 3, 2);
       progress('102: createCollection1');
       let chash = createCollectionSafe(`chash_${dbCount}${extendedNames[1]}`, 3, 2);
@@ -39,6 +40,12 @@
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
       // Create a few collections:
+      db._useDatabase('_system');
+      baseName = database;
+      if (baseName === "_system") {
+        baseName = "system";
+      }
+      baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
       print(`${Date()} 102: using ${baseName}`);
       db._useDatabase(baseName);
       let c = db[`c_${dbCount}${extendedNames[0]}`];
@@ -70,7 +77,13 @@
     },
     makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
       // Create some indexes:
-      print(`${Date()} 102: using ${baseName}`);
+      db._useDatabase('_system');
+      baseName = database;
+      if (baseName === "_system") {
+        baseName = "system";
+      }
+      baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
+      print(`${Date()} 102: finalizing ${baseName}`);
       db._useDatabase(baseName);
       let c = db[`c_${dbCount}${extendedNames[0]}`];
       let chash = db[`chash_${dbCount}${extendedNames[1]}`];
