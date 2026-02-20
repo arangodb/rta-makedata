@@ -90,11 +90,13 @@ class testCursor {
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      const divisor = (versionHas('tsan') || versionHas('asan')) ? 2:1;
+
       // check per DB
       let cursors = [];
       try {
         let i=0;
-        for (; i < 10; i++) {
+        for (; i < 10/divisor; i++) {
           let collName = `citations_naive_${dbCount}`;
           let cur = new testCursor("FOR k IN @@coll RETURN k",
                                    {
@@ -112,7 +114,7 @@ class testCursor {
           let viewName = `view2_101_${dbCount}`;
           let filteredViews = db._views().filter(view => view.name() === viewName);
           if (filteredViews.length > 0) {
-            for (; i < 20; i++) {
+            for (; i < 20/divisor; i++) {
               let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') OPTIONS { waitForSync: true } return doc",
                                        {
                                          "@view": viewName
@@ -126,7 +128,7 @@ class testCursor {
             offset += 10;
           }
           if (isCluster) {
-            for (;i < 30; i++) {
+            for (;i < 30/divisor; i++) {
               let collName = `citations_smart_${dbCount}`;
               let cur = new testCursor("FOR k IN @@coll RETURN k",
                                        {
