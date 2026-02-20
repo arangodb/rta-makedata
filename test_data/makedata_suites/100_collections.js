@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, semver */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, getValue, semver */
 
 // This file uses hash and skiplist indexes which are deprecated in 4.0+
 // For 4.0+, use 110_collections.js instead which uses persistent indexes
@@ -33,6 +33,46 @@
       let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 2);
       version_coll.insert({"version": db._version()});
 
+    },
+    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
+      progress(`100: Makedata ${dbCount} ${loopCount}`);
+      let c = db[`c_${dbCount}`];
+      let chash = db[`chash_${dbCount}`];
+      let cskip = db[`cskip_${dbCount}`];
+      let cfull = db[`cfull_${dbCount}`];
+      let cgeo = db[`cgeo_${dbCount}`];
+      let cunique = db[`cunique_${dbCount}`];
+      let cmulti = db[`cmulti_${dbCount}`];
+      let cempty = db[`cempty_${dbCount}`];
+
+      // Now the actual data writing:
+      resetRCount();
+      writeData(c, getValue(1000));
+      progress('100: writeData1');
+      writeData(chash, getValue(12345));
+      progress('100: writeData2');
+      writeData(cskip, getValue(2176));
+      progress('100: writeData3');
+      writeData(cgeo, getValue(5245));
+      progress('100: writeData4');
+      writeData(cfull, getValue(6253));
+      progress('100: writeData5');
+      writeData(cunique, getValue(5362));
+      progress('100: writeData6');
+      writeData(cmulti, getValue(12346));
+      progress('100: writeData7');
+    },
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
+      progress(`100: Makedata ${dbCount} creating indices`);
+      let c = db[`c_${dbCount}`];
+      let chash = db[`chash_${dbCount}`];
+      let cskip = db[`cskip_${dbCount}`];
+      let cfull = db[`cfull_${dbCount}`];
+      let cgeo = db[`cgeo_${dbCount}`];
+      let cunique = db[`cunique_${dbCount}`];
+      let cmulti = db[`cmulti_${dbCount}`];
+      let cempty = db[`cempty_${dbCount}`];
+
       // Create some indexes:
       progress('100: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
@@ -53,34 +93,6 @@
       progress('100: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
       progress('100: createIndexFulltext9');
-    },
-    makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      progress(`100: Makedata ${dbCount} ${loopCount}`);
-      let c = db[`c_${dbCount}`];
-      let chash = db[`chash_${dbCount}`];
-      let cskip = db[`cskip_${dbCount}`];
-      let cfull = db[`cfull_${dbCount}`];
-      let cgeo = db[`cgeo_${dbCount}`];
-      let cunique = db[`cunique_${dbCount}`];
-      let cmulti = db[`cmulti_${dbCount}`];
-      let cempty = db[`cempty_${dbCount}`];
-
-      // Now the actual data writing:
-      resetRCount();
-      writeData(c, 1000);
-      progress('100: writeData1');
-      writeData(chash, 12345);
-      progress('100: writeData2');
-      writeData(cskip, 2176);
-      progress('100: writeData3');
-      writeData(cgeo, 5245);
-      progress('100: writeData4');
-      writeData(cfull, 6253);
-      progress('100: writeData5');
-      writeData(cunique, 5362);
-      progress('100: writeData6');
-      writeData(cmulti, 12346);
-      progress('100: writeData7');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 100: checking data ${dbCount}`);
@@ -139,14 +151,14 @@
 
       // Check data:
       progress("100: checking data");
-      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== getValue(1000) * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== getValue(12345) * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== getValue(2176) * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== getValue(5245) * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== getValue(6253) * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== getValue(5362) * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
       if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
 
       // Check a few queries:

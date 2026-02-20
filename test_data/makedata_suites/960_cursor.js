@@ -1,4 +1,4 @@
-/* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD, _ */
+/* global print, assertTrue, assertFalse, assertEqual, db, isInstrumented, semver, download, sleep, fs, arango, PWD, _ */
 
 class testCursor {
   constructor(query, bindvars, batchSize) {
@@ -90,11 +90,13 @@ class testCursor {
     },
 
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      const divisor = isInstrumented ? 3:1;
+
       // check per DB
       let cursors = [];
       try {
         let i=0;
-        for (; i < 10; i++) {
+        for (; i < 10/divisor; i++) {
           let collName = `citations_naive_${dbCount}`;
           let cur = new testCursor("FOR k IN @@coll RETURN k",
                                    {
@@ -107,12 +109,12 @@ class testCursor {
           }
         }
 
-        let offset = 8;
+        let offset = 8/divisor;
         if (isEnterprise) {
           let viewName = `view2_101_${dbCount}`;
           let filteredViews = db._views().filter(view => view.name() === viewName);
           if (filteredViews.length > 0) {
-            for (; i < 20; i++) {
+            for (; i < 20/divisor; i++) {
               let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') OPTIONS { waitForSync: true } return doc",
                                        {
                                          "@view": viewName
@@ -123,10 +125,10 @@ class testCursor {
                 cursors.push(cur);
               }
             }
-            offset += 10;
+            offset += 10/divisor;
           }
           if (isCluster) {
-            for (;i < 30; i++) {
+            for (;i < 30/divisor; i++) {
               let collName = `citations_smart_${dbCount}`;
               let cur = new testCursor("FOR k IN @@coll RETURN k",
                                        {

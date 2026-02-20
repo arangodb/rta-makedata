@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount, getValue */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -20,29 +20,69 @@
       baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
       print(`${Date()} 102: creating ${baseName}`);
       db._createDatabase(baseName);
+      db._useDatabase(baseName);
+      let c = createCollectionSafe(`c_${dbCount}${extendedNames[0]}`, 3, 2);
+      progress('102: createCollection1');
+      let chash = createCollectionSafe(`chash_${dbCount}${extendedNames[1]}`, 3, 2);
+      progress('102: createCollection2');
+      let cskip = createCollectionSafe(`cskip_${dbCount}${extendedNames[2]}`, 1, 1);
+      progress('102: createCollection3');
+      let cfull = createCollectionSafe(`cfull_${dbCount}${extendedNames[3]}`, 3, 1);
+      progress('102: createCollection4');
+      let cgeo = createCollectionSafe(`cgeo_${dbCount}${extendedNames[4]}`, 3, 2);
+      progress('102: createCollectionGeo5');
+      let cunique = createCollectionSafe(`cunique_${dbCount}${extendedNames[5]}`, 1, 1);
+      progress('102: createCollection6');
+      let cmulti = createCollectionSafe(`cmulti_${dbCount}${extendedNames[6]}`, 3, 2);
+      progress('102: createCollection7');
+      let cempty = createCollectionSafe(`cempty_${dbCount}${extendedNames[7]}`, 3, 1);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       // All items created must contain dbCount and loopCount
       // Create a few collections:
+      db._useDatabase('_system');
       print(`${Date()} 102: using ${baseName}`);
       db._useDatabase(baseName);
-      let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
-      progress('102: createCollection1');
-      let chash = createCollectionSafe(`chash_${loopCount}${extendedNames[1]}`, 3, 2);
-      progress('102: createCollection2');
-      let cskip = createCollectionSafe(`cskip_${loopCount}${extendedNames[2]}`, 1, 1);
-      progress('102: createCollection3');
-      let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[3]}`, 3, 1);
-      progress('102: createCollection4');
-      let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[4]}`, 3, 2);
-      progress('102: createCollectionGeo5');
-      let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[5]}`, 1, 1);
-      progress('102: createCollection6');
-      let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[6]}`, 3, 2);
-      progress('102: createCollection7');
-      let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
+      let c = db[`c_${dbCount}${extendedNames[0]}`];
+      let chash = db[`chash_${dbCount}${extendedNames[1]}`];
+      let cskip = db[`cskip_${dbCount}${extendedNames[2]}`];
+      let cfull = db[`cfull_${dbCount}${extendedNames[3]}`];
+      let cgeo = db[`cgeo_${dbCount}${extendedNames[4]}`];
+      let cunique = db[`cunique_${dbCount}${extendedNames[5]}`];
+      let cmulti = db[`cmulti_${dbCount}${extendedNames[6]}`];
+      let cempty = db[`cempty_${dbCount}${extendedNames[7]}`];
 
+      // Now the actual data writing:
+      resetRCount();
+      writeData(c, getValue(1000));
+      progress('102: writeData1');
+      writeData(chash, getValue(12345));
+      progress('102: writeData2');
+      writeData(cskip, getValue(2176));
+      progress('102: writeData3');
+      writeData(cgeo, getValue(5245));
+      progress('102: writeData4');
+      writeData(cfull, getValue(6253));
+      progress('102: writeData5');
+      writeData(cunique, getValue(5362));
+      progress('102: writeData6');
+      writeData(cmulti, getValue(12346));
+      progress('102: writeData7');
+      db._useDatabase('_system');
+    },
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
       // Create some indexes:
+      db._useDatabase('_system');
+      print(`${Date()} 102: finalizing ${baseName}`);
+      db._useDatabase(baseName);
+      let c = db[`c_${dbCount}${extendedNames[0]}`];
+      let chash = db[`chash_${dbCount}${extendedNames[1]}`];
+      let cskip = db[`cskip_${dbCount}${extendedNames[2]}`];
+      let cfull = db[`cfull_${dbCount}${extendedNames[3]}`];
+      let cgeo = db[`cgeo_${dbCount}${extendedNames[4]}`];
+      let cunique = db[`cunique_${dbCount}${extendedNames[5]}`];
+      let cmulti = db[`cmulti_${dbCount}${extendedNames[6]}`];
+      let cempty = db[`cempty_${dbCount}${extendedNames[7]}`];
       progress('102: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false, name: extendedNames[1]});
       progress('102: createIndexHash1');
@@ -63,23 +103,6 @@
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6, name: extendedNames[0]});
       progress('102: createIndexFulltext9');
 
-      // Now the actual data writing:
-      resetRCount();
-      writeData(c, 1000);
-      progress('102: writeData1');
-      writeData(chash, 12345);
-      progress('102: writeData2');
-      writeData(cskip, 2176);
-      progress('102: writeData3');
-      writeData(cgeo, 5245);
-      progress('102: writeData4');
-      writeData(cfull, 6253);
-      progress('102: writeData5');
-      writeData(cunique, 5362);
-      progress('102: writeData6');
-      writeData(cmulti, 12346);
-      progress('102: writeData7');
-      db._useDatabase('_system');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       db._useDatabase('_system');
@@ -151,14 +174,14 @@
 
       // Check data:
       progress("102: checking counts");
-      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== 2176 * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (c.count() !== getValue(1000) * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
+      if (chash.count() !== getValue(12345) * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
+      if (cskip.count() !== getValue(2176) * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
+      if (cgeo.count() !== getValue(5245) * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
+      if (cfull.count() !== getValue(6253) * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
+      if (cunique.count() !== getValue(5362) * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
 
       // Check a few queries:
       progress("102: query 1");

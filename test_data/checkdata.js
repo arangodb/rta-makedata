@@ -85,6 +85,7 @@ const optionsDefaults = {
   test: undefined,
   skip: undefined,
   passvoid: '',
+  printTimeTableMeasurement: false,
   printTimeMeasurement: false,
   forceOneShard: false
 };

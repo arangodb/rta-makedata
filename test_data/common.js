@@ -26,6 +26,17 @@ function versionHas(attribute) {
   }
 };
 
+const isInstrumented = (versionHas('tsan') || versionHas('asan'));
+
+function getValue(defVal) {
+  if (isInstrumented) {
+    return Math.trunc(defVal / 10);
+  }
+  else {
+    return defVal;
+  }
+}
+
 function progress(gaugeName) {
   if (gaugeName === undefined) {
     throw new Error("gauge name must be defined");
@@ -35,9 +46,9 @@ function progress(gaugeName) {
   timeLine.push(delta);
   if (options.progress) {
     if (options.printTimeMeasurement) {
-      print(`# - ${gaugeName},${tStart},${delta}`);
+      print(`# ${Date()} - ${gaugeName},${tStart},${delta}`);
     } else {
-      print(`# - ${gaugeName}`);
+      print(`# ${Date()} - ${gaugeName}`);
     }
   }
   tStart = now;
@@ -197,7 +208,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
   let resultTable = new AsciiTable("");
   resultTable.setHeading(tableColumnHeaders);
 
-  let fns = Array.from(wantFunctions, () => [])
+  let fns = Array.from(wantFunctions, () => []);
   const FNChars = ['D', 'L', 'F'];
   let filters = [];
   if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
@@ -248,6 +259,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
     let pseg = suitePath.split(fs.pathSeparator);
     let suite_filename = pseg[pseg.length - 1];
     let suite = require("internal").load(suitePath);
+    let numericId = suite_filename.slice(0,3);
     if (suite.isSupported(oldVersion, newVersion, options, enterprise, isCluster)) {
       let count = 0;
       wantFunctions.forEach(fn => {
@@ -256,7 +268,7 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
           supported += FNChars[count];
           if (!(previously_executed_suites.includes(suite_filename)) || !excludePreviouslyExecuted) {
             char = ' X';
-            fns[count].push(suite[fn]);
+            fns[count].push([numericId, suite[fn]]);
             executed_suites.push(suite_filename);
           } else {
             char = ' S';
@@ -289,6 +301,13 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
 function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopFN) {
   let dbCount = options.countOffset;
   let totalCount = options.countOffset + options.numberOfDBs;
+  let timetable = {};
+  let setTimeTable = function (id, index, value) {
+    if (!timetable.hasOwnProperty(id)) {
+      timetable[id] = [0,0,0];
+    }
+    timetable[id][index] = value;
+  };
   while (dbCount < totalCount) {
     tStart = time();
     timeLine = [tStart];
@@ -302,12 +321,14 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
       if (db._databases().includes(database)) {
         db._useDatabase(database);
       }
-      func(options,
-           isCluster,
-           enterprise,
-           database,
-           dbCount,
-           options.readOnly);
+      let tInStart = time();
+      func[1](options,
+              isCluster,
+              enterprise,
+              database,
+              dbCount,
+              options.readOnly);
+      setTimeTable(func[0], 0, time() - tInStart);
     });
     let loopCount = options.collectionCountOffset;
     while (loopCount < options.collectionMultiplier) {
@@ -318,12 +339,14 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
         if (db._databases().includes(database)) {
           db._useDatabase(database);
         }
-        func(options,
-             isCluster,
-             enterprise,
-             dbCount,
-             loopCount,
-             options.readOnly);
+        let tInStart = time();
+        func[1](options,
+                isCluster,
+                enterprise,
+                dbCount,
+                loopCount,
+                options.readOnly);
+        setTimeTable(func[0], 1, time() - tInStart);
       });
 
       progress('inner Loop End');
@@ -334,15 +357,31 @@ function mainTestLoop(options, defaultDB, isCluster, enterprise, fns, endOfLoopF
       if (db._databases().includes(database)) {
         db._useDatabase(database);
       }
-      func(options,
-          isCluster,
-          enterprise,
-          dbCount,
-          options.readOnly);
+      let tInStart = time();
+      func[1](options,
+              isCluster,
+              enterprise,
+              dbCount,
+              options.readOnly);
+      setTimeTable(func[0], 2, time() - tInStart);
     });
     progress('outer loop end');
 
     endOfLoopFN(database);
+    if (options.printTimeTableMeasurement) {
+      let tableColumnHeaders = [
+        "testname", "DB", "loop", "finalize"
+      ];
+      let resultTable = new AsciiTable("");
+      resultTable.setHeading(tableColumnHeaders);
+      for (const [id, values] of Object.entries(timetable)) {
+        resultTable.addRow([id,
+                            `${values[0]}`.slice(0,6),
+                            `${values[1]}`.slice(0,6),
+                            `${values[2]}`.slice(0,6)]);
+      }
+      print(resultTable.toString());
+    }
     if (options.printTimeMeasurement) {
       print(timeLine.join());
     }

@@ -92,6 +92,7 @@ const optionsDefaults = {
   progress: false,
   newVersion: "3.5.0",
   passvoid: '',
+  printTimeTableMeasurement: false,
   printTimeMeasurement: false,
   bigDoc: false,
   test: undefined,
