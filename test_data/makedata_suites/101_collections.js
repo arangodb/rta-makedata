@@ -620,11 +620,12 @@ function compareProperties(name, obj1, obj2) {
       let docs = JSON.parse(docsAsStr);
       // this function will read and insert and check all the neccessary data for the respective collection
       data_array.forEach(col => {
-
         progress(`101: Insert docs into collection ${col.name()} with computed values`);
         col.save(docs, { silent: true });
-
+      });
+      data_array.forEach(col => {
         //this cmd will find one docs from the collection
+        progress(`101: Loading docs from collection ${col.name()} with computed values`);
         let has_cv_field = db._query(`FOR doc IN ${col.name()} LIMIT 10 RETURN doc`).toArray();
         // checking computed value field exit on the collection's doc
         if (col === c0 || col === c1 || col === c6 || col === c7 || col === c8 || col === c10) {
