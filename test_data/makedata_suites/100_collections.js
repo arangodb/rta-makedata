@@ -33,26 +33,6 @@
       let version_coll = createCollectionSafe(`version_collection_${dbCount}`, 3, 2);
       version_coll.insert({"version": db._version()});
 
-      // Create some indexes:
-      progress('100: createCollection8');
-      createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
-      progress('100: createIndexHash1');
-      createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
-      progress('100: createIndexSkiplist2');
-      createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
-      progress('100: createIndexFulltext3');
-      createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
-      progress('100: createIndexGeo4');
-      createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
-      progress('100: createIndex5');
-      createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false});
-      progress('100: createIndex6');
-      createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"]});
-      progress('100: createIndex7');
-      createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
-      progress('100: createIndexGeo8');
-      createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
-      progress('100: createIndexFulltext9');
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`100: Makedata ${dbCount} ${loopCount}`);
@@ -82,6 +62,28 @@
       writeData(cmulti, 12346);
       progress('100: writeData7');
     },
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
+      // Create some indexes:
+      progress('100: createCollection8');
+      createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
+      progress('100: createIndexHash1');
+      createIndexSafe({col: cskip, type: "skiplist", fields: ["a"], unique: false});
+      progress('100: createIndexSkiplist2');
+      createIndexSafe({col: cfull, type: "fulltext", fields: ["text"], minLength: 4});
+      progress('100: createIndexFulltext3');
+      createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
+      progress('100: createIndexGeo4');
+      createIndexSafe({col: cunique, type: "hash", fields: ["a"], unique: true});
+      progress('100: createIndex5');
+      createIndexSafe({col: cmulti, type: "hash", fields: ["a"], unique: false});
+      progress('100: createIndex6');
+      createIndexSafe({col: cmulti, type: "skiplist", fields: ["b", "c"]});
+      progress('100: createIndex7');
+      createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true});
+      progress('100: createIndexGeo8');
+      createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
+      progress('100: createIndexFulltext9');
+    };
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 100: checking data ${dbCount}`);
       let cols = db._collections();
