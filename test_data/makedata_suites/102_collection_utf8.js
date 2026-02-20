@@ -70,6 +70,16 @@
     },
     makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
       // Create some indexes:
+      print(`${Date()} 102: using ${baseName}`);
+      db._useDatabase(baseName);
+      let c = db[`c_${dbCount}${extendedNames[0]}`];
+      let chash = db[`chash_${dbCount}${extendedNames[1]}`];
+      let cskip = db[`cskip_${dbCount}${extendedNames[2]}`];
+      let cfull = db[`cfull_${dbCount}${extendedNames[3]}`];
+      let cgeo = db[`cgeo_${dbCount}${extendedNames[4]}`];
+      let cunique = db[`cunique_${dbCount}${extendedNames[5]}`];
+      let cmulti = db[`cmulti_${dbCount}${extendedNames[6]}`];
+      let cempty = db[`cempty_${dbCount}${extendedNames[7]}`];
       progress('102: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false, name: extendedNames[1]});
       progress('102: createIndexHash1');

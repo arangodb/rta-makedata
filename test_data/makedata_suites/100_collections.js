@@ -63,6 +63,16 @@
       progress('100: writeData7');
     },
     makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
+      progress(`100: Makedata ${dbCount} creating indices`);
+      let c = db[`c_${dbCount}`];
+      let chash = db[`chash_${dbCount}`];
+      let cskip = db[`cskip_${dbCount}`];
+      let cfull = db[`cfull_${dbCount}`];
+      let cgeo = db[`cgeo_${dbCount}`];
+      let cunique = db[`cunique_${dbCount}`];
+      let cmulti = db[`cmulti_${dbCount}`];
+      let cempty = db[`cempty_${dbCount}`];
+
       // Create some indexes:
       progress('100: createCollection8');
       createIndexSafe({col: chash, type: "hash", fields: ["a"], unique: false});
@@ -83,7 +93,7 @@
       progress('100: createIndexGeo8');
       createIndexSafe({col: cmulti, type: "fulltext", fields: ["text"], minLength: 6});
       progress('100: createIndexFulltext9');
-    };
+    },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 100: checking data ${dbCount}`);
       let cols = db._collections();

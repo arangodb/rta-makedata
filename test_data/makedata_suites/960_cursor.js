@@ -1,4 +1,4 @@
-/* global print, assertTrue, assertFalse, assertEqual, db, semver, download, sleep, fs, arango, PWD, _ */
+/* global print, assertTrue, assertFalse, assertEqual, db, versionHas, semver, download, sleep, fs, arango, PWD, _ */
 
 class testCursor {
   constructor(query, bindvars, batchSize) {
