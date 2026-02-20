@@ -109,7 +109,7 @@ class testCursor {
           }
         }
 
-        let offset = 8;
+        let offset = 8/divisor;
         if (isEnterprise) {
           let viewName = `view2_101_${dbCount}`;
           let filteredViews = db._views().filter(view => view.name() === viewName);
@@ -125,7 +125,7 @@ class testCursor {
                 cursors.push(cur);
               }
             }
-            offset += 10;
+            offset += 10/divisor;
           }
           if (isCluster) {
             for (;i < 30/divisor; i++) {
