@@ -51,6 +51,8 @@ let {
   mainTestLoop,
   versionHas,
   getIndexTypes,
+  getValue,
+  isInstrumented,
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -85,6 +87,7 @@ const optionsDefaults = {
   test: undefined,
   skip: undefined,
   passvoid: '',
+  printTimeTableMeasurement: false,
   printTimeMeasurement: false,
   forceOneShard: false
 };
