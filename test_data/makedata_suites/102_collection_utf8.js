@@ -185,23 +185,25 @@
 
       // Check a few queries:
       progress("102: query 1");
-      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
+      let searchID = isInstrumented? "id101":"id1001";
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("102: query 3");
-      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
+      searchID = isInstrumented? "id105":"id10452";
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("102: query 3");
-      let searchId = "id" + (13948 * options.dataMultiplier);
-      runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchId} RETURN x`,  1);
+      searchID = "id" + (isInstrumented? 1339 : 13948 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchID} RETURN x`,  1);
       progress("102: query 4");
       runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       progress("102: query 5");
-      searchId = "id" + (20473 * options.dataMultiplier);
-      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchId} RETURN x`, 1);
+      searchID = "id" + (isInstrumented? 2075 : 20473 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("102: query 6");
-      searchId = "id" + (32236 * options.dataMultiplier);
-      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchId} RETURN x`, 1);
+      searchID = "id" + (isInstrumented? 2709 : 32236 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("102: query 7");
-      searchId = "id" + (32847 * options.dataMultiplier);
-      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchId} RETURN x`, 1);
+      searchID = "id" + (isInstrumented? 3245 : 32847 * options.dataMultiplier);
+      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("102: queries done");
       db._useDatabase('_system');
     },

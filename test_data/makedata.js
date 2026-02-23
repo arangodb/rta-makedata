@@ -63,6 +63,7 @@ let {
   writeData,
   resetRCount,
   getIndexTypes,
+  getValue,
 } = require(fs.join(PWD, 'common'));
 
 const {

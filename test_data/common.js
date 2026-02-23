@@ -27,7 +27,6 @@ function versionHas(attribute) {
 };
 
 const isInstrumented = (versionHas('tsan') || versionHas('asan'));
-
 function getValue(defVal) {
   if (isInstrumented) {
     return Math.trunc(defVal / 10);
@@ -491,6 +490,7 @@ exports.getMetricValue = getMetricValue;
 exports.createSafe = createSafe;
 exports.versionHas = versionHas;
 exports.progress = progress;
+exports.getValue = getValue;
 exports.getShardCount = getShardCount;
 exports.getReplicationFactor = getReplicationFactor;
 exports.writeGraphData = writeGraphData;
@@ -500,4 +500,5 @@ exports.createIndexSafe = createIndexSafe;
 exports.runAqlQueryResultCount = runAqlQueryResultCount;
 exports.runAqlQueryResultCountMultiply = runAqlQueryResultCountMultiply;
 exports.setOptions = function (opts) { options = opts; };
+exports.isInstrumented = isInstrumented;
 Object.defineProperty(exports, 'options', { get: () => options });

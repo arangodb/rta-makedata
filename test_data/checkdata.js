@@ -51,6 +51,8 @@ let {
   mainTestLoop,
   versionHas,
   getIndexTypes,
+  getValue,
+  isInstrumented,
 } = require(fs.join(PWD, 'common'));
 
 const {

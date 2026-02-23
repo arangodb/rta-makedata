@@ -163,22 +163,28 @@
 
       // Check a few queries:
       progress("100: query 1");
-      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
+      let searchID = isInstrumented? "id101":"id1001";
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("100: query 2");
-      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == "id10452" RETURN x`, 1);
+      searchID = isInstrumented? "id105":"id10452";
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == ${searchID} RETURN x`, 1);
       if (options.dataMultiplier === 1) {
         progress("100: query 3");
-        runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == "id13948" RETURN x`,  1);
+        searchID = isInstrumented? "id1339":"id13948";
+        runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchID} RETURN x`,  1);
       }
       progress("100: query 4");
       runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       if (options.dataMultiplier === 1) {
         progress("100: query 5");
-        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id20473" RETURN x`, 1);
+        searchID = isInstrumented? "id1556":"id20473";
+        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
         progress("100: query 6");
-        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id32236" RETURN x`, 1);
+        searchID = isInstrumented? "id2709":"id32236";
+        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
         progress("100: query 6");
-        runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`, 1);
+        searchID = isInstrumented? "id3245":"id32847";
+        runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
       }
       progress("100: queries done");
       progress("100: done");
