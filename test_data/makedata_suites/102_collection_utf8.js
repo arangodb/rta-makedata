@@ -122,14 +122,14 @@
       db._collections().forEach(col => { cnames.push(col.name());});
       let allFound = true;
       let notFound = [];
-      [`c_${loopCount}${extendedNames[0]}`,
-       `chash_${loopCount}${extendedNames[1]}`,
-       `cskip_${loopCount}${extendedNames[2]}`,
-       `cfull_${loopCount}${extendedNames[3]}`,
-       `cgeo_${loopCount}${extendedNames[4]}`,
-       `cunique_${loopCount}${extendedNames[5]}`,
-       `cmulti_${loopCount}${extendedNames[6]}`,
-       `cempty_${loopCount}${extendedNames[7]}`].forEach(colname => {
+      [`c_${dbCount}${extendedNames[0]}`,
+       `chash_${dbCount}${extendedNames[1]}`,
+       `cskip_${dbCount}${extendedNames[2]}`,
+       `cfull_${dbCount}${extendedNames[3]}`,
+       `cgeo_${dbCount}${extendedNames[4]}`,
+       `cunique_${dbCount}${extendedNames[5]}`,
+       `cmulti_${dbCount}${extendedNames[6]}`,
+       `cempty_${dbCount}${extendedNames[7]}`].forEach(colname => {
          let foundOne = false;
          cnames.forEach(oneColName => {
            if (oneColName === colname) {
@@ -146,14 +146,14 @@
         throw new Error(`not all collections were present on the system!: ${notFound} All collections: ${cnames}`);
       }
 
-      let c = db._collection(`c_${loopCount}${extendedNames[0]}`);
-      let chash = db._collection(`chash_${loopCount}${extendedNames[1]}`);
-      let cskip = db._collection(`cskip_${loopCount}${extendedNames[2]}`);
-      let cfull = db._collection(`cfull_${loopCount}${extendedNames[3]}`);
-      let cgeo = db._collection(`cgeo_${loopCount}${extendedNames[4]}`);
-      let cunique = db._collection(`cunique_${loopCount}${extendedNames[5]}`);
-      let cmulti = db._collection(`cmulti_${loopCount}${extendedNames[6]}`);
-      let cempty = db._collection(`cempty_${loopCount}${extendedNames[7]}`);
+      let c = db._collection(`c_${dbCount}${extendedNames[0]}`);
+      let chash = db._collection(`chash_${dbCount}${extendedNames[1]}`);
+      let cskip = db._collection(`cskip_${dbCount}${extendedNames[2]}`);
+      let cfull = db._collection(`cfull_${dbCount}${extendedNames[3]}`);
+      let cgeo = db._collection(`cgeo_${dbCount}${extendedNames[4]}`);
+      let cunique = db._collection(`cunique_${dbCount}${extendedNames[5]}`);
+      let cmulti = db._collection(`cmulti_${dbCount}${extendedNames[6]}`);
+      let cempty = db._collection(`cempty_${dbCount}${extendedNames[7]}`);
 
       // Check indexes:
       progress("102: checking indices");
