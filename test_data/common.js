@@ -187,6 +187,28 @@ function runAqlQueryResultCountMultiply(query, expectLength) {
   }
 }
 
+function assertIndexCount(collection, expectCount) {
+  let actualCount = collection.getIndexes().length;
+  
+  if (actualCount !== expectCount) {
+    throw new Error(`${Date()} Collection ${collection.name()} was expected to have ${expectCount} indexes, but has ${actualCount}`);
+  }
+}
+
+function assertIndexType(collection, offset, expectType) {
+  let actualType = collection.getIndexes()[offset].type;
+  if (actualType !== expectType) {
+    throw new Error(`${Date()} Collection ${collection.name()} was expected to have an index of type "${expectType}", but has ${actualType} in ${offset} - ${JSON.stringify(collection.getIndexes())}`);
+  }
+}
+
+function assertCollectionCount(collection, expectCount) {
+  let actualCount = collection.count();
+  if (actualCount !== expectCount) {
+    throw new Error(`${Date()} Collection ${collection.name()} Count was expected to be ${expectCount} but is ${actualCount}`);
+  }
+}
+
 function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
   var EXECUTED_TEST_SUITES_FILE = "";
   var previously_executed_suites = [];
@@ -477,7 +499,9 @@ function writeData(coll, n) {
     wcount += 1;
   }
 };
-
+exports.assertCollectionCount = assertCollectionCount;
+exports.assertIndexType = assertIndexType;
+exports.assertIndexCount = assertIndexCount;
 exports.makeRandomString = makeRandomString;
 exports.makeRandomNumber = makeRandomNumber;
 exports.makeRandomTimeStamp = makeRandomTimeStamp;
