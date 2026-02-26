@@ -53,6 +53,9 @@ let {
   getIndexTypes,
   getValue,
   isInstrumented,
+  assertCollectionCount,
+  assertIndexType,
+  assertIndexCount,
 } = require(fs.join(PWD, 'common'));
 
 const {

@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql,  resetRCount, writeData, getValue, semver, isInstrumented */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, assertCollectionCount, assertIndexType, assertIndexCount, runAqlQueryResultCount, aql,  resetRCount, writeData, getValue, semver, isInstrumented */
 
 // This file uses hash and skiplist indexes which are deprecated in 4.0+
 // For 4.0+, use 110_collections.js instead which uses persistent indexes
@@ -135,31 +135,32 @@
       // Check indexes:
       progress("100: checking indices");
 
-      if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
-      if (chash.getIndexes().length !== 2) { throw new Error(`Apple ${chash.getIndexes().length}`); }
-      if (chash.getIndexes()[1].type !== 'hash') { throw new Error(`Pear ${chash.getIndexes()[1].type}`); }
-      if (cskip.getIndexes().length !== 2) { throw new Error(`Tomato ${cskip.getIndexes().length}`); }
-      if (cskip.getIndexes()[1].type !== 'skiplist') { throw new Error(`Avocado ${cskip.getIndexes()[1].type}`); }
-      if (cfull.getIndexes().length !== 2) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cfull.getIndexes()[1].type !== 'fulltext') { throw new Error(`Cucumber ${cfull.getIndexes()[1].type}`); }
-      if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
-      if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
-      if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
+      assertIndexCount(c, 1);
+      assertIndexCount(chash, 2);
+      assertIndexType(chash, 1, 'hash');
+      assertIndexCount(cskip, 2);
+      assertIndexType(cskip, 1, 'skiplist');
+      assertIndexCount(cfull, 2);
+      assertIndexType(cfull, 1, 'fulltext');
+      assertIndexCount(cgeo, 2);
+      assertIndexType(cgeo, 1, 'geo');
+      assertIndexCount(cunique, 2);
+      assertIndexCount(cmulti, 5);
+      assertIndexCount(cempty, 1);
+
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
-      if (cmulti.getIndexes().length !== 5) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
-      if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
       progress("100: checking data");
-      if (c.count() !== getValue(1000) * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (chash.count() !== getValue(12345) * options.dataMultiplier) { throw new Error(`VW ${chash.count()} !== 12345`); }
-      if (cskip.count() !== getValue(2176) * options.dataMultiplier) { throw new Error(`Tesla ${cskip.count()} !== 2176`); }
-      if (cgeo.count() !== getValue(5245) * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== getValue(6253) * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== getValue(5362) * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (cmulti.count() !== getValue(12346) * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
-      if (version_collection.count() !== 1) { throw new Error(`Fiat ${version_collection.count()} !== 1`); }
+      assertCollectionCount(c, getValue(1000) * options.dataMultiplier);
+      assertCollectionCount(chash, getValue(12345) * options.dataMultiplier);
+      assertCollectionCount(cskip, getValue(2176) * options.dataMultiplier);
+      assertCollectionCount(cgeo, getValue(5245) * options.dataMultiplier);
+      assertCollectionCount(cfull, getValue(6253) * options.dataMultiplier);
+      assertCollectionCount(cunique, getValue(5362) * options.dataMultiplier);
+      assertCollectionCount(cmulti, getValue(12346) * options.dataMultiplier);
+      assertCollectionCount(cmulti, getValue(12346) * options.dataMultiplier);
+      assertCollectionCount(version_collection, 1);
 
       // Check a few queries:
       progress("100: query 1");

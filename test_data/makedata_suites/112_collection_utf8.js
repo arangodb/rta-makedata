@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, assertIndexType, assertIndexCount, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount */
 
 // This is the ArangoDB 4.0+ version of 102_collection_utf8.js
 // In 4.0, hash and skiplist indexes are deprecated and replaced by persistent
@@ -123,25 +123,26 @@
       // Check indexes:
       progress("112: checking indices");
 
-      if (c.getIndexes().length !== 1) { throw new Error(`Banana ${c.getIndexes().length}`); }
-      if (cpersistent.getIndexes().length !== 2) { throw new Error(`Apple ${cpersistent.getIndexes().length}`); }
-      if (cpersistent.getIndexes()[1].type !== 'persistent') { throw new Error(`Pear ${cpersistent.getIndexes()[1].type}`); }
-      if (cfull.getIndexes().length !== 1) { throw new Error(`Mango ${cfull.getIndexes().length}`); }
-      if (cgeo.getIndexes().length !== 2) { throw new Error(`Jackfruit ${cgeo.getIndexes().length}`); }
-      if (cgeo.getIndexes()[1].type !== 'geo') { throw new Error(`Onion ${cgeo.getIndexes()[1].type}`); }
-      if (cunique.getIndexes().length !== 2) { throw new Error(`Durian ${cunique.getIndexes().length}`); }
+      assertIndexCount(c, 1);
+      assertIndexCount(cpersistent, 2);
+      assertIndexType(cpersistent, 1, 'persistent');
+      assertIndexCount(cfull, 1);
+      assertIndexCount(cgeo, 2);
+      assertIndexType(cgeo, 1, 'geo');
+      assertIndexCount(cunique, 2);
+      assertIndexCount(cmulti, 4);
+      assertIndexCount(cempty, 1);
+
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
-      if (cmulti.getIndexes().length !== 4) { throw new Error(`Leek ${cmulti.getIndexes().length}`); }
-      if (cempty.getIndexes().length !== 1) { throw new Error(`Pineapple ${cempty.getIndexes().length}`); }
 
       // Check data:
       progress("112: checking counts");
-      if (c.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c.count()} !== 1000`); }
-      if (cpersistent.count() !== 12345 * options.dataMultiplier) { throw new Error(`VW ${cpersistent.count()} !== 12345`); }
-      if (cgeo.count() !== 5245 * options.dataMultiplier) { throw new Error(`Mercedes ${cgeo.count()} !== 5245`); }
-      if (cfull.count() !== 6253 * options.dataMultiplier) { throw new Error(`Renault ${cfull.count()} !== 6253`); }
-      if (cunique.count() !== 5362 * options.dataMultiplier) { throw new Error(`Opel ${cunique.count()} !== 5362`); }
-      if (cmulti.count() !== 12346 * options.dataMultiplier) { throw new Error(`Fiat ${cmulti.count()} !== 12346`); }
+      assertCollectionCount(c, 1000 * options.dataMultiplier);
+      assertCollectionCount(cpersistent, 12345 * options.dataMultiplier);
+      assertCollectionCount(cgeo, 5245 * options.dataMultiplier);
+      assertCollectionCount(cfull, 6253 * options.dataMultiplier);
+      assertCollectionCount(cunique, 5362 * options.dataMultiplier);
+      assertCollectionCount(cmulti, 12346 * options.dataMultiplier);
 
       // Check a few queries:
       progress("112: query 1");
