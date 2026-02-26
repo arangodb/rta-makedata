@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, assertIndexType, assertIndexCount, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
 
 // This is the ArangoDB 4.0+ version of 100_collections.js
 // In 4.0, hash and skiplist indexes are deprecated and replaced by persistent
