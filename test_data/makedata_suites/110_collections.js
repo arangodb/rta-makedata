@@ -1,7 +1,8 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, assertIndexType, assertIndexCount, time, runAqlQueryResultCount, aql, resetRCount, writeData, semver */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, assertIndexType, assertIndexCount, time, runAqlQueryResultCount, aql, resetRCount, writeData, getValue, semver, isInstrumented */
 
 // This is the ArangoDB 4.0+ version of 100_collections.js
-// In 4.0, hash and skiplist indexes are deprecated and replaced by persistent
+// In 4.0, hash and skiplist indexes are converted to persistent.
+// makeData runs only on 4.0+ (not on 3.12). checkData runs after upgrade on 4.0 and verifies that indexes created by 100 (hash/skiplist) are now persistent.
 
 (function () {
   return {
@@ -72,11 +73,13 @@
       progress('110: writeData6');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      // Post-upgrade check: data was created by 100 on 3.12 (chash_, cskip_, etc.). Verify indexes are now persistent.
       print(`${Date()} 110: checking data ${dbCount}`);
       let cols = db._collections();
       let allFound = true;
       [`c_${dbCount}`,
-       `cpersistent_${dbCount}`,
+       `chash_${dbCount}`,
+       `cskip_${dbCount}`,
        `cfull_${dbCount}`,
        `cgeo_${dbCount}`,
        `cunique_${dbCount}`,
@@ -99,7 +102,8 @@
       }
 
       let c = db._collection(`c_${dbCount}`);
-      let cpersistent = db._collection(`cpersistent_${dbCount}`);
+      let chash = db._collection(`chash_${dbCount}`);
+      let cskip = db._collection(`cskip_${dbCount}`);
       let cfull = db._collection(`cfull_${dbCount}`);
       let cgeo = db._collection(`cgeo_${dbCount}`);
       let cunique = db._collection(`cunique_${dbCount}`);
@@ -107,50 +111,68 @@
       let cempty = db._collection(`cempty_${dbCount}`);
       let version_collection = db._collection(`version_collection_${dbCount}`);
 
-      // Check indexes:
+      // Check indexes (hash/skiplist from 100 are now persistent in 4.0):
       progress("110: checking indices");
 
       assertIndexCount(c, 1);
-      assertIndexCount(cpersistent, 2);
-      assertIndexType(cpersistent, 1, 'persistent');
-      assertIndexCount(cfull, 1);
+      assertIndexCount(chash, 2);
+      assertIndexType(chash, 1, 'persistent');
+      assertIndexCount(cskip, 2);
+      assertIndexType(cskip, 1, 'persistent');
+      assertIndexCount(cfull, 2);
+      assertIndexType(cfull, 1, 'fulltext');
       assertIndexCount(cgeo, 2);
       assertIndexType(cgeo, 1, 'geo');
       assertIndexCount(cunique, 2);
-      assertIndexCount(cmulti, 4);
+      assertIndexType(cunique, 1, 'persistent');
+      assertIndexCount(cmulti, 5);
+      assertIndexType(cmulti, 1, 'persistent');
+      assertIndexType(cmulti, 2, 'persistent');
       assertIndexCount(cempty, 1);
 
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
 
       // Check data:
       progress("110: checking data");
-      assertCollectionCount(c, 1000 * options.dataMultiplier);
-      assertCollectionCount(cpersistent, 12345 * options.dataMultiplier);
-      assertCollectionCount(cgeo, 5245 * options.dataMultiplier);
-      assertCollectionCount(cfull, 6253 * options.dataMultiplier);
-      assertCollectionCount(cunique, 5362 * options.dataMultiplier);
-      assertCollectionCount(cmulti, 12346 * options.dataMultiplier);
+      assertCollectionCount(c, getValue(1000) * options.dataMultiplier);
+      assertCollectionCount(chash, getValue(12345) * options.dataMultiplier);
+      assertCollectionCount(cskip, getValue(2176) * options.dataMultiplier);
+      assertCollectionCount(cgeo, getValue(5245) * options.dataMultiplier);
+      assertCollectionCount(cfull, getValue(6253) * options.dataMultiplier);
+      assertCollectionCount(cunique, getValue(5362) * options.dataMultiplier);
+      assertCollectionCount(cmulti, getValue(12346) * options.dataMultiplier);
       assertCollectionCount(version_collection, 1);
 
       // Check a few queries:
       progress("110: query 1");
-      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == "id1001" RETURN x`, 1);
+      let searchID = isInstrumented ? "id101" : "id1001";
+      runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("110: query 2");
-      runAqlQueryResultCount(aql`FOR x IN ${cpersistent} FILTER x.a == "id10452" RETURN x`, 1);
-      progress("110: query 3");
+      searchID = isInstrumented ? "id105" : "id10452";
+      runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == ${searchID} RETURN x`, 1);
+      if (options.dataMultiplier === 1) {
+        progress("110: query 3");
+        searchID = isInstrumented ? "id1339" : "id13948";
+        runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchID} RETURN x`, 1);
+      }
+      progress("110: query 4");
       runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
       if (options.dataMultiplier === 1) {
-        progress("110: query 4");
-        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == "id15000" RETURN x`, 1);
         progress("110: query 5");
-        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == "id27000" RETURN x`, 1);
+        searchID = isInstrumented ? "id1556" : "id20473";
+        runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
         progress("110: query 6");
-        runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == "id32847" RETURN x`, 1);
+        searchID = isInstrumented ? "id2709" : "id32236";
+        runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
+        progress("110: query 7");
+        searchID = isInstrumented ? "id3245" : "id32847";
+        runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
       }
       progress("110: queries done");
       progress("110: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      // Drops same collections as 100 (post-upgrade cleanup):
       print(`${Date()} 110: clearing data ${dbCount} ${loopCount}`);
       progress("110: drop 1");
       try {
@@ -158,29 +180,33 @@
       } catch (e) {}
       progress("110: drop 2");
       try {
-        db._drop(`cpersistent_${loopCount}`);
+        db._drop(`chash_${loopCount}`);
       } catch (e) {}
       progress("110: drop 3");
       try {
-        db._drop(`cfull_${loopCount}`);
+        db._drop(`cskip_${loopCount}`);
       } catch (e) {}
       progress("110: drop 4");
       try {
-        db._drop(`cgeo_${loopCount}`);
+        db._drop(`cfull_${loopCount}`);
       } catch (e) {}
       progress("110: drop 5");
       try {
-        db._drop(`cunique_${loopCount}`);
+        db._drop(`cgeo_${loopCount}`);
       } catch (e) {}
       progress("110: drop 6");
       try {
-        db._drop(`cmulti_${loopCount}`);
+        db._drop(`cunique_${loopCount}`);
       } catch (e) {}
       progress("110: drop 7");
       try {
-        db._drop(`cempty_${loopCount}`);
+        db._drop(`cmulti_${loopCount}`);
       } catch (e) {}
       progress("110: drop 8");
+      try {
+        db._drop(`cempty_${loopCount}`);
+      } catch (e) {}
+      progress("110: drop 9");
       try {
         db._drop(`version_collection_${loopCount}`);
       } catch (e) {}
