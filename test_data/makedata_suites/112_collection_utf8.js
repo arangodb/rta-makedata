@@ -131,16 +131,24 @@
       assertIndexType(chash, 1, 'persistent');
       assertIndexCount(cskip, 2);
       assertIndexType(cskip, 1, 'persistent');
-      assertIndexCount(cfull, 2);
-      assertIndexType(cfull, 1, 'fulltext');
+      assertIndexCount(cfull, 1);
       assertIndexCount(cgeo, 2);
       assertIndexType(cgeo, 1, 'geo');
       assertIndexCount(cunique, 2);
       assertIndexType(cunique, 1, 'persistent');
-      assertIndexCount(cmulti, 5);
+      assertIndexCount(cmulti, 4);
       assertIndexType(cmulti, 1, 'persistent');
       assertIndexType(cmulti, 2, 'persistent');
       assertIndexCount(cempty, 1);
+
+      // Verify no fulltext indexes remain after upgrade to 4.0
+      [cfull, cmulti].forEach(col => {
+        col.getIndexes().forEach(idx => {
+          if (idx.type === 'fulltext') {
+            throw new Error(`112: fulltext index still exists on ${col.name()} after upgrade to 4.0!`);
+          }
+        });
+      });
 
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
 
