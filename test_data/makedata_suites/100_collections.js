@@ -1,7 +1,8 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, assertCollectionCount, assertIndexType, assertIndexCount, runAqlQueryResultCount, aql,  resetRCount, writeData, getValue, semver, isInstrumented */
 
 // This file uses hash and skiplist indexes which are deprecated in 4.0+
-// For 4.0+, use 110_collections.js instead which uses persistent indexes
+// makeData/makeDataFinalize run on 3.12 (version < 4.0) and create hash/skiplist indexes.
+// checkData runs only on current version < 4.0 (not after upgrade). For post-upgrade on 4.0, 110_collections.js checkData verifies indexes were converted to persistent.
 
 (function () {
   return {

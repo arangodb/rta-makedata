@@ -5,7 +5,8 @@
   let baseName;
   return {
     // This file uses hash and skiplist indexes which are deprecated in 4.0+
-    // For 4.0+, use 112_collection_utf8.js instead which uses persistent indexes
+    // makeData/makeDataFinalize run on 3.12 (version < 4.0) and create hash/skiplist indexes.
+    // checkData runs only on current version < 4.0 (not after upgrade). For post-upgrade on 4.0, 112_collection_utf8.js checkData verifies indexes were converted to persistent.
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
