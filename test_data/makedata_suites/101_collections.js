@@ -701,6 +701,11 @@ function compareProperties(name, obj1, obj2) {
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       progress(`101: checking data ${dbCount}`);
+
+      collections_names_declaration(dbCount).forEach(cname => {
+        db._query(`FOR doc IN ${cname} OPTIONS {waitForSync: true} LIMIT 1 RETURN doc `).toArray();
+      });
+
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
 
