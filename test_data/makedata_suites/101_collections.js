@@ -80,6 +80,139 @@ function queries_for_collections(dbCount){
   ];
 }
 
+function getExpectedValues() {
+  return {
+    c0_expected: [
+      {
+        name: 'cv_field',
+        expression: "RETURN SOUNDEX('sky')",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c1_expected: [
+      {
+        name: 'cv_field',
+        expression: "RETURN SOUNDEX('dog')",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c2_expected: [
+      {
+        name: 'cv_field_insert',
+        expression: "RETURN SOUNDEX('frog')",
+        computeOn: [ 'insert' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c3_expected: [
+      {
+        name: 'cv_field_update',
+        expression: "RETURN SOUNDEX('beer')",
+        computeOn: [ 'update' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c4_expected: [
+      {
+        name: 'cv_field_replace',
+        expression: "RETURN SOUNDEX('water')",
+        computeOn: [ 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c5_expected: [
+      {
+        name: 'cv_field',
+        expression: 'RETURN null',
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: false
+      }
+    ],
+    c6_expected: [
+      {
+        name: 'cv_field',
+        expression: 'RETURN TO_HEX(@doc.name)',
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c7_expected: [
+      {
+        name: 'cv_field',
+        expression: "RETURN CONCAT('42_', TO_STRING(@doc.field))",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: false,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c8_expected: [
+      {
+        name: 'cv_field',
+        expression: "RETURN CONCAT('42_', TO_STRING(@doc.field))",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c9_expected: [
+      {
+        name: 'cv_field1',
+        expression: "RETURN 'foo'",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      },
+      {
+        name: 'cv_field2',
+        expression: "RETURN 'bar'",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      },
+      {
+        name: 'cv_field3',
+        expression: "RETURN 'baz'",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ],
+    c10_expected: [
+      {
+        name: 'cv_field',
+        expression: "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)",
+        computeOn: [ 'insert', 'update', 'replace' ],
+        overwrite: true,
+        failOnWarning: false,
+        keepNull: true
+      }
+    ]
+  };
+}
+    
+
+
 // this function will provide all queries for views
 function queries_for_views(dbCount) {
   // get all the view's variable name from the variable_name_declaration method globally
@@ -152,165 +285,39 @@ function compareProperties(name, obj1, obj2) {
       //-------------------------------------------------------x-------------------------------------------------------------
 
       progress("101: Perform modification and comparison for desired output of Computed Values");
-
-      let c0_expected = [
-        {
-          name: 'cv_field',
-          expression: "RETURN SOUNDEX('sky')",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
+      let props = getExpectedValues();
       let c0_actual = c0.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('sky')", overwrite: true }] });
-      compareProperties(collections_names[0], c0_expected, c0_actual.computedValues);
+      compareProperties(collections_names[0], props.c0_expected, c0_actual.computedValues);
 
-      let c1_expected = [
-        {
-          name: 'cv_field',
-          expression: "RETURN SOUNDEX('dog')",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c1_actual = c1.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN SOUNDEX('dog')", "overwrite": true }] });
-      compareProperties(collections_names[1], c1_expected, c1_actual.computedValues);
+      compareProperties(collections_names[1], props.c1_expected, c1_actual.computedValues);
 
-      let c2_expected = [
-        {
-          name: 'cv_field_insert',
-          expression: "RETURN SOUNDEX('frog')",
-          computeOn: [ 'insert' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c2_actual = c2.properties({ computedValues: [{ "name": "cv_field_insert", "expression": "RETURN SOUNDEX('frog')", "computeOn": ["insert"], "overwrite": true }] });
-      compareProperties(collections_names[2], c2_expected, c2_actual.computedValues);
+      compareProperties(collections_names[2], props.c2_expected, c2_actual.computedValues);
 
-      let c3_expected = [
-        {
-          name: 'cv_field_update',
-          expression: "RETURN SOUNDEX('beer')",
-          computeOn: [ 'update' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c3_actual = c3.properties({ computedValues: [{ "name": "cv_field_update", "expression": "RETURN SOUNDEX('beer')", "computeOn": ["update"], "overwrite": true }] });
-      compareProperties(collections_names[3], c3_expected, c3_actual.computedValues);
+      compareProperties(collections_names[3], props.c3_expected, c3_actual.computedValues);
 
-      let c4_expected = [
-        {
-          name: 'cv_field_replace',
-          expression: "RETURN SOUNDEX('water')",
-          computeOn: [ 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c4_actual = c4.properties({ computedValues: [{ "name": "cv_field_replace", "expression": "RETURN SOUNDEX('water')", "computeOn": ["replace"], "overwrite": true }] });
-      compareProperties(collections_names[4], c4_expected, c4_actual.computedValues);
+      compareProperties(collections_names[4], props.c4_expected, c4_actual.computedValues);
 
-      let c5_expected = [
-        {
-          name: 'cv_field',
-          expression: 'RETURN null',
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: false
-        }
-      ];
       let c5_actual = c5.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN null", "overwrite": true, "keepNull": false }] });
-      compareProperties(collections_names[5], c5_expected, c5_actual.computedValues);
+      compareProperties(collections_names[5], props.c5_expected, c5_actual.computedValues);
 
-      let c6_expected = [
-        {
-          name: 'cv_field',
-          expression: 'RETURN TO_HEX(@doc.name)',
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c6_actual = c6.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN TO_HEX(@doc.name)", "overwrite": true }] });
-      compareProperties(collections_names[6], c6_expected, c6_actual.computedValues);
+      compareProperties(collections_names[6], props.c6_expected, c6_actual.computedValues);
 
-      let c7_expected = [
-        {
-          name: 'cv_field',
-          expression: "RETURN CONCAT('42_', TO_STRING(@doc.field))",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: false,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c7_actual = c7.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", "overwrite": false }] });
-      compareProperties(collections_names[7], c7_expected, c7_actual.computedValues);
+      compareProperties(collections_names[7], props.c7_expected, c7_actual.computedValues);
 
-      let c8_expected = [
-        {
-          name: 'cv_field',
-          expression: "RETURN CONCAT('42_', TO_STRING(@doc.field))",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c8_actual = c8.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", "overwrite": true }] });
-      compareProperties(collections_names[8], c8_expected, c8_actual.computedValues);
+      compareProperties(collections_names[8], props.c8_expected, c8_actual.computedValues);
 
-      let c9_expected = [
-        {
-          name: 'cv_field1',
-          expression: "RETURN 'foo'",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        },
-        {
-          name: 'cv_field2',
-          expression: "RETURN 'bar'",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        },
-        {
-          name: 'cv_field3',
-          expression: "RETURN 'baz'",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c9_actual = c9.properties({ computedValues: [{ "name": "cv_field1", "expression": "RETURN 'foo'", "overwrite": true }, { "name": "cv_field2", "expression": "RETURN 'bar'", "overwrite": true }, { "name": "cv_field3", "expression": "RETURN 'baz'", "overwrite": true }] });
-      compareProperties(collections_names[9], c9_expected, c9_actual.computedValues);
+      compareProperties(collections_names[9], props.c9_expected, c9_actual.computedValues);
 
-      let c10_expected = [
-        {
-          name: 'cv_field',
-          expression: "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)",
-          computeOn: [ 'insert', 'update', 'replace' ],
-          overwrite: true,
-          failOnWarning: false,
-          keepNull: true
-        }
-      ];
       let c10_actual = c10.properties({ computedValues: [{ "name": "cv_field", "expression": "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)", "overwrite": true }] });
-      compareProperties(collections_names[10], c10_expected, c10_actual.computedValues);
+      compareProperties(collections_names[10], props.c10_expected, c10_actual.computedValues);
 
       //-------------------------------------------------------x-------------------------------------------------------------
       // Ensure 'inverted' and 'persistent' indexes on cv field for all collections
@@ -697,27 +704,39 @@ function compareProperties(name, obj1, obj2) {
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
       result_comparison(db, views_queries);
+      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+
+      print(db._query("for doc in c10_101_0 OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in c10_101_0 limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c").toArray())
 
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       progress(`101: checking data ${dbCount}`);
 
-      collections_names_declaration(dbCount).forEach(cname => {
+      let cnames = collections_names_declaration(dbCount);
+      let cvalues = getExpectedValues();
+      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+      for (let i = 0; i < cnames.length; i++) {
+        compareProperties(cnames[i],
+                          cvalues[`c${i}_expected`],
+                          db[cnames[i]].properties().computedValues);
+      }
+      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+      cnames.forEach(cname => {
         db._query(`FOR doc IN ${cname} OPTIONS {waitForSync: true} LIMIT 1 RETURN doc `).toArray();
       });
+      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
 
+      print(db._query("for doc in c10_101_0 OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in c10_101_0 limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c").toArray())
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
 
-      /* BTS-1508: re-enable for triggering again
       // require("internal").sleep(120)
       result_comparison(db, collections_queries);
 
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
       result_comparison(db, views_queries);
-      */
       return 0;
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
