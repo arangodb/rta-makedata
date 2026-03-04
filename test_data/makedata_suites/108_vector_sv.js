@@ -23,10 +23,11 @@
 
       // Fill collection with documents:
       let docs = [];
-      let gen = randomNumberGeneratorFloat(randomInteger());
+      const seed = randomInteger();
+      let gen = randomNumberGeneratorFloat(seed);
 
       for (let i = 0; i < docNumber * options.dataMultiplier; ++i) {
-        const vector = Array.from({ length: 20}, () => gen());
+        const vector = Array.from({length: 20}, () => gen());
         docs.push({
           vector,
           val: i,
@@ -111,10 +112,10 @@
             RETURN d.vector
           )
           FOR d IN ${c_vector_sv}
-            FILTER d.val < 5 AND d.stringField == 'type_A'
-            LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector)
+            FILTER d.val < 100 AND d.stringField == 'type_A'
+            LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector, {nProbe: 10})
             SORT dist LIMIT 5
-            RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 2);
+            RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 5);
       }
       progress("108: queries done");
       progress("108: done");
