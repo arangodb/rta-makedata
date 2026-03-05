@@ -623,6 +623,7 @@ function compareProperties(name, obj1, obj2) {
         progress(`101: Insert docs into collection ${col.name()} with computed values`);
         col.save(docs, { silent: true });
       });
+      internal.sleep(10);
       data_array.forEach(col => {
         //this cmd will find one docs from the collection
         progress(`101: Loading docs from collection ${col.name()} with computed values`);
