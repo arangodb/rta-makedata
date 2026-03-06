@@ -1,4 +1,4 @@
-/* global semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual, semver */
+/* global semver, progress, createCollectionSafe, db, fs, PWD, _, assertTrue, assertEqual, semver, internal */
 
 // this method will declare all the collection name with proper dbCount
 let collections_names_declaration = (dbCount) => {
