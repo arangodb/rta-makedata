@@ -76,7 +76,8 @@ function queries_for_collections(dbCount){
     [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 16000],
     
     [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${collections_names[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
-    [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
+    // BTS-2331: revision changes on restore - thus we can't do this filter:
+    // [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
 
@@ -228,7 +229,8 @@ function queries_for_views(dbCount) {
     [`for doc in ${view[0]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
     [`for doc in ${view[0]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
     [`for doc in ${view[0]} search doc.cv_field1=='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
-    [`for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000],
+    // BTS-2331: can't use revision, since it may change on an arangorestore
+    // [`for doc in ${view[0]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000],
     
     [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('sky') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
     [`for doc in ${view[1]} search doc.cv_field == SOUNDEX('dog') OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
@@ -239,7 +241,8 @@ function queries_for_views(dbCount) {
     [`for doc in ${view[1]} filter doc.cv_field == to_hex(doc.name) collect with count into c return c`, 16000],
     [`for doc in ${view[1]} filter doc.cv_field == CONCAT('42_', TO_STRING(doc.field)) collect with count into c return c`, 25600],
     [`for doc in ${view[1]} search doc.cv_field1 =='foo' and doc.cv_field2=='bar' and doc.cv_field3=='baz' OPTIONS {waitForSync: true} collect with count into c return c`, 16000],
-    [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
+    // BTS-2331: can't lean on the _rev, it may change on arangorestore
+    // [`for doc in ${view[1]} filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
 
@@ -281,6 +284,7 @@ function compareProperties(name, obj1, obj2) {
       let c7 = createCollectionSafe (collections_names[7], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: false }] });
       let c8 = createCollectionSafe (collections_names[8], 3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT('42_', TO_STRING(@doc.field))", overwrite: true }] });
       let c9 = createCollectionSafe(collections_names[9],  3, 2, { computedValues: [{ "name": "default1", "expression": "RETURN 'foo'", overwrite: true }, { "name": "default2", "expression": "RETURN 'bar'", overwrite: true }, { "name": "default3", "expression": "RETURN 'baz'", overwrite: true }] });
+      // BTS-2331: this is problematic since in some cases _rev may change without cv_value being recalculated
       let c10 = createCollectionSafe(collections_names[10],3, 2, { computedValues: [{ "name": "default", "expression": "RETURN CONCAT(@doc._key, ' ', @doc._id, ' ', @doc._rev)", overwrite: true }] });
       //-------------------------------------------------------x-------------------------------------------------------------
 
