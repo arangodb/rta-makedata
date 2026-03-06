@@ -75,8 +75,8 @@ function queries_for_collections(dbCount){
     [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 16000],
     [`for doc in ${collections_names[9]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field1 == 'foo' and doc.cv_field2 == 'bar' and doc.cv_field3 == 'baz' collect with count into c return c`, 16000],
     
-    [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${collections_names[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
     // BTS-2331: revision changes on restore - thus we can't do this filter:
+    // [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in ${collections_names[10]} limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c`, 1],
     // [`for doc in ${collections_names[10]} OPTIONS { indexHint : 'persistent' } filter doc.cv_field == CONCAT(doc._key, ' ', doc._id, ' ', doc._rev) collect with count into c return c`, 16000]
   ];
 }
