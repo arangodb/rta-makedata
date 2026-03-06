@@ -708,9 +708,6 @@ function compareProperties(name, obj1, obj2) {
       //execute queries which use views and verify that the proper amount of docs are returned
       let views_queries = queries_for_views(dbCount);
       result_comparison(db, views_queries);
-      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
-
-      print(db._query("for doc in c10_101_0 OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in c10_101_0 limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c").toArray())
 
       return 0;
     },
@@ -719,19 +716,15 @@ function compareProperties(name, obj1, obj2) {
 
       let cnames = collections_names_declaration(dbCount);
       let cvalues = getExpectedValues();
-      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
       for (let i = 0; i < cnames.length; i++) {
         compareProperties(cnames[i],
                           cvalues[`c${i}_expected`],
                           db[cnames[i]].properties().computedValues);
       }
-      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
       cnames.forEach(cname => {
         db._query(`FOR doc IN ${cname} OPTIONS {waitForSync: true} LIMIT 1 RETURN doc `).toArray();
       });
-      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
 
-      print(db._query("for doc in c10_101_0 OPTIONS { indexHint : 'inverted', forceIndexHint: true, waitForSync: true } filter doc.cv_field == FIRST(for d in c10_101_0 limit 1001, 1 return CONCAT(d._key, ' ', d._id, ' ', d._rev)) collect with count into c return c").toArray())
       //execute queries which use views and verify that the proper amount of docs are returned
       let collections_queries = queries_for_collections(dbCount);
 
