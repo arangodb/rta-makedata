@@ -15,16 +15,18 @@
       // Create collections:
       let c = createCollectionSafe(`c_${dbCount}`, 3, 2);
       progress('110: createCollection1');
-      let cpersistent = createCollectionSafe(`cpersistent_${dbCount}`, 3, 2);
+      let chash = createCollectionSafe(`chash_${dbCount}`, 3, 2);
       progress('110: createCollection2');
-      let cfull = createCollectionSafe(`cfull_${dbCount}`, 3, 1);
+      let cskip = createCollectionSafe(`cskip_${dbCount}`, 3, 2);
       progress('110: createCollection3');
+      let cfull = createCollectionSafe(`cfull_${dbCount}`, 3, 1);
+      progress('110: createCollection4');
       let cgeo = createCollectionSafe(`cgeo_${dbCount}`, 3, 2);
-      progress('110: createCollectionGeo4');
+      progress('110: createCollectionGeo5');
       let cunique = createCollectionSafe(`cunique_${dbCount}`, 1, 1);
-      progress('110: createCollection5');
-      let cmulti = createCollectionSafe(`cmulti_${dbCount}`, 3, 2);
       progress('110: createCollection6');
+      let cmulti = createCollectionSafe(`cmulti_${dbCount}`, 3, 2);
+      progress('110: createCollection7');
       let cempty = createCollectionSafe(`cempty_${dbCount}`, 3, 1);
 
       // create a special collection, which will store only one document - current arangodb version
@@ -33,9 +35,11 @@
       version_coll.insert({"version": db._version()});
 
       // Create indexes:
-      progress('110: createCollection7');
-      createIndexSafe({col: cpersistent, type: "persistent", fields: ["a"], unique: false});
+      progress('110: createCollection8');
+      createIndexSafe({col: chash, type: "persistent", fields: ["a"], unique: false});
       progress('110: createIndexPersistent1');
+      createIndexSafe({col: cskip, type: "persistent", fields: ["a"], unique: false});
+      progress('110: createIndexPersistent2');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true});
       progress('110: createIndexGeo3');
       createIndexSafe({col: cunique, type: "persistent", fields: ["a"], unique: true});
@@ -50,7 +54,8 @@
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
       progress(`110: Makedata ${dbCount} ${loopCount}`);
       let c = db[`c_${dbCount}`];
-      let cpersistent = db[`cpersistent_${dbCount}`];
+      let chash = db[`chash_${dbCount}`];
+      let cskip = db[`cskip_${dbCount}`];
       let cfull = db[`cfull_${dbCount}`];
       let cgeo = db[`cgeo_${dbCount}`];
       let cunique = db[`cunique_${dbCount}`];
@@ -61,16 +66,18 @@
       resetRCount();
       writeData(c, 1000);
       progress('110: writeData1');
-      writeData(cpersistent, 12345);
+      writeData(chash, 12345);
       progress('110: writeData2');
-      writeData(cgeo, 5245);
+      writeData(cskip, 2176);
       progress('110: writeData3');
-      writeData(cfull, 6253);
+      writeData(cgeo, 5245);
       progress('110: writeData4');
-      writeData(cunique, 5362);
+      writeData(cfull, 6253);
       progress('110: writeData5');
-      writeData(cmulti, 12346);
+      writeData(cunique, 5362);
       progress('110: writeData6');
+      writeData(cmulti, 12346);
+      progress('110: writeData7');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       // Post-upgrade check: data was created by 100 on 3.12 (chash_, cskip_, etc.). Verify indexes are now persistent.
