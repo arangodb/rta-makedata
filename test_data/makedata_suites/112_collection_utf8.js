@@ -138,22 +138,40 @@
       assertIndexCount(cempty, 1);
 
       if (hasCpersistent && !hasChashCskip) {
+        // 112 native path: data created by 112 makeData (no getValue(), write order: c, cpersistent, cgeo, cfull, cunique, cmulti).
+        // ID ranges (dM=1): c=[id2,id1001], cpersistent=[id1002,id13346], cgeo=[id13347,id18591],
+        //   cfull=[id18592,id24844], cunique=[id24845,id30206], cmulti=[id30207,id42552].
+        // With dM>1, ranges scale proportionally: [cumBefore*dM+2, (cumBefore+size)*dM+1].
         let cpersistent = db._collection(`cpersistent_${dbCount}${extendedNames[1]}`);
         assertIndexCount(cpersistent, 2);
         assertIndexType(cpersistent, 1, 'persistent');
-        assertCollectionCount(c, getValue(1000) * options.dataMultiplier);
-        assertCollectionCount(cpersistent, getValue(12345) * options.dataMultiplier);
-        assertCollectionCount(cgeo, getValue(5245) * options.dataMultiplier);
-        assertCollectionCount(cfull, getValue(6253) * options.dataMultiplier);
-        assertCollectionCount(cunique, getValue(5362) * options.dataMultiplier);
-        assertCollectionCount(cmulti, getValue(12346) * options.dataMultiplier);
+        assertCollectionCount(c, 1000 * options.dataMultiplier);
+        assertCollectionCount(cpersistent, 12345 * options.dataMultiplier);
+        assertCollectionCount(cgeo, 5245 * options.dataMultiplier);
+        assertCollectionCount(cfull, 6253 * options.dataMultiplier);
+        assertCollectionCount(cunique, 5362 * options.dataMultiplier);
+        assertCollectionCount(cmulti, 12346 * options.dataMultiplier);
         progress("112: query 1");
-        let searchID = isInstrumented ? "id101" : "id1001";
+        let searchID = "id501";
         runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == ${searchID} RETURN x`, 1);
         progress("112: query 2");
-        searchID = isInstrumented ? "id105" : "id10452";
+        searchID = "id7000";
         runAqlQueryResultCount(aql`FOR x IN ${cpersistent} FILTER x.a == ${searchID} RETURN x`, 1);
+        progress("112: query 3");
+        runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
+        if (options.dataMultiplier === 1) {
+          progress("112: query 4");
+          searchID = "id16000";
+          runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
+          progress("112: query 5");
+          searchID = "id27500";
+          runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
+          progress("112: query 6");
+          searchID = "id36000";
+          runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
+        }
       } else {
+        // 102 upgrade path: data created by 102 makeData (uses getValue(), write order: c, chash, cskip, cgeo, cfull, cunique, cmulti).
         let chash = db._collection(`chash_${dbCount}${extendedNames[1]}`);
         let cskip = db._collection(`cskip_${dbCount}${extendedNames[2]}`);
         assertIndexCount(chash, 2);
@@ -182,35 +200,22 @@
         searchID = isInstrumented ? "id105" : "id10452";
         runAqlQueryResultCount(aql`FOR x IN ${chash} FILTER x.a == ${searchID} RETURN x`, 1);
         progress("112: query 3");
-        searchID = "id" + (isInstrumented ? 1339 : 13948 * options.dataMultiplier);
-        runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchID} RETURN x`, 1);
+        runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
+        if (options.dataMultiplier === 1) {
+          progress("112: query 4");
+          searchID = isInstrumented ? "id1339" : "id13948";
+          runAqlQueryResultCount(aql`FOR x IN ${cskip} FILTER x.a == ${searchID} RETURN x`, 1);
+          progress("112: query 5");
+          searchID = isInstrumented ? "id1556" : "id20473";
+          runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
+          progress("112: query 6");
+          searchID = isInstrumented ? "id2709" : "id32236";
+          runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
+          progress("112: query 7");
+          searchID = isInstrumented ? "id3245" : "id32847";
+          runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
+        }
       }
-
-      // 112 write order: c, cpersistent, cfull, cgeo, cunique, cmulti (102: c, chash, cskip, cgeo, cfull, ...). Id ranges differ; use ids in first batch for 112.
-      let searchID;
-      progress("112: query 4");
-      runAqlQueryResultCount(aql`FOR x IN ${cempty} RETURN x`, 0);
-      progress("112: query 5");
-      if (hasCpersistent && !hasChashCskip) {
-        searchID = isInstrumented ? "id18600" : "id20000";
-      } else {
-        searchID = "id" + (isInstrumented ? 2075 : 20473 * options.dataMultiplier);
-      }
-      runAqlQueryResultCount(aql`FOR x IN ${cgeo} FILTER x.a == ${searchID} RETURN x`, 1);
-      progress("112: query 6");
-      if (hasCpersistent && !hasChashCskip) {
-        searchID = isInstrumented ? "id23845" : "id25000";
-      } else {
-        searchID = "id" + (isInstrumented ? 2709 : 32236 * options.dataMultiplier);
-      }
-      runAqlQueryResultCount(aql`FOR x IN ${cunique} FILTER x.a == ${searchID} RETURN x`, 1);
-      progress("112: query 7");
-      if (hasCpersistent && !hasChashCskip) {
-        searchID = isInstrumented ? "id29207" : "id35000";
-      } else {
-        searchID = "id" + (isInstrumented ? 3245 : 32847 * options.dataMultiplier);
-      }
-      runAqlQueryResultCount(aql`FOR x IN ${cmulti} FILTER x.a == ${searchID} RETURN x`, 1);
       progress("112: queries done");
       db._useDatabase('_system');
     },
