@@ -7,7 +7,7 @@
 // then 112 checkData verifies the result in both cases.
 
 (function () {
-  let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտροնում", "🌸🌲🌵 🍃💔"];
+  let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
   let baseName;
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
@@ -105,6 +105,7 @@
       print(`${Date()} 112: using ${baseName}`);
     },
     checkData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      // Post-upgrade check: data was created by 102 on 3.12 (chash_, cskip_, etc.). Verify indexes are now persistent.
       print(`${Date()} 112: checking data ${dbCount} ${loopCount}`);
       print(`${Date()} 112: using ${baseName}`);
       db._useDatabase(baseName);
@@ -145,6 +146,7 @@
       let cmulti = db._collection(`cmulti_${dbCount}${extendedNames[6]}`);
       let cempty = db._collection(`cempty_${dbCount}${extendedNames[7]}`);
 
+      // Check indexes (hash/skiplist from 102 are now persistent in 4.0):
       progress("112: checking indices");
 
       assertIndexCount(c, 1);
@@ -162,6 +164,7 @@
       assertIndexType(cmulti, 2, 'persistent');
       assertIndexCount(cempty, 1);
 
+      // Verify no fulltext indexes remain after upgrade to 4.0
       [cfull, cmulti].forEach(col => {
         col.getIndexes().forEach(idx => {
           if (idx.type === 'fulltext') {
@@ -172,6 +175,7 @@
 
       if (cunique.getIndexes()[1].unique !== true) { throw new Error(`Mandarin ${cunique.getIndexes()[1].unique}`); }
 
+      // Check data:
       progress("112: checking counts");
       assertCollectionCount(c, getValue(1000) * options.dataMultiplier);
       assertCollectionCount(chash, getValue(12345) * options.dataMultiplier);
@@ -181,6 +185,7 @@
       assertCollectionCount(cunique, getValue(5362) * options.dataMultiplier);
       assertCollectionCount(cmulti, getValue(12346) * options.dataMultiplier);
 
+      // Check a few queries (match 102's query logic):
       progress("112: query 1");
       let searchID = isInstrumented ? "id101" : "id1001";
       runAqlQueryResultCount(aql`FOR x IN ${c} FILTER x.a == ${searchID} RETURN x`, 1);
@@ -213,5 +218,6 @@
       }
       db._dropDatabase(`M${baseName}_${dbCount}_${extendedNames[3]}`);
     }
+    // we drop the whole db, so no further cleanup needed
   };
 }());
