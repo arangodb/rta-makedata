@@ -1,8 +1,10 @@
 /* global print, db, progress, createCollectionSafe, createIndexSafe, assertCollectionCount, assertIndexType, assertIndexCount, time, rand, semver, aql, runAqlQueryResultCount, writeData, resetRCount, getValue, isInstrumented */
 
 // This is the ArangoDB 4.0+ version of 102_collection_utf8.js
-// In 4.0, hash and skiplist indexes are converted to persistent.
-// makeData runs only on 4.0+ (not on 3.12). checkData runs after upgrade on 4.0 and verifies that indexes created by 102 (hash/skiplist) are now persistent.
+// In 4.0, hash and skiplist indexes are converted to persistent, fulltext indexes are dropped.
+// makeData mirrors 102's structure using the same collection names but with persistent indexes
+// instead of hash/skiplist and no fulltext. This allows running 102 makeData XOR 112 makeData,
+// then 112 checkData verifies the result in both cases.
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
@@ -21,30 +23,67 @@
       baseName = `M${baseName}_${dbCount}_${extendedNames[3]}`;
       print(`${Date()} 112: creating ${baseName}`);
       db._createDatabase(baseName);
+      db._useDatabase(baseName);
+      let c = createCollectionSafe(`c_${dbCount}${extendedNames[0]}`, 3, 2);
+      progress('112: createCollection1');
+      let chash = createCollectionSafe(`chash_${dbCount}${extendedNames[1]}`, 3, 2);
+      progress('112: createCollection2');
+      let cskip = createCollectionSafe(`cskip_${dbCount}${extendedNames[2]}`, 1, 1);
+      progress('112: createCollection3');
+      let cfull = createCollectionSafe(`cfull_${dbCount}${extendedNames[3]}`, 3, 1);
+      progress('112: createCollection4');
+      let cgeo = createCollectionSafe(`cgeo_${dbCount}${extendedNames[4]}`, 3, 2);
+      progress('112: createCollectionGeo5');
+      let cunique = createCollectionSafe(`cunique_${dbCount}${extendedNames[5]}`, 1, 1);
+      progress('112: createCollection6');
+      let cmulti = createCollectionSafe(`cmulti_${dbCount}${extendedNames[6]}`, 3, 2);
+      progress('112: createCollection7');
+      let cempty = createCollectionSafe(`cempty_${dbCount}${extendedNames[7]}`, 3, 1);
     },
     makeData: function (options, isCluster, isEnterprise, dbCount, loopCount) {
-      // All items created must contain dbCount and loopCount
-      // Create collections:
+      db._useDatabase('_system');
       print(`${Date()} 112: using ${baseName}`);
       db._useDatabase(baseName);
-      let c = createCollectionSafe(`c_${loopCount}${extendedNames[0]}`, 3, 2);
-      progress('112: createCollection1');
-      let cpersistent = createCollectionSafe(`cpersistent_${loopCount}${extendedNames[1]}`, 3, 2);
-      progress('112: createCollection2');
-      let cfull = createCollectionSafe(`cfull_${loopCount}${extendedNames[3]}`, 3, 1);
-      progress('112: createCollection3');
-      let cgeo = createCollectionSafe(`cgeo_${loopCount}${extendedNames[4]}`, 3, 2);
-      progress('112: createCollectionGeo4');
-      let cunique = createCollectionSafe(`cunique_${loopCount}${extendedNames[5]}`, 1, 1);
-      progress('112: createCollection5');
-      let cmulti = createCollectionSafe(`cmulti_${loopCount}${extendedNames[6]}`, 3, 2);
-      progress('112: createCollection6');
-      let cempty = createCollectionSafe(`cempty_${loopCount}${extendedNames[7]}`, 3, 1);
+      let c = db[`c_${dbCount}${extendedNames[0]}`];
+      let chash = db[`chash_${dbCount}${extendedNames[1]}`];
+      let cskip = db[`cskip_${dbCount}${extendedNames[2]}`];
+      let cfull = db[`cfull_${dbCount}${extendedNames[3]}`];
+      let cgeo = db[`cgeo_${dbCount}${extendedNames[4]}`];
+      let cunique = db[`cunique_${dbCount}${extendedNames[5]}`];
+      let cmulti = db[`cmulti_${dbCount}${extendedNames[6]}`];
+      let cempty = db[`cempty_${dbCount}${extendedNames[7]}`];
 
-      // Create indexes:
-      progress('112: createCollection7');
-      createIndexSafe({col: cpersistent, type: "persistent", fields: ["a"], unique: false, name: extendedNames[1]});
+      resetRCount();
+      writeData(c, getValue(1000));
+      progress('112: writeData1');
+      writeData(chash, getValue(12345));
+      progress('112: writeData2');
+      writeData(cskip, getValue(2176));
+      progress('112: writeData3');
+      writeData(cgeo, getValue(5245));
+      progress('112: writeData4');
+      writeData(cfull, getValue(6253));
+      progress('112: writeData5');
+      writeData(cunique, getValue(5362));
+      progress('112: writeData6');
+      writeData(cmulti, getValue(12346));
+      progress('112: writeData7');
+      db._useDatabase('_system');
+    },
+    makeDataFinalize: function (options, isCluster, isEnterprise, dbCount) {
+      db._useDatabase('_system');
+      print(`${Date()} 112: finalizing ${baseName}`);
+      db._useDatabase(baseName);
+      let chash = db[`chash_${dbCount}${extendedNames[1]}`];
+      let cskip = db[`cskip_${dbCount}${extendedNames[2]}`];
+      let cgeo = db[`cgeo_${dbCount}${extendedNames[4]}`];
+      let cunique = db[`cunique_${dbCount}${extendedNames[5]}`];
+      let cmulti = db[`cmulti_${dbCount}${extendedNames[6]}`];
+
+      createIndexSafe({col: chash, type: "persistent", fields: ["a"], unique: false, name: extendedNames[1]});
       progress('112: createIndexPersistent1');
+      createIndexSafe({col: cskip, type: "persistent", fields: ["a"], unique: false, name: extendedNames[2]});
+      progress('112: createIndexPersistent2');
       createIndexSafe({col: cgeo, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[4]});
       progress('112: createIndexGeo3');
       createIndexSafe({col: cunique, type: "persistent", fields: ["a"], unique: true, name: extendedNames[5]});
@@ -55,22 +94,6 @@
       progress('112: createIndex6');
       createIndexSafe({col: cmulti, type: "geo", fields: ["position"], geoJson: true, name: extendedNames[0]});
       progress('112: createIndexGeo7');
-
-      // Now the actual data writing:
-      resetRCount();
-      writeData(c, 1000);
-      progress('112: writeData1');
-      writeData(cpersistent, 12345);
-      progress('112: writeData2');
-      writeData(cgeo, 5245);
-      progress('112: writeData3');
-      writeData(cfull, 6253);
-      progress('112: writeData4');
-      writeData(cunique, 5362);
-      progress('112: writeData5');
-      writeData(cmulti, 12346);
-      progress('112: writeData6');
-      db._useDatabase('_system');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       db._useDatabase('_system');
