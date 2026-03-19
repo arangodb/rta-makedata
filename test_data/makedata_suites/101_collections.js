@@ -642,27 +642,27 @@ function compareProperties(name, obj1, obj2) {
         let has_cv_field = db._query(`FOR doc IN ${col.name()} OPTIONS {waitForSync: true} FILTER HAS(doc, '${fieldName}') LIMIT 10 RETURN doc `).toArray();
         // checking computed value field exit on the collection's doc
         if (col === c0 || col === c1 || col === c6 || col === c7 || col === c8 || col === c10) {
-          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty(fieldName))) {
             throw new Error(`101: Computed value field '${fieldName}' missing from collection ${col.name()} => ${JSON.stringify(has_cv_field)}`);
           }
         }
         else if (col === c2) {
-          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field_insert"))) {
-            throw new Error(`101: Computed value field 'cv_field_insert' missing from collection ${col.name()} => ${JSON.stringify(has_cv_field)}`);
+          if (!has_cv_field.some(obj => obj.hasOwnProperty(fieldName))) {
+            throw new Error(`101: Computed value field '${fieldName}' missing from collection ${col.name()} => ${JSON.stringify(has_cv_field)}`);
           }
         }
         else if (col === c3 || col === c4) {
-          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty(fieldName))) {
             throw new Error(`101: Computed value field '${fieldName}' missing from collection ${col.name()} => ${JSON.stringify(has_cv_field)}`);
           }
         }
         else if (col === c5) {
-          if (has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+          if (has_cv_field.some(obj => obj.hasOwnProperty(fieldName))) {
             throw new Error(`101: Computed value field '${fieldName}' is present for ${col.name()} => ${JSON.stringify(has_cv_field)}`);
           }
         } 
         else if (col === c9) {
-          if (!has_cv_field.some(obj => obj.hasOwnProperty("cv_field"))) {
+          if (!has_cv_field.some(obj => obj.hasOwnProperty(fieldName))) {
             throw new Error(`101: Computed value field '${fieldName}' missing from collection ${col.name()} => ${JSON.stringify(has_cv_field)}`);
           }
         }
