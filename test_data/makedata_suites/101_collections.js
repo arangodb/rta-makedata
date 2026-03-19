@@ -638,7 +638,7 @@ function compareProperties(name, obj1, obj2) {
       data_array.forEach(col => {
         //this cmd will find one docs from the collection
         progress(`101: Loading docs from collection ${col.name()} with computed values`);
-        let fieldName = (col === c2) ? 'cv_field_insert' : 'cv_field'
+        let fieldName = (col === c2) ? 'cv_field_insert' : 'cv_field';
         let has_cv_field = db._query(`FOR doc IN ${col.name()} OPTIONS {waitForSync: true} FILTER HAS(doc, '${fieldName}') LIMIT 10 RETURN doc `).toArray();
         // checking computed value field exit on the collection's doc
         if (col === c0 || col === c1 || col === c6 || col === c7 || col === c8 || col === c10) {
