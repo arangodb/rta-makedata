@@ -98,6 +98,23 @@
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} `);
       }
 
+      // Wait for vector index to become ready (it needs background training
+      // after restore).
+      progress("108: waiting for vector index to be ready");
+      const maxWait = 120;
+      const start = time();
+      while (true) {
+        let idx = c_vector_sv.getIndexes()[1];
+        if (idx.trainingState === "ready") {
+          break;
+        }
+        if (time() - start > maxWait) {
+          throw new Error(`108: vector index not ready after ${maxWait}s, ` +
+                          `state: ${idx.trainingState}`);
+        }
+        require("internal").sleep(1);
+      }
+
       // Check data:
       progress("108: checking data");
       if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
