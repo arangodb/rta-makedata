@@ -19,7 +19,7 @@
       } = require("@arangodb/testutils/seededRandom");
       progress(`108: Makedata ${dbCount} ${loopCount}`);
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
-      const docNumber = 1000;
+      const docNumber = 4000;
 
       // Fill collection with documents:
       let docs = [];
@@ -100,7 +100,7 @@
 
       // Check data:
       progress("108: checking data");
-      if (c_vector_sv.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 1000`); }
+      if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
 
       // Check a few queries:
       progress("108: query 1");

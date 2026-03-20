@@ -25,7 +25,7 @@
 
       // Write data first
       resetRCount();
-      writeData(c_vector, 1000);
+      writeData(c_vector, 4000);
 
       progress('107: writeData1');
     },
@@ -85,34 +85,26 @@
 
       // Check data:
       progress("107: checking data");
-      if (c_vector.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 1000`); }
+      if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
 
-      // Wait for vector index to be trained (needed after restore/replication)
+      // Wait for vector index to be trained by retrying the vector query
+      // until it succeeds (after restore, training happens asynchronously)
       progress("107: waiting for vector index to be trained");
       {
         const internal = require('internal');
         const timeoutSec = 120;
         let trained = false;
         for (let i = 0; i < timeoutSec; i++) {
-          let indexes = internal.isCluster()
-            ? c_vector.indexes(true, true)
-            : c_vector.indexes();
-          let vecIdx = indexes.filter(idx => idx.type === 'vector');
-          if (vecIdx.length > 0 && vecIdx.every(idx => {
-            if (idx.trainingState !== undefined) {
-              return idx.trainingState === "ready";
-            }
-            if (idx.shards !== undefined) {
-              let shardEntries = Object.values(idx.shards);
-              return shardEntries.length > 0 &&
-                shardEntries.every(s => s.trainingState === "ready");
-            }
-            return false;
-          })) {
+          try {
+            runAqlQueryResultCount(aql`
+                FOR d IN ${c_vector}
+                    SORT APPROX_NEAR_L2(d.TypeVec, [1,2,3,4,5], {nProbe: 5})
+                      LIMIT 5 RETURN d`, 5);
             trained = true;
             break;
+          } catch (e) {
+            internal.sleep(1);
           }
-          internal.sleep(1);
         }
         if (!trained) {
           throw new Error("107: vector index did not become trained within timeout");
