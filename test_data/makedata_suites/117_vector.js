@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 // This is the ArangoDB 4.0+ version of 107_vector.js
 // Uses persistent instead of hash for secondary index
@@ -74,37 +74,8 @@
       progress("117: checking data");
       if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
 
-      // Wait for vector index to be trained (needed after restore/replication)
       progress("117: waiting for vector index to be trained");
-      {
-        const internal = require('internal');
-        const timeoutSec = 120;
-        let trained = false;
-        for (let i = 0; i < timeoutSec; i++) {
-          let indexes = internal.isCluster()
-            ? c_vector.indexes(true, true)
-            : c_vector.indexes();
-          let vecIdx = indexes.filter(idx => idx.type === 'vector');
-          if (vecIdx.length > 0 && vecIdx.every(idx => {
-            if (idx.trainingState !== undefined) {
-              return idx.trainingState === "ready";
-            }
-            if (idx.shards !== undefined) {
-              let shardEntries = Object.values(idx.shards);
-              return shardEntries.length > 0 &&
-                shardEntries.every(s => s.trainingState === "ready");
-            }
-            return false;
-          })) {
-            trained = true;
-            break;
-          }
-          internal.sleep(1);
-        }
-        if (!trained) {
-          throw new Error("117: vector index did not become trained within timeout");
-        }
-      }
+      waitForVectorIndexTrained(c_vector);
 
       // Check a few queries:
       progress("117: query 1");

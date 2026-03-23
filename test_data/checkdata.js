@@ -58,6 +58,7 @@ let {
   assertCollectionCount,
   assertIndexType,
   assertIndexCount,
+  waitForVectorIndexTrained,
 } = require(fs.join(PWD, 'common'));
 
 const {

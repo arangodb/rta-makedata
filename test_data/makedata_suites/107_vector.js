@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 (function () {
   let secondIndexCreate = false;
@@ -87,29 +87,8 @@
       progress("107: checking data");
       if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
 
-      // Wait for vector index to be trained by retrying the vector query
-      // until it succeeds (after restore, training happens asynchronously)
       progress("107: waiting for vector index to be trained");
-      {
-        const internal = require('internal');
-        const timeoutSec = 120;
-        let trained = false;
-        for (let i = 0; i < timeoutSec; i++) {
-          try {
-            runAqlQueryResultCount(aql`
-                FOR d IN ${c_vector}
-                    SORT APPROX_NEAR_L2(d.TypeVec, [1,2,3,4,5], {nProbe: 5})
-                      LIMIT 5 RETURN d`, 5);
-            trained = true;
-            break;
-          } catch (e) {
-            internal.sleep(1);
-          }
-        }
-        if (!trained) {
-          throw new Error("107: vector index did not become trained within timeout");
-        }
-      }
+      waitForVectorIndexTrained(c_vector);
 
       // Check a few queries:
       progress("107: query 1");
