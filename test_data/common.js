@@ -180,10 +180,24 @@ function runAqlQueryResultCount(query, expectLength) {
   }
 }
 
+function runAqlQueryResultCountMinMax(query, expectMinLength, expectMaxLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length < expectMinLength || res.length > expectMaxLength) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting the result between '${expectMinLength}' and '${expectMaxLength}' but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
+
 function runAqlQueryResultCountMultiply(query, expectLength) {
   let res = db._query(query.query, query.bindVars).toArray();
   if (res.length !== expectLength * options.dataMultiplier) {
     throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting ${expectLength * options.dataMultiplier} but got ${res.length} - ${JSON.stringify(res)}`);
+  }
+}
+
+function runAqlQueryResultCountMultiplyMinMax(query, expectMinLength, expectMaxLength) {
+  let res = db._query(query.query, query.bindVars).toArray();
+  if (res.length < expectMinLength * options.dataMultiplier || res.length > expectMaxLength * options.dataMultiplier) {
+    throw new Error(`AQL query: '${query.query}' '${JSON.stringify(query.bindVars)}' expecting the result between '${expectMinLength * options.dataMultiplier}' and '${expectMaxLength * options.dataMultiplier}' but got ${res.length} - ${JSON.stringify(res)}`);
   }
 }
 
@@ -523,6 +537,8 @@ exports.createCollectionSafe = createCollectionSafe;
 exports.createIndexSafe = createIndexSafe;
 exports.runAqlQueryResultCount = runAqlQueryResultCount;
 exports.runAqlQueryResultCountMultiply = runAqlQueryResultCountMultiply;
+exports.runAqlQueryResultCountMinMax = runAqlQueryResultCountMinMax;
+exports.runAqlQueryResultCountMultiplyMinMax = runAqlQueryResultCountMultiplyMinMax;
 exports.setOptions = function (opts) { options = opts; };
 exports.isInstrumented = isInstrumented;
 Object.defineProperty(exports, 'options', { get: () => options });

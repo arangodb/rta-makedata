@@ -47,6 +47,8 @@ let {
   setOptions,
   runAqlQueryResultCount,
   runAqlQueryResultCountMultiply,
+  runAqlQueryResultCountMinMax,
+  runAqlQueryResultCountMultiplyMinMax,
   scanMakeDataPaths,
   mainTestLoop,
   versionHas,
