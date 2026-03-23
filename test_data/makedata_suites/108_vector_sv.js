@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, runAqlQueryResultCountMinMax, aql, semver, resetRCount */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCountMinMax, aql, semver, resetRCount */
 
 (function () {
   return {
