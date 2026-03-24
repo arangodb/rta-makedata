@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCountMinMax, aql, semver, resetRCount */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCountMinMax, aql, semver, resetRCount, waitForVectorIndexTrained */
 
 (function () {
   return {
@@ -19,7 +19,7 @@
       } = require("@arangodb/testutils/seededRandom");
       progress(`108: Makedata ${dbCount} ${loopCount}`);
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
-      const docNumber = 1000;
+      const docNumber = 4000;
 
       // Fill collection with documents:
       let docs = [];
@@ -98,9 +98,12 @@
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} `);
       }
 
+      progress("108: waiting for vector index to be ready");
+      waitForVectorIndexTrained(c_vector_sv, options.curVersion);
+
       // Check data:
       progress("108: checking data");
-      if (c_vector_sv.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 1000`); }
+      if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
 
       // Check a few queries:
       // progress("108: query 1");

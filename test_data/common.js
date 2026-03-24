@@ -203,7 +203,7 @@ function runAqlQueryResultCountMultiplyMinMax(query, expectMinLength, expectMaxL
 
 function assertIndexCount(collection, expectCount) {
   let actualCount = collection.getIndexes().length;
-  
+
   if (actualCount !== expectCount) {
     throw new Error(`${Date()} Collection ${collection.name()} was expected to have ${expectCount} indexes, but has ${actualCount}`);
   }
@@ -513,6 +513,33 @@ function writeData(coll, n) {
     wcount += 1;
   }
 };
+
+function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
+  if (timeoutSec === undefined) {
+    timeoutSec = 120;
+  }
+  const semver = require('semver');
+  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
+  const hasTrainingState = semver.gte(currentVersionSemver, "3.12.9");
+  for (let i = 0; i < timeoutSec; i++) {
+    let indexes = collection.getIndexes();
+    let vectorIndexes = indexes.filter(idx => idx.type === "vector");
+    if (vectorIndexes.length === 0) {
+      sleep(1);
+      continue;
+    }
+    if (!hasTrainingState) {
+      return;
+    }
+    if (vectorIndexes.every(idx => idx.trainingState === "ready")) {
+      return;
+    }
+    sleep(1);
+  }
+  throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
+}
+
+exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;
 exports.assertIndexCount = assertIndexCount;

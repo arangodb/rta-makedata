@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 (function () {
   let secondIndexCreate = false;
@@ -25,7 +25,7 @@
 
       // Write data first
       resetRCount();
-      writeData(c_vector, 1000);
+      writeData(c_vector, 4000);
 
       progress('107: writeData1');
     },
@@ -85,7 +85,10 @@
 
       // Check data:
       progress("107: checking data");
-      if (c_vector.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 1000`); }
+      if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
+
+      progress("107: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector, options.curVersion);
 
       // Check a few queries:
       progress("107: query 1");

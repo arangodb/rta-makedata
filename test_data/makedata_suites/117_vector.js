@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 // This is the ArangoDB 4.0+ version of 107_vector.js
 // Uses persistent instead of hash for secondary index
@@ -21,7 +21,7 @@
 
       // Now the actual data writing:
       resetRCount();
-      writeData(c_vector, 1000);
+      writeData(c_vector, 4000);
       if (c_vector.indexes().length === 1) {
         createIndexSafe({
           col: c_vector,
@@ -72,7 +72,10 @@
 
       // Check data:
       progress("117: checking data");
-      if (c_vector.count() !== 1000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 1000`); }
+      if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
+
+      progress("117: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector, options.curVersion);
 
       // Check a few queries:
       progress("117: query 1");
