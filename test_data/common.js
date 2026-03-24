@@ -203,7 +203,7 @@ function runAqlQueryResultCountMultiplyMinMax(query, expectMinLength, expectMaxL
 
 function assertIndexCount(collection, expectCount) {
   let actualCount = collection.getIndexes().length;
-  
+
   if (actualCount !== expectCount) {
     throw new Error(`${Date()} Collection ${collection.name()} was expected to have ${expectCount} indexes, but has ${actualCount}`);
   }
@@ -513,6 +513,7 @@ function writeData(coll, n) {
     wcount += 1;
   }
 };
+
 function waitForVectorIndexTrained(collection, timeoutSec) {
   if (timeoutSec === undefined) {
     timeoutSec = 120;
@@ -521,7 +522,7 @@ function waitForVectorIndexTrained(collection, timeoutSec) {
     let indexes = collection.getIndexes();
     let vectorIndexes = indexes.filter(idx => idx.type === "vector");
     if (vectorIndexes.length > 0 &&
-        vectorIndexes.every(idx => idx.trainingState === "ready")) {
+        vectorIndexes.every(idx => !idx.hasOwnProperty('trainingState') || idx.trainingState === "ready")) {
       return;
     }
     sleep(1);
