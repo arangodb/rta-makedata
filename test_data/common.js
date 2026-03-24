@@ -514,15 +514,24 @@ function writeData(coll, n) {
   }
 };
 
-function waitForVectorIndexTrained(collection, timeoutSec) {
+function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
   if (timeoutSec === undefined) {
     timeoutSec = 120;
   }
+  const semver = require('semver');
+  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
+  const hasTrainingState = semver.gte(currentVersionSemver, "3.12.9");
   for (let i = 0; i < timeoutSec; i++) {
     let indexes = collection.getIndexes();
     let vectorIndexes = indexes.filter(idx => idx.type === "vector");
-    if (vectorIndexes.length > 0 &&
-        vectorIndexes.every(idx => !idx.hasOwnProperty('trainingState') || idx.trainingState === "ready")) {
+    if (vectorIndexes.length === 0) {
+      sleep(1);
+      continue;
+    }
+    if (!hasTrainingState) {
+      return;
+    }
+    if (vectorIndexes.every(idx => idx.trainingState === "ready")) {
       return;
     }
     sleep(1);

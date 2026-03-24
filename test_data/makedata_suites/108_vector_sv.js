@@ -99,7 +99,7 @@
       }
 
       progress("108: waiting for vector index to be ready");
-      waitForVectorIndexTrained(c_vector_sv);
+      waitForVectorIndexTrained(c_vector_sv, options.curVersion);
 
       // Check data:
       progress("108: checking data");

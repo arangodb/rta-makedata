@@ -88,7 +88,7 @@
       if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
 
       progress("107: waiting for vector index to be trained");
-      waitForVectorIndexTrained(c_vector);
+      waitForVectorIndexTrained(c_vector, options.curVersion);
 
       // Check a few queries:
       progress("107: query 1");
