@@ -107,7 +107,10 @@ with the following meanings:
 - `X` in `DB`-column: This test has database level functionality
 - `X` in `loop`-column: This test has loop-level functionality
 
-
 # Embeddings
 RTA Makedata is embedded into [arangodb](https://github.com/arangodb/arangodb) and [RTA](https://github.com/arangodb/release-test-automation); 
 Hence a PR on RTA Makedata has to be sidelined by two PRs.
+
+Hints:
+  - for a PR that is used within `Embeddings` consider to rebase and use the latest commit of a dependent `rta-makedata` PR
+  - use "merge" commit instead of "squash" for such an rta-makedata PR to allow for an `Embeddings` PR to be merged without an additional "forward" action
