@@ -56,17 +56,17 @@ function arraysEqual(analyzer_name, a, b) {
     throw new Error(`${analyzer_name}: Didn't get the expected response from the server! ${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
 }
-
+const analyzer_dump = db._analyzers.toArray();
 function dumpAnalyzerCollection() {
   print(`${Date()} Dumping analyzers`);
   print("--------------------------------------------------------------------------------");
-  print(JSON.stringify(db._analyzers.toArray()));
+  print(JSON.stringify(analyzer_dump));
   print("--------------------------------------------------------------------------------");
   print(`${Date()} DONE`);
 }
 
 // this function will check everything regarding given analyzer
-function checkAnalyzerSet(testgroup, test){
+function checkAnalyzerSet(testgroup, test, analyzer_dump){
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult;
   try {
