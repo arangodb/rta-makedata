@@ -66,7 +66,7 @@ function dumpAnalyzerCollection() {
 }
 
 // this function will check everything regarding given analyzer
-function checkAnalyzerSet(testgroup, test, analyzer_dump){
+function checkAnalyzerSet(testgroup, test){
   progress(`${testgroup}: ${test.analyzerName} running query ${test.query}`);
   let queryResult;
   try {
