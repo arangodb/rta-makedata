@@ -56,7 +56,7 @@ function arraysEqual(analyzer_name, a, b) {
     throw new Error(`${analyzer_name}: Didn't get the expected response from the server! ${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
 }
-const analyzer_dump = db._analyzers.toArray();
+let analyzer_dump = null;
 function dumpAnalyzerCollection() {
   print(`${Date()} Dumping analyzers`);
   print("--------------------------------------------------------------------------------");

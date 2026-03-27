@@ -1,4 +1,4 @@
-/* global print, semver, progress, createSafe, createCollectionSafe, db, analyzers, fs, PWD, createAnalyzerSet, checkAnalyzerSet, deleteAnalyzerSet */
+/* global print, semver, progress, createSafe, createCollectionSafe, db, analyzers, fs, PWD, createAnalyzerSet, checkAnalyzerSet, deleteAnalyzerSet, analyzer_dump */
 /*jslint maxlen: 100*/
 
 function getTestData_607(dbCount) {
@@ -337,6 +337,8 @@ function getTestData_607(dbCount) {
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
       // documentation link: https://www.arangodb.com/docs/3.7/analyzers.html
+      // initialize the global variable for reporting.
+      analyzer_dump = db._analyzers.toArray();
 
       print(`${Date()} 607: making per database data ${dbCount}`);
       getTestData_607(dbCount).forEach((test) => {
