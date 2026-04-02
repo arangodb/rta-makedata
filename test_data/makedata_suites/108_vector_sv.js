@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCountMinMax, aql, semver, resetRCount, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
 
 (function () {
   return {
@@ -106,21 +106,21 @@
       if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
 
       // Check a few queries:
-      // progress("108: query 1");
-      // if (options.dataMultiplier === 1) {
-      //   runAqlQueryResultCountMinMax(aql`
-      //     LET rp = (
-      //       FOR d IN ${c_vector_sv}
-      //       FILTER d.val == 500
-      //       RETURN d.vector
-      //     )
-      //     FOR d IN ${c_vector_sv}
-      //       FILTER d.val < 100 AND d.stringField == 'type_A'
-      //       LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector, {nProbe: 10})
-      //       SORT dist LIMIT 5
-      //       RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 0, 5);
-      // }
-      // progress("108: queries done");
+      progress("108: query 1");
+      if (options.dataMultiplier === 1) {
+        runAqlQueryResultCount(aql`
+          LET rp = (
+            FOR d IN ${c_vector_sv}
+            FILTER d.val == 2000
+            RETURN d.vector
+          )
+          FOR d IN ${c_vector_sv}
+            FILTER d.val < 250 AND d.stringField == 'type_A'
+            LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector, {nProbe: 10})
+            SORT dist LIMIT 5
+            RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 5);
+      }
+      progress("108: queries done");
       progress("108: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
