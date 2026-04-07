@@ -338,6 +338,7 @@ function getTestData_607(dbCount) {
       // All items created must contain dbCount
       // documentation link: https://www.arangodb.com/docs/3.7/analyzers.html
       // initialize the global variable for reporting.
+      /* eslint-disable-next-line no-native-reassign */
       analyzer_dump = db._analyzers.toArray();
 
       print(`${Date()} 607: making per database data ${dbCount}`);
