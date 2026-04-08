@@ -50,21 +50,27 @@
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
         print('108: creating vector index with stored values');
-        createIndexSafe({
-          col: c_vector_sv,
-          name: `vector_l2_stored`,
-          type: "vector",
-          fields: ["vector"],
-          inBackground: false,
-          storedValues: ["val", "stringField", "boolField", "floatField"],
-          params: {
-            metric: "l2",
-            dimension: 20,
-            nLists: 10,
-            trainingIterations: 10,
-            defaultNProbe: 10
-          }
-        });
+        try {
+          c_vector_sv.ensureIndex({
+            name: `vector_l2_stored`,
+            type: "vector",
+            fields: ["vector"],
+            inBackground: false,
+            storedValues: ["val", "stringField", "boolField", "floatField"],
+            params: {
+              metric: "l2",
+              dimension: 20,
+              nLists: 10,
+              trainingIterations: 10,
+              defaultNProbe: 10
+            }
+          });
+        } catch(e) {
+          print('108: error when creating vector index with stored values');
+          print(`108: Indexes state: ${JSON.stringify(c_vector_sv.indexes())}`);
+          throw e;
+        }
+        print('108: created vector index with stored values');
       }
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -95,7 +101,7 @@
       let indexExpectCount = 2;
 
       if (c_vector_sv.getIndexes().length !== indexExpectCount || c_vector_sv.getIndexes()[1].type !== "vector") {
-        throw new Error(`Banana ${c_vector_sv.getIndexes().length} `);
+        throw new Error(`Banana ${c_vector_sv.getIndexes().length} indexes: ${JSON.stringify(c_vector_sv.getIndexes())}`);
       }
 
       progress("108: waiting for vector index to be ready");
