@@ -35,21 +35,26 @@
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
         progress('107: createIndexVector');
-        createIndexSafe({
-          col: c_vector,
-          name: `i_vector_dbcount`,
-          type: "vector",
-          fields: ["TypeVec"],
-          inBackground: false,
-          params: {
-            metric: "l2",
-            dimension: 5,
-            nLists: 1
-          },
-        });
-        if (secondIndexCreate) {
-          print('107: creating hash index');
-          createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+        try {
+          c_vector.ensureIndex({
+            name: `i_vector_dbcount`,
+            type: "vector",
+            fields: ["TypeVec"],
+            inBackground: false,
+            params: {
+              metric: "l2",
+              dimension: 5,
+              nLists: 1
+            },
+          });
+          if (secondIndexCreate) {
+            print('107: creating hash index');
+            createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
+          }
+        } catch(e) {
+          print('107: error when creating vector index');
+          print(`107: Indexes state: ${JSON.stringify(c_vector.indexes())}`);
+          throw e;
         }
       }
     },
@@ -80,7 +85,7 @@
 
       const indexExpectCount = (secondIndexCreate) ? 3 : 2;
       if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
-        throw new Error(`Banana ${c_vector.getIndexes().length} `);
+        throw new Error(`Banana ${c_vector.getIndexes().length} indexes: ${JSON.stringify(c_vector.getIndexes())}`);
       }
 
       // Check data:
