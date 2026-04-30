@@ -64,19 +64,19 @@
 
       // Now the actual data writing:
       resetRCount();
-      writeData(c, 1000);
+      writeData(c, getValue(1000));
       progress('110: writeData1');
-      writeData(chash, 12345);
+      writeData(chash, getValue(12345));
       progress('110: writeData2');
-      writeData(cskip, 2176);
+      writeData(cskip, getValue(2176));
       progress('110: writeData3');
-      writeData(cgeo, 5245);
+      writeData(cgeo, getValue(5245));
       progress('110: writeData4');
-      writeData(cfull, 6253);
+      writeData(cfull, getValue(6253));
       progress('110: writeData5');
-      writeData(cunique, 5362);
+      writeData(cunique, getValue(5362));
       progress('110: writeData6');
-      writeData(cmulti, 12346);
+      writeData(cmulti, getValue(12346));
       progress('110: writeData7');
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
