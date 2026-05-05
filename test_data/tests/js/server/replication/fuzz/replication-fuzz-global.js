@@ -392,7 +392,7 @@ function ReplicationSuite() {
               tc.remove(k1);
               tc.remove(k2);
             } else {
-              let docs = trx.query("FOR doc IN @@col SORT RAND() LIMIT 2 RETURN doc",
+              let docs = trx.query("FOR doc IN @@col LIMIT 100 SORT RAND() LIMIT 2 RETURN doc",
                                    {"@col": collection});
               tc.remove(docs[0]._key);
               tc.remove(docs[1]._key);
