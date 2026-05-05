@@ -381,10 +381,11 @@ function ReplicationSuite() {
 
           let removeMulti = function() {
             let collection = pickCollection();
+            let count = collection.count();
             let trx = db._createTransaction({
               collections: { write: [collection.name()] }});
             let tc = trx.collection(collection.name());
-            if (tc.count() < 2) {
+            if (count < 2) {
               let k1 = tc.insert({});
               let k2 = tc.insert({});
               tc.remove(k1);
