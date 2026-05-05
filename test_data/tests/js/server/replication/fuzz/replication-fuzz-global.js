@@ -300,7 +300,8 @@ function ReplicationSuite() {
             collection.insert({ _key: "test3", value: Date.now() }, { overwriteMode: "update" });
             try {
               collection.insert({ _key: "test4", value: Date.now() }, { overwriteMode: "conflict" });
-            } catch () {}
+            } catch (err) {
+            }
           };
 
           let remove = function() {
