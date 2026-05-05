@@ -334,112 +334,91 @@ function ReplicationSuite() {
 
           let insertOrReplace = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                let key = "test" + Math.floor(Math.random() * 10000);
-                try {
-                  db[collection].insert({ _key: key, value: Date.now() });
-                } catch (err) {
-                  db[collection].replace(key, { value2: Date.now() });
-                }
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }})
+            let tc = trx.collection(collection.name());
+            let key = "test" + Math.floor(Math.random() * 10000);
+            try {
+              tc.insert({ _key: key, value: Date.now() });
+            } catch (err) {
+              tc.replace(key, { value2: Date.now() });
+            }
+            trx.commit();
           };
 
           let insertOrUpdate = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                let key = "test" + Math.floor(Math.random() * 10000);
-                try {
-                  db[collection].insert({ _key: key, value: Date.now() });
-                } catch (err) {
-                  db[collection].update(key, { value2: Date.now() });
-                }
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            let key = "test" + Math.floor(Math.random() * 10000);
+            try {
+              tc.insert({ _key: key, value: Date.now() });
+            } catch (err) {
+              tc.update(key, { value2: Date.now() });
+            }
+            trx.commit();
           };
 
           let insertMulti = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                db[collection].insert({ value1: Date.now() });
-                db[collection].insert({ value2: Date.now() });
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            tc.insert({ value1: Date.now() });
+            tc.insert({ value2: Date.now() });
+            trx.commit();
           };
 
           let removeMulti = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                if (db[collection].count() < 2) {
-                  let k1 = db[collection].insert({});
-                  let k2 = db[collection].insert({});
-                  db[collection].remove(k1);
-                  db[collection].remove(k2);
-                  return;
-                }
-                db[collection].remove(db[collection].any());
-                db[collection].remove(db[collection].any());
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            if (tc.count() < 2) {
+              let k1 = tc.insert({});
+              let k2 = tc.insert({});
+              tc.remove(k1);
+              tc.remove(k2);
+            } else {
+              tc.remove(db[collection].any());
+              tc.remove(db[collection].any());
+            }
+            trx.commit();
           };
 
           let removeInsert = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                if (db[collection].count() === 0) {
-                  db[collection].insert({ value: Date.now() });
-                }
-                db[collection].remove(db[collection].any());
-                db[collection].insert({ value: Date.now() });
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            if (tc.count() === 0) {
+              tc.insert({ value: Date.now() });
+            }
+            tx._query('FOR doc IN @@cn LIMIT 1 REMOVE {_key: doc._key} IN @@cn', {'@cn': collection.name()});
+            tc.insert({ value: Date.now() });
+            trx.commit();
           };
 
           let insertRemove = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                let k = db[collection].insert({ value: Date.now() });
-                db[collection].remove(k);
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            let k = tc.insert({ value: Date.now() });
+            tc.remove(k);
+            trx.commit();
           };
 
           let insertBatch = function() {
             let collection = pickCollection();
-            db._executeTransaction({
-              collections: { write: [collection.name()] },
-              action: function(params) {
-                let collection = params.cn, db = require("internal").db;
-                for (let i = 0; i < 1000; ++i) {
-                  db[collection].insert({ value1: Date.now() });
-                }
-              },
-              params: { cn: collection.name() }
-            });
+            let trx = db._createTransaction({
+              collections: { write: [collection.name()] }});
+            let tc = trx.collection(collection.name());
+            for (let i = 0; i < 1000; ++i) {
+              tc.insert({ value1: Date.now() });
+            }
+            trx.commit();
           };
 
           let createCollection = function() {
