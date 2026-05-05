@@ -304,7 +304,8 @@ function ReplicationSuite() {
               collection.remove(k);
               return;
             }
-            collection.remove(collection.any());
+            db._query("FOR doc IN @@col SORT RAND() LIMIT 1 REMOVE doc IN @@col",
+                      {"@col": collection.name()});
           };
 
           let replace = function() {
@@ -314,7 +315,8 @@ function ReplicationSuite() {
               collection.replace(k, { value2: Date.now() });
               return;
             }
-            collection.replace(collection.any(), { value2: Date.now() });
+            db._query("FOR doc IN @@col SORT RAND() LIMIT 1 REPLACE {_key: doc._key, value2: @date} IN @@col",
+                      {"@col": collection.name(), 'date': Date.now() });
           };
 
           let update = function() {
@@ -324,7 +326,8 @@ function ReplicationSuite() {
               collection.update(k, { value2: Date.now() });
               return;
             }
-            collection.update(collection.any(), { value2: Date.now() });
+            db._query("FOR doc IN @@col SORT RAND() LIMIT 1 UPDATE {_key: doc._key, value2: @date} IN @@col",
+                      {"@col": collection.name(), 'date': Date.now() });
           };
 
           let insertEdge = function() {
@@ -381,8 +384,10 @@ function ReplicationSuite() {
               tc.remove(k1);
               tc.remove(k2);
             } else {
-              tc.remove(db[collection].any());
-              tc.remove(db[collection].any());
+              let docs = db._query("FOR doc IN @@col SORT RAND() LIMIT 2 RETURN doc",
+                                   {"@col": collection});
+              tc.remove(docs[0]._key);
+              tc.remove(docs[1]._key);
             }
             trx.commit();
           };
