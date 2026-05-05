@@ -384,7 +384,7 @@ function ReplicationSuite() {
               tc.remove(k1);
               tc.remove(k2);
             } else {
-              let docs = db._query("FOR doc IN @@col SORT RAND() LIMIT 2 RETURN doc",
+              let docs = trx.query("FOR doc IN @@col SORT RAND() LIMIT 2 RETURN doc",
                                    {"@col": collection});
               tc.remove(docs[0]._key);
               tc.remove(docs[1]._key);
@@ -400,7 +400,7 @@ function ReplicationSuite() {
             if (tc.count() === 0) {
               tc.insert({ value: Date.now() });
             }
-            trx._query('FOR doc IN @@cn LIMIT 1 REMOVE {_key: doc._key} IN @@cn', {'@cn': collection.name()});
+            trx.query('FOR doc IN @@cn LIMIT 1 REMOVE {_key: doc._key} IN @@cn', {'@cn': collection.name()});
             tc.insert({ value: Date.now() });
             trx.commit();
           };
