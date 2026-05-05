@@ -400,7 +400,7 @@ function ReplicationSuite() {
             if (tc.count() === 0) {
               tc.insert({ value: Date.now() });
             }
-            tx._query('FOR doc IN @@cn LIMIT 1 REMOVE {_key: doc._key} IN @@cn', {'@cn': collection.name()});
+            trx._query('FOR doc IN @@cn LIMIT 1 REMOVE {_key: doc._key} IN @@cn', {'@cn': collection.name()});
             tc.insert({ value: Date.now() });
             trx.commit();
           };
