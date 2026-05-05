@@ -345,7 +345,7 @@ function ReplicationSuite() {
           let insertOrReplace = function() {
             let collection = pickCollection();
             let trx = db._createTransaction({
-              collections: { write: [collection.name()] }})
+              collections: { write: [collection.name()] }});
             let tc = trx.collection(collection.name());
             let key = "test" + Math.floor(Math.random() * 10000);
             try {
