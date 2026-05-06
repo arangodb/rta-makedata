@@ -81,7 +81,8 @@ const optionsDefaults = {
   bigDoc: false,
   test: undefined,
   skip: undefined,
-  forceOneShard: false
+  forceOneShard: false,
+  isInstrumented: false,
 };
 
 let args = _.clone(ARGUMENTS);

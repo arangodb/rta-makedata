@@ -26,7 +26,7 @@ function versionHas(attribute) {
   }
 };
 
-const isInstrumented = (versionHas('tsan') || versionHas('asan'));
+const isInstrumented = (versionHas('tsan') || versionHas('asan') || options.isInstrumented);
 function getValue(defVal) {
   if (isInstrumented) {
     return Math.trunc(defVal / 10);

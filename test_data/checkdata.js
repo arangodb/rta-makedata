@@ -95,7 +95,8 @@ const optionsDefaults = {
   passvoid: '',
   printTimeTableMeasurement: false,
   printTimeMeasurement: false,
-  forceOneShard: false
+  forceOneShard: false,
+  isInstrumented: false,
 };
 
 let args = _.clone(ARGUMENTS);

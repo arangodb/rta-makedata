@@ -101,6 +101,7 @@ const optionsDefaults = {
   excludePreviouslyExecutedTests: false,
   forceOneShard: false,
   createOneShardDatabase: false,
+  isInstrumented: false,
 };
 
 let args = _.clone(ARGUMENTS);
