@@ -5,6 +5,9 @@
   return {
     // hash index is deprecated in 4.0, use 117_vector.js for 4.0+
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if (!options.testVector) {
+	return false;
+      }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
       secondIndexCreate = (semver.gt(oldVersionSemver, "3.12.5") &&

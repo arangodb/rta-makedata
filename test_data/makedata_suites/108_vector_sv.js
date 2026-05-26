@@ -3,6 +3,9 @@
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if (!options.testVector) {
+	return false;
+      }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
       return (semver.gte(oldVersionSemver, "3.12.7") &&

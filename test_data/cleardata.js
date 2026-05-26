@@ -72,6 +72,7 @@ const optionsDefaults = {
   collectionMultiplier: 1,
   collectionCountOffset: 0,
   testFoxx: true,
+  testVector: true,
   singleShard: false,
   progress: false,
   oldVersion: "3.5.0",

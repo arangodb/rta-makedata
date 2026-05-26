@@ -6,6 +6,9 @@
 (function () {
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if (!options.testVector) {
+	return false;
+      }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       return semver.gte(currentVersionSemver, "4.0.0");
     },
