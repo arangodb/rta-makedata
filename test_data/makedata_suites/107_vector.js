@@ -37,7 +37,7 @@
       let c_vector = db[`c_vector_${dbCount}`];
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
-        progress('107: createIndexVector');
+        progress(`107: createIndexVector with data distribution ${JSON.stringify(c_vector.count(true))}`);
         try {
           c_vector.ensureIndex({
             name: `i_vector_dbcount`,
