@@ -52,7 +52,7 @@
       progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
-        print('108: creating vector index with stored values');
+        progress(`108: creating vector index with stored values with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
         try {
           c_vector_sv.ensureIndex({
             name: `vector_l2_stored`,
@@ -69,7 +69,7 @@
             }
           });
         } catch(e) {
-          print('108: error when creating vector index with stored values');
+          print(`108: error when creating vector index with stored values with error: ${e}`);
           print(`108: Indexes state: ${JSON.stringify(c_vector_sv.indexes())}`);
           throw e;
         }
