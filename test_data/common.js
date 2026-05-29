@@ -26,7 +26,7 @@ function versionHas(attribute) {
   }
 };
 
-const isInstrumented = (versionHas('tsan') || versionHas('asan') || options.isInstrumented);
+const isInstrumented = (versionHas('tsan') || versionHas('asan'));
 function getValue(defVal) {
   if (isInstrumented) {
     return Math.trunc(defVal / 10);
@@ -202,17 +202,19 @@ function runAqlQueryResultCountMultiplyMinMax(query, expectMinLength, expectMaxL
 }
 
 function assertIndexCount(collection, expectCount) {
-  let actualCount = collection.getIndexes().length;
+  let idx = collection.getIndexes();
+  let actualCount = idx.length;
 
   if (actualCount !== expectCount) {
-    throw new Error(`${Date()} Collection ${collection.name()} was expected to have ${expectCount} indexes, but has ${actualCount}`);
+    throw new Error(`${Date()} Collection ${collection.name()} was expected to have ${expectCount} indexes, but has ${actualCount} - ${JSON.stringify(idx)}`);
   }
 }
 
 function assertIndexType(collection, offset, expectType) {
-  let actualType = collection.getIndexes()[offset].type;
+  let idx = collection.getIndexes();
+  let actualType = idx[offset].type;
   if (actualType !== expectType) {
-    throw new Error(`${Date()} Collection ${collection.name()} was expected to have an index of type "${expectType}", but has ${actualType} in ${offset} - ${JSON.stringify(collection.getIndexes())}`);
+    throw new Error(`${Date()} Collection ${collection.name()} was expected to have an index of type "${expectType}", but has ${actualType} in ${offset} - ${JSON.stringify(idx)}`);
   }
 }
 
