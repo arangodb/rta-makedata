@@ -1,4 +1,4 @@
-/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
+/* global print, db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
 
 // This is the ArangoDB 4.0+ version of 107_vector.js
 // Uses persistent instead of hash for secondary index
@@ -31,7 +31,7 @@
           name: `i_vector_dbcount`,
           type: "vector",
           fields: ["TypeVec"],
-          inBackground: false,
+          inBackground: true,
           params: {
             metric: "l2",
             dimension: 5,
@@ -76,9 +76,6 @@
       // Check data:
       progress("117: checking data");
       if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
-
-      progress("117: waiting for vector index to be trained");
-      waitForVectorIndexTrained(c_vector, options.curVersion);
 
       // Check a few queries:
       progress("117: query 1");

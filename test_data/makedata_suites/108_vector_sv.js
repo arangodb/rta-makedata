@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount */
 
 (function () {
   return {
@@ -58,7 +58,7 @@
             name: `vector_l2_stored`,
             type: "vector",
             fields: ["vector"],
-            inBackground: false,
+            inBackground: true,
             storedValues: ["val", "stringField", "boolField", "floatField"],
             params: {
               metric: "l2",
@@ -106,9 +106,6 @@
       if (c_vector_sv.getIndexes().length !== indexExpectCount || c_vector_sv.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} indexes: ${JSON.stringify(c_vector_sv.getIndexes())}`);
       }
-
-      progress("108: waiting for vector index to be ready");
-      waitForVectorIndexTrained(c_vector_sv, options.curVersion);
 
       // Check data:
       progress("108: checking data");
