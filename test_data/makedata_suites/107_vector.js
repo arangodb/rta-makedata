@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 (function () {
   let secondIndexCreate = false;
@@ -94,6 +94,11 @@
       // Check data:
       progress("107: checking data");
       if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
+
+      // Before 3.12.10 the index must be trained before APPROX_NEAR_L2 can query
+      // it (no-op from 3.12.10 / 4.0 on, which fall back to linear scan).
+      progress("107: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector, options.curVersion);
 
       // Check a few queries:
       progress("107: query 1");

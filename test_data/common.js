@@ -516,6 +516,41 @@ function writeData(coll, n) {
   }
 };
 
+// Waits until the vector indexes on a collection are trained.
+//
+// Up to 3.12.9 a vector index must finish training before an APPROX_NEAR_*
+// query can use it; querying an untrained index fails with error 1555. From
+// 3.12.10 / 4.0 on the index has a linear-scan fallback, so untrained queries
+// already return results and there is nothing to wait for.
+function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
+  const semver = require('semver');
+  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
+  if (semver.gte(currentVersionSemver, "3.12.10")) {
+    return;
+  }
+  if (timeoutSec === undefined) {
+    timeoutSec = 120;
+  }
+  const hasTrainingState = semver.gte(currentVersionSemver, "3.12.9");
+  for (let i = 0; i < timeoutSec; i++) {
+    let indexes = collection.getIndexes();
+    let vectorIndexes = indexes.filter(idx => idx.type === "vector");
+    if (vectorIndexes.length === 0) {
+      sleep(1);
+      continue;
+    }
+    if (!hasTrainingState) {
+      return;
+    }
+    if (vectorIndexes.every(idx => idx.trainingState === "ready")) {
+      return;
+    }
+    sleep(1);
+  }
+  throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
+}
+
+exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;
 exports.assertIndexCount = assertIndexCount;

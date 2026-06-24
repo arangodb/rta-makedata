@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
 
 (function () {
   return {
@@ -106,6 +106,11 @@
       if (c_vector_sv.getIndexes().length !== indexExpectCount || c_vector_sv.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} indexes: ${JSON.stringify(c_vector_sv.getIndexes())}`);
       }
+
+      // Before 3.12.10 the index must be trained before APPROX_NEAR_L2 can query
+      // it (no-op from 3.12.10 / 4.0 on, which fall back to linear scan).
+      progress("108: waiting for vector index to be ready");
+      waitForVectorIndexTrained(c_vector_sv, options.curVersion);
 
       // Check data:
       progress("108: checking data");
