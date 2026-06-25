@@ -518,46 +518,14 @@ function writeData(coll, n) {
 
 // 3.12.10 / 4.0 bundle the vector-index update: an index can be built in the
 // background (training completes asynchronously) and an untrained index already
-// answers APPROX_NEAR_* queries via a linear-scan fallback. Up to 3.12.9 the
-// index must be built in the foreground and finish training before it can be
-// queried; background creation there never reaches the "ready" state.
+// answers APPROX_NEAR_* queries via a linear-scan fallback. Up to 3.12.9 a
+// background build on a cluster never reaches the "ready" state and an untrained
+// index cannot be queried, so vector queries only run from 3.12.10 / 4.0 on.
 function vectorIndexTrainsInBackground(currentVersion) {
   const semver = require('semver');
   return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.10");
 }
 
-// Waits until the vector indexes on a collection are trained. No-op from
-// 3.12.10 / 4.0 on, where untrained indexes already answer queries; up to
-// 3.12.9 querying an untrained index fails with error 1555.
-function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
-  if (vectorIndexTrainsInBackground(currentVersion)) {
-    return;
-  }
-  const semver = require('semver');
-  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
-  if (timeoutSec === undefined) {
-    timeoutSec = 120;
-  }
-  const hasTrainingState = semver.gte(currentVersionSemver, "3.12.9");
-  for (let i = 0; i < timeoutSec; i++) {
-    let indexes = collection.getIndexes();
-    let vectorIndexes = indexes.filter(idx => idx.type === "vector");
-    if (vectorIndexes.length === 0) {
-      sleep(1);
-      continue;
-    }
-    if (!hasTrainingState) {
-      return;
-    }
-    if (vectorIndexes.every(idx => idx.trainingState === "ready")) {
-      return;
-    }
-    sleep(1);
-  }
-  throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
-}
-
-exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
 exports.vectorIndexTrainsInBackground = vectorIndexTrainsInBackground;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;

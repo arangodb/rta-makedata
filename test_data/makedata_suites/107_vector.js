@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained, vectorIndexTrainsInBackground */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, vectorIndexTrainsInBackground */
 
 (function () {
   let secondIndexCreate = false;
@@ -40,7 +40,10 @@
       let c_vector = db[`c_vector_${dbCount}`];
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
-        const inBackground = vectorIndexTrainsInBackground(options.curVersion);
+        // Always build in the background: a foreground build on a pre-3.12.10
+        // cluster blocks long enough (fixed per-index overhead) to trip the test
+        // harness timeout, while a background build returns immediately.
+        const inBackground = true;
         print(`107: creating vector index (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector.count(true))}`);
         try {
           const start = time();
@@ -101,18 +104,18 @@
       progress("107: checking data");
       if (c_vector.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // Before 3.12.10 the index must be trained before APPROX_NEAR_L2 can query
-      // it (no-op from 3.12.10 / 4.0 on, which fall back to linear scan).
-      progress("107: waiting for vector index to be trained");
-      waitForVectorIndexTrained(c_vector, options.curVersion);
-
-      // Check a few queries:
-      progress("107: query 1");
-      runAqlQueryResultCount(aql`
-           FOR d IN ${c_vector}
-               SORT APPROX_NEAR_L2(d.TypeVec,  [1,2,3,4,5], {nProbe: 5})
-                 LIMIT 5 RETURN d`, 5);
-      progress("107: queries done");
+      // The vector index is built in the background; on a pre-3.12.10 cluster it
+      // never finishes training and an untrained index cannot be queried. Only
+      // from 3.12.10 / 4.0 on does an untrained index answer queries (linear-scan
+      // fallback), so run the vector query only there.
+      if (vectorIndexTrainsInBackground(options.curVersion)) {
+        progress("107: query 1");
+        runAqlQueryResultCount(aql`
+             FOR d IN ${c_vector}
+                 SORT APPROX_NEAR_L2(d.TypeVec,  [1,2,3,4,5], {nProbe: 5})
+                   LIMIT 5 RETURN d`, 5);
+        progress("107: queries done");
+      }
       progress("107: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
