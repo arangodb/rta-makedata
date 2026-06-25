@@ -52,13 +52,15 @@
       progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
-        progress(`108: creating vector index with stored values with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
+        const inBackground = vectorIndexTrainsInBackground(options.curVersion);
+        print(`108: creating vector index with stored values (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
         try {
+          const start = time();
           c_vector_sv.ensureIndex({
             name: `vector_l2_stored`,
             type: "vector",
             fields: ["vector"],
-            inBackground: vectorIndexTrainsInBackground(options.curVersion),
+            inBackground: inBackground,
             storedValues: ["val", "stringField", "boolField", "floatField"],
             params: {
               metric: "l2",
@@ -68,12 +70,12 @@
               defaultNProbe: 10
             }
           });
+          print(`108: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector_sv.getIndexes().filter(idx => idx.type === "vector"))}`);
         } catch(e) {
           print(`108: error when creating vector index with stored values with error: ${e}`);
           print(`108: Indexes state: ${JSON.stringify(c_vector_sv.indexes())}`);
           throw e;
         }
-        print('108: created vector index with stored values');
       }
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {

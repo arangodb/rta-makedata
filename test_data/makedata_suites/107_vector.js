@@ -37,25 +37,28 @@
       let c_vector = db[`c_vector_${dbCount}`];
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
-        progress(`107: createIndexVector with data distribution ${JSON.stringify(c_vector.count(true))}`);
+        const inBackground = vectorIndexTrainsInBackground(options.curVersion);
+        print(`107: creating vector index (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector.count(true))}`);
         try {
+          const start = time();
           c_vector.ensureIndex({
             name: `i_vector_dbcount`,
             type: "vector",
             fields: ["TypeVec"],
-            inBackground: vectorIndexTrainsInBackground(options.curVersion),
+            inBackground: inBackground,
             params: {
               metric: "l2",
               dimension: 5,
               nLists: 1
             },
           });
+          print(`107: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector.getIndexes().filter(idx => idx.type === "vector"))}`);
           if (secondIndexCreate) {
             print('107: creating hash index');
             createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
           }
         } catch(e) {
-          print('107: error when creating vector index');
+          print(`107: error when creating vector index: ${e}`);
           print(`107: Indexes state: ${JSON.stringify(c_vector.indexes())}`);
           throw e;
         }
