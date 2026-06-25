@@ -2,6 +2,9 @@
 
 (function () {
   let secondIndexCreate = false;
+  // Kept small so the (foreground) index build on pre-3.12.10 clusters finishes
+  // well within the test harness timeout; nLists is 1, so this is ample.
+  const VECTOR_DOC_COUNT = 100;
   return {
     // hash index is deprecated in 4.0, use 117_vector.js for 4.0+
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
@@ -28,7 +31,7 @@
 
       // Write data first
       resetRCount();
-      writeData(c_vector, 4000);
+      writeData(c_vector, VECTOR_DOC_COUNT);
 
       progress('107: writeData1');
     },
@@ -96,7 +99,7 @@
 
       // Check data:
       progress("107: checking data");
-      if (c_vector.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== 4000`); }
+      if (c_vector.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
       // Before 3.12.10 the index must be trained before APPROX_NEAR_L2 can query
       // it (no-op from 3.12.10 / 4.0 on, which fall back to linear scan).

@@ -1,6 +1,9 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained, vectorIndexTrainsInBackground */
 
 (function () {
+  // Kept small so the (foreground) index build on pre-3.12.10 clusters finishes
+  // well within the test harness timeout; nLists is 10, so this is ample.
+  const VECTOR_DOC_COUNT = 100;
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       if (!options.testVector) {
@@ -22,7 +25,7 @@
       } = require("@arangodb/testutils/seededRandom");
       progress(`108: Makedata ${dbCount} ${loopCount}`);
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
-      const docNumber = 4000;
+      const docNumber = VECTOR_DOC_COUNT;
 
       // Fill collection with documents:
       let docs = [];
@@ -116,7 +119,7 @@
 
       // Check data:
       progress("108: checking data");
-      if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
+      if (c_vector_sv.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
       // Check a few queries:
       progress("108: query 1");
@@ -124,7 +127,7 @@
         runAqlQueryResultCount(aql`
           LET rp = (
             FOR d IN ${c_vector_sv}
-            FILTER d.val == 2000
+            FILTER d.val == ${VECTOR_DOC_COUNT / 2}
             RETURN d.vector
           )
           FOR d IN ${c_vector_sv}
