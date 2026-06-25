@@ -516,18 +516,25 @@ function writeData(coll, n) {
   }
 };
 
-// Waits until the vector indexes on a collection are trained.
-//
-// Up to 3.12.9 a vector index must finish training before an APPROX_NEAR_*
-// query can use it; querying an untrained index fails with error 1555. From
-// 3.12.10 / 4.0 on the index has a linear-scan fallback, so untrained queries
-// already return results and there is nothing to wait for.
-function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
+// 3.12.10 / 4.0 bundle the vector-index update: an index can be built in the
+// background (training completes asynchronously) and an untrained index already
+// answers APPROX_NEAR_* queries via a linear-scan fallback. Up to 3.12.9 the
+// index must be built in the foreground and finish training before it can be
+// queried; background creation there never reaches the "ready" state.
+function vectorIndexTrainsInBackground(currentVersion) {
   const semver = require('semver');
-  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
-  if (semver.gte(currentVersionSemver, "3.12.10")) {
+  return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.10");
+}
+
+// Waits until the vector indexes on a collection are trained. No-op from
+// 3.12.10 / 4.0 on, where untrained indexes already answer queries; up to
+// 3.12.9 querying an untrained index fails with error 1555.
+function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
+  if (vectorIndexTrainsInBackground(currentVersion)) {
     return;
   }
+  const semver = require('semver');
+  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
   if (timeoutSec === undefined) {
     timeoutSec = 120;
   }
@@ -551,6 +558,7 @@ function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
 }
 
 exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
+exports.vectorIndexTrainsInBackground = vectorIndexTrainsInBackground;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;
 exports.assertIndexCount = assertIndexCount;

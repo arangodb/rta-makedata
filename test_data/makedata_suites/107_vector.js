@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained, vectorIndexTrainsInBackground */
 
 (function () {
   let secondIndexCreate = false;
@@ -43,7 +43,7 @@
             name: `i_vector_dbcount`,
             type: "vector",
             fields: ["TypeVec"],
-            inBackground: true,
+            inBackground: vectorIndexTrainsInBackground(options.curVersion),
             params: {
               metric: "l2",
               dimension: 5,

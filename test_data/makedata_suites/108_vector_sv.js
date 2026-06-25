@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained, vectorIndexTrainsInBackground */
 
 (function () {
   return {
@@ -58,7 +58,7 @@
             name: `vector_l2_stored`,
             type: "vector",
             fields: ["vector"],
-            inBackground: true,
+            inBackground: vectorIndexTrainsInBackground(options.curVersion),
             storedValues: ["val", "stringField", "boolField", "floatField"],
             params: {
               metric: "l2",
