@@ -516,17 +516,39 @@ function writeData(coll, n) {
   }
 };
 
-// 3.12.10 / 4.0 bundle the vector-index update: an index can be built in the
-// background (training completes asynchronously) and an untrained index already
-// answers APPROX_NEAR_* queries via a linear-scan fallback. Up to 3.12.9 a
-// background build on a cluster never reaches the "ready" state and an untrained
-// index cannot be queried, so vector queries only run from 3.12.10 / 4.0 on.
-function vectorIndexTrainsInBackground(currentVersion) {
+// A vector index exposes its trainingState (and an untrained index can therefore
+// be waited on) from 3.12.9 on. Below that the state is not observable and the
+// index is not reliably queryable, so callers skip the vector query there.
+function vectorIndexIsQueryable(currentVersion) {
   const semver = require('semver');
-  return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.10");
+  return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.9");
 }
 
-exports.vectorIndexTrainsInBackground = vectorIndexTrainsInBackground;
+// Waits until every vector index on the collection reports trainingState
+// "ready". Training runs asynchronously in a cluster and its completion is
+// published to the agency only on the next maintenance report, so the index is
+// briefly not-ready after creation. We poll and print on every iteration: the
+// print keeps the test harness's no-output watchdog (progressive timeout) alive
+// during the otherwise-silent wait. Use a plain print rather than progress() so
+// the keep-alive works regardless of the --progress option.
+function waitForVectorIndexTrained(collection, timeoutSec) {
+  if (timeoutSec === undefined) {
+    timeoutSec = 300;
+  }
+  for (let i = 0; i < timeoutSec; i++) {
+    let vectorIndexes = collection.getIndexes().filter(idx => idx.type === "vector");
+    if (vectorIndexes.length > 0 &&
+        vectorIndexes.every(idx => idx.trainingState === "ready")) {
+      return;
+    }
+    print(`# ${Date()} - waiting for vector index on ${collection.name()} to be trained: ${i}s`);
+    sleep(1);
+  }
+  throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
+}
+
+exports.vectorIndexIsQueryable = vectorIndexIsQueryable;
+exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;
 exports.assertIndexCount = assertIndexCount;

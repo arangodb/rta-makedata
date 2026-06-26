@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, vectorIndexTrainsInBackground */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, vectorIndexIsQueryable, waitForVectorIndexTrained */
 
 (function () {
   let secondIndexCreate = false;
@@ -104,11 +104,12 @@
       progress("107: checking data");
       if (c_vector.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // The vector index is built in the background; on a pre-3.12.10 cluster it
-      // never finishes training and an untrained index cannot be queried. Only
-      // from 3.12.10 / 4.0 on does an untrained index answer queries (linear-scan
-      // fallback), so run the vector query only there.
-      if (vectorIndexTrainsInBackground(options.curVersion)) {
+      // The index is built in the background, so wait until training finishes
+      // before querying it (trainingState is observable from 3.12.9 on; the wait
+      // prints periodically to survive the harness no-output watchdog).
+      if (vectorIndexIsQueryable(options.curVersion)) {
+        progress("107: waiting for vector index to be trained");
+        waitForVectorIndexTrained(c_vector);
         progress("107: query 1");
         runAqlQueryResultCount(aql`
              FOR d IN ${c_vector}

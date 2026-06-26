@@ -58,7 +58,8 @@ let {
   assertCollectionCount,
   assertIndexType,
   assertIndexCount,
-  vectorIndexTrainsInBackground,
+  vectorIndexIsQueryable,
+  waitForVectorIndexTrained,
 } = require(fs.join(PWD, 'common'));
 
 const {
