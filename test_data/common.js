@@ -533,7 +533,11 @@ function vectorIndexIsQueryable(currentVersion) {
 // the keep-alive works regardless of the --progress option.
 function waitForVectorIndexTrained(collection, timeoutSec) {
   if (timeoutSec === undefined) {
-    timeoutSec = 300;
+    // Generous cap: the build itself is fast, but on slow/instrumented builds
+    // the deferred training and its agency propagation can take a while. Stays
+    // under the checkdata deadline so a genuine hang still fails with this
+    // message rather than the harness's opaque deadline kill.
+    timeoutSec = 600;
   }
   for (let i = 0; i < timeoutSec; i++) {
     let vectorIndexes = collection.getIndexes().filter(idx => idx.type === "vector");

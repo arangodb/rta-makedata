@@ -106,6 +106,17 @@
 
       let c_vector_sv = db._collection(`c_vector_sv_${dbCount}`);
 
+      // The vector index is built in the background and only appears in
+      // getIndexes() once its (deferred) build completes, which can race the
+      // index check below. Wait for it to finish first. trainingState is
+      // observable from 3.12.9 on; the wait prints periodically so the harness
+      // no-output watchdog does not kill it.
+      const indexIsQueryable = vectorIndexIsQueryable(options.curVersion);
+      if (indexIsQueryable) {
+        progress("108: waiting for vector index to be trained");
+        waitForVectorIndexTrained(c_vector_sv);
+      }
+
       // Check indexes:
       progress("108: checking indices");
 
@@ -119,12 +130,8 @@
       progress("108: checking data");
       if (c_vector_sv.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // The index is built in the background, so wait until training finishes
-      // before querying it (trainingState is observable from 3.12.9 on; the wait
-      // prints periodically to survive the harness no-output watchdog).
-      if (vectorIndexIsQueryable(options.curVersion) && options.dataMultiplier === 1) {
-        progress("108: waiting for vector index to be trained");
-        waitForVectorIndexTrained(c_vector_sv);
+      // Check a few queries:
+      if (indexIsQueryable && options.dataMultiplier === 1) {
         progress("108: query 1");
         runAqlQueryResultCount(aql`
           LET rp = (
