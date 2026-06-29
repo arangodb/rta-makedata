@@ -516,9 +516,12 @@ function writeData(coll, n) {
   }
 };
 
-// A vector index exposes its trainingState (and an untrained index can therefore
-// be waited on) from 3.12.9 on. Below that the state is not observable and the
-// index is not reliably queryable, so callers skip the vector query there.
+// We build the vector index in the background, so before querying it we must
+// wait until training has finished. A vector index only exposes its
+// trainingState from 3.12.9 on (3.12.4-3.12.8 have no such field), so only there
+// can we observe readiness and wait for it; below that we cannot tell when the
+// index is ready, so callers skip the vector query. (3.12.9 is also the oldest
+// version the upgrade matrix actually exercises, so this is mostly a fallback.)
 function vectorIndexIsQueryable(currentVersion) {
   const semver = require('semver');
   return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.9");

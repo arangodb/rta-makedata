@@ -2,8 +2,8 @@
 
 (function () {
   let secondIndexCreate = false;
-  // Kept small so the (foreground) index build on pre-3.12.10 clusters finishes
-  // well within the test harness timeout; nLists is 1, so this is ample.
+  // Small data set keeps the suite fast; the build is quick regardless. nLists
+  // is 1, so 100 docs is far above the per-index training-data minimum (nLists).
   const VECTOR_DOC_COUNT = 100;
   return {
     // hash index is deprecated in 4.0, use 117_vector.js for 4.0+

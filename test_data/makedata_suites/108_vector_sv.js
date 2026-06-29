@@ -1,8 +1,8 @@
 /* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, vectorIndexIsQueryable, waitForVectorIndexTrained */
 
 (function () {
-  // Kept small so the (foreground) index build on pre-3.12.10 clusters finishes
-  // well within the test harness timeout; nLists is 10, so this is ample.
+  // Small data set keeps the suite fast; the build is quick regardless. nLists
+  // is 10, so 100 docs is far above the per-index training-data minimum (nLists).
   const VECTOR_DOC_COUNT = 100;
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
