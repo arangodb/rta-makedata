@@ -1,4 +1,4 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, vectorIndexIsQueryable, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
 
 (function () {
   // Small data set keeps the suite fast; the build is quick regardless. nLists
@@ -11,8 +11,11 @@
       }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return (semver.gte(oldVersionSemver, "3.12.7") &&
-          semver.gte(currentVersionSemver, "3.12.7"));
+      // Require 3.12.9+: the first version exposing the vector index's
+      // trainingState, so we can wait for the index and then reliably verify
+      // data + index + query. No upper bound — runs on 4.0+ as well.
+      return (semver.gte(oldVersionSemver, "3.12.9") &&
+          semver.gte(currentVersionSemver, "3.12.9"));
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('108: createCollection');
@@ -107,17 +110,13 @@
       let c_vector_sv = db._collection(`c_vector_sv_${dbCount}`);
 
       // The vector index is built in the background and only appears in
-      // getIndexes() once its (deferred) build completes, which can race the
-      // index check below. Wait for it to finish first. trainingState is
-      // observable from 3.12.9 on; the wait prints periodically so the harness
-      // no-output watchdog does not kill it.
-      const indexIsQueryable = vectorIndexIsQueryable(options.curVersion);
-      if (indexIsQueryable) {
-        progress("108: waiting for vector index to be trained");
-        waitForVectorIndexTrained(c_vector_sv);
-      }
+      // getIndexes() once its (deferred) build completes. Wait for it to finish
+      // before checking/querying (printing periodically so the harness no-output
+      // watchdog does not kill the otherwise-silent wait).
+      progress("108: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector_sv);
 
-      // Check indexes:
+      // 1) the index is present (primary + vector = 2):
       progress("108: checking indices");
 
       let indexExpectCount = 2;
@@ -126,14 +125,13 @@
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} indexes: ${JSON.stringify(c_vector_sv.getIndexes())}`);
       }
 
-      // Check data:
+      // 2) the data is present:
       progress("108: checking data");
       if (c_vector_sv.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // Check a few queries:
-      if (indexIsQueryable && options.dataMultiplier === 1) {
-        progress("108: query 1");
-        runAqlQueryResultCount(aql`
+      // 3) the index can be queried (stored-value filter + nearest-neighbor):
+      progress("108: query 1");
+      runAqlQueryResultCount(aql`
           LET rp = (
             FOR d IN ${c_vector_sv}
             FILTER d.val == ${VECTOR_DOC_COUNT / 2}
@@ -144,7 +142,6 @@
             LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector, {nProbe: 10})
             SORT dist LIMIT 5
             RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 5);
-      }
       progress("108: queries done");
       progress("108: done");
     },

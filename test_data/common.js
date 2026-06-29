@@ -516,17 +516,6 @@ function writeData(coll, n) {
   }
 };
 
-// We build the vector index in the background, so before querying it we must
-// wait until training has finished. A vector index only exposes its
-// trainingState from 3.12.9 on (3.12.4-3.12.8 have no such field), so only there
-// can we observe readiness and wait for it; below that we cannot tell when the
-// index is ready, so callers skip the vector query. (3.12.9 is also the oldest
-// version the upgrade matrix actually exercises, so this is mostly a fallback.)
-function vectorIndexIsQueryable(currentVersion) {
-  const semver = require('semver');
-  return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.9");
-}
-
 // Waits until every vector index on the collection reports trainingState
 // "ready". Training runs asynchronously in a cluster and its completion is
 // published to the agency only on the next maintenance report, so the index is
@@ -554,7 +543,6 @@ function waitForVectorIndexTrained(collection, timeoutSec) {
   throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
 }
 
-exports.vectorIndexIsQueryable = vectorIndexIsQueryable;
 exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;

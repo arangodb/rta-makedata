@@ -1,23 +1,24 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, vectorIndexIsQueryable, waitForVectorIndexTrained */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, writeData, waitForVectorIndexTrained */
 
 (function () {
-  let secondIndexCreate = false;
   // Small data set keeps the suite fast; the build is quick regardless. nLists
   // is 1, so 100 docs is far above the per-index training-data minimum (nLists).
   const VECTOR_DOC_COUNT = 100;
   return {
-    // hash index is deprecated in 4.0, use 117_vector.js for 4.0+
+    // Single vector-index suite for 3.12.9+ and 4.0+. Uses a persistent
+    // secondary index (works on both 3.12 and 4.0 and survives upgrades), so no
+    // separate 4.0 variant is needed.
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       if (!options.testVector) {
 	return false;
       }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      secondIndexCreate = (semver.gt(oldVersionSemver, "3.12.5") &&
-              semver.gt(currentVersionSemver, "3.12.5"));
-      return (semver.gt(oldVersionSemver, "3.12.4") &&
-              semver.gt(currentVersionSemver, "3.12.4") &&
-              semver.lt(currentVersionSemver, "4.0.0"));
+      // Require 3.12.9+: the first version exposing the vector index's
+      // trainingState, so we can wait for the index and then reliably verify
+      // data + index + query. No upper bound — runs on 4.0+ as well.
+      return (semver.gte(oldVersionSemver, "3.12.9") &&
+              semver.gte(currentVersionSemver, "3.12.9"));
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('107: createCollection');
@@ -59,10 +60,8 @@
             },
           });
           print(`107: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector.getIndexes().filter(idx => idx.type === "vector"))}`);
-          if (secondIndexCreate) {
-            print('107: creating hash index');
-            createIndexSafe({col: c_vector, type: "hash", fields: ["a"], unique: false});
-          }
+          print('107: creating persistent index');
+          createIndexSafe({col: c_vector, type: "persistent", fields: ["a"], unique: false});
         } catch(e) {
           print(`107: error when creating vector index: ${e}`);
           print(`107: Indexes state: ${JSON.stringify(c_vector.indexes())}`);
@@ -93,37 +92,29 @@
       let c_vector = db._collection(`c_vector_${dbCount}`);
 
       // The vector index is built in the background and only appears in
-      // getIndexes() once its (deferred) build completes, which can race the
-      // index check below. Wait for it to finish first. trainingState is
-      // observable from 3.12.9 on; the wait prints periodically so the harness
-      // no-output watchdog does not kill it.
-      const indexIsQueryable = vectorIndexIsQueryable(options.curVersion);
-      if (indexIsQueryable) {
-        progress("107: waiting for vector index to be trained");
-        waitForVectorIndexTrained(c_vector);
-      }
+      // getIndexes() once its (deferred) build completes. Wait for it to finish
+      // before checking/querying (printing periodically so the harness no-output
+      // watchdog does not kill the otherwise-silent wait).
+      progress("107: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector);
 
-      // Check indexes:
+      // 1) the index is present (primary + vector + persistent = 3):
       progress("107: checking indices");
-
-      const indexExpectCount = (secondIndexCreate) ? 3 : 2;
-      if (c_vector.getIndexes().length !== indexExpectCount || c_vector.getIndexes()[1].type !== "vector") {
+      if (c_vector.getIndexes().length !== 3 || c_vector.getIndexes()[1].type !== "vector") {
         throw new Error(`Banana ${c_vector.getIndexes().length} indexes: ${JSON.stringify(c_vector.getIndexes())}`);
       }
 
-      // Check data:
+      // 2) the data is present:
       progress("107: checking data");
       if (c_vector.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // Check a few queries:
-      if (indexIsQueryable) {
-        progress("107: query 1");
-        runAqlQueryResultCount(aql`
-             FOR d IN ${c_vector}
-                 SORT APPROX_NEAR_L2(d.TypeVec,  [1,2,3,4,5], {nProbe: 5})
-                   LIMIT 5 RETURN d`, 5);
-        progress("107: queries done");
-      }
+      // 3) the index can be queried:
+      progress("107: query 1");
+      runAqlQueryResultCount(aql`
+           FOR d IN ${c_vector}
+               SORT APPROX_NEAR_L2(d.TypeVec,  [1,2,3,4,5], {nProbe: 5})
+                 LIMIT 5 RETURN d`, 5);
+      progress("107: queries done");
       progress("107: done");
     },
     clearData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
