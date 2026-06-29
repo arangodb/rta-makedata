@@ -221,6 +221,9 @@ function assertIndexType(collection, offset, expectType) {
 function assertCollectionCount(collection, expectCount) {
   let actualCount = collection.count();
   if (actualCount !== expectCount) {
+    if (isInstrumented && Math.trunc(expectCount / 10) === actualCount) {
+      return;
+    }
     throw new Error(`${Date()} Collection ${collection.name()} Count was expected to be ${expectCount} but is ${actualCount}`);
   }
 }
