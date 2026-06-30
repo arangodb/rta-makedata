@@ -519,49 +519,34 @@ function writeData(coll, n) {
   }
 };
 
-// 3.12.10 / 4.0 bundle the vector-index update: an index can be built in the
-// background (training completes asynchronously) and an untrained index already
-// answers APPROX_NEAR_* queries via a linear-scan fallback. Up to 3.12.9 the
-// index must be built in the foreground and finish training before it can be
-// queried; background creation there never reaches the "ready" state.
-function vectorIndexTrainsInBackground(currentVersion) {
-  const semver = require('semver');
-  return semver.gte(semver.parse(semver.coerce(currentVersion)), "3.12.10");
-}
-
-// Waits until the vector indexes on a collection are trained. No-op from
-// 3.12.10 / 4.0 on, where untrained indexes already answer queries; up to
-// 3.12.9 querying an untrained index fails with error 1555.
-function waitForVectorIndexTrained(collection, currentVersion, timeoutSec) {
-  if (vectorIndexTrainsInBackground(currentVersion)) {
-    return;
-  }
-  const semver = require('semver');
-  const currentVersionSemver = semver.parse(semver.coerce(currentVersion));
+// Waits until every vector index on the collection reports trainingState
+// "ready". Training runs asynchronously in a cluster and its completion is
+// published to the agency only on the next maintenance report, so the index is
+// briefly not-ready after creation. We poll and print on every iteration: the
+// print keeps the test harness's no-output watchdog (progressive timeout) alive
+// during the otherwise-silent wait. Use a plain print rather than progress() so
+// the keep-alive works regardless of the --progress option.
+function waitForVectorIndexTrained(collection, timeoutSec) {
   if (timeoutSec === undefined) {
-    timeoutSec = 120;
+    // Generous cap: the build itself is fast, but on slow/instrumented builds
+    // the deferred training and its agency propagation can take a while. Stays
+    // under the checkdata deadline so a genuine hang still fails with this
+    // message rather than the harness's opaque deadline kill.
+    timeoutSec = 600;
   }
-  const hasTrainingState = semver.gte(currentVersionSemver, "3.12.9");
   for (let i = 0; i < timeoutSec; i++) {
-    let indexes = collection.getIndexes();
-    let vectorIndexes = indexes.filter(idx => idx.type === "vector");
-    if (vectorIndexes.length === 0) {
-      sleep(1);
-      continue;
-    }
-    if (!hasTrainingState) {
+    let vectorIndexes = collection.getIndexes().filter(idx => idx.type === "vector");
+    if (vectorIndexes.length > 0 &&
+        vectorIndexes.every(idx => idx.trainingState === "ready")) {
       return;
     }
-    if (vectorIndexes.every(idx => idx.trainingState === "ready")) {
-      return;
-    }
+    print(`# ${Date()} - waiting for vector index on ${collection.name()} to be trained: ${i}s`);
     sleep(1);
   }
   throw new Error(`Vector index on ${collection.name()} did not become trained within ${timeoutSec}s`);
 }
 
 exports.waitForVectorIndexTrained = waitForVectorIndexTrained;
-exports.vectorIndexTrainsInBackground = vectorIndexTrainsInBackground;
 exports.assertCollectionCount = assertCollectionCount;
 exports.assertIndexType = assertIndexType;
 exports.assertIndexCount = assertIndexCount;

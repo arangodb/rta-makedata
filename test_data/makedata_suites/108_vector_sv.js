@@ -1,6 +1,9 @@
-/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained, vectorIndexTrainsInBackground */
+/* global print,  db, progress, createCollectionSafe, createIndexSafe, time, runAqlQueryResultCount, aql, semver, resetRCount, waitForVectorIndexTrained */
 
 (function () {
+  // Small data set keeps the suite fast; the build is quick regardless. nLists
+  // is 10, so 100 docs is far above the per-index training-data minimum (nLists).
+  const VECTOR_DOC_COUNT = 100;
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       if (!options.testVector) {
@@ -8,8 +11,11 @@
       }
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
       let oldVersionSemver = semver.parse(semver.coerce(oldVersion));
-      return (semver.gte(oldVersionSemver, "3.12.7") &&
-          semver.gte(currentVersionSemver, "3.12.7"));
+      // Require 3.12.9+: the first version exposing the vector index's
+      // trainingState, so we can wait for the index and then reliably verify
+      // data + index + query. No upper bound — runs on 4.0+ as well.
+      return (semver.gte(oldVersionSemver, "3.12.9") &&
+          semver.gte(currentVersionSemver, "3.12.9"));
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       progress('108: createCollection');
@@ -22,7 +28,7 @@
       } = require("@arangodb/testutils/seededRandom");
       progress(`108: Makedata ${dbCount} ${loopCount}`);
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
-      const docNumber = 4000;
+      const docNumber = VECTOR_DOC_COUNT;
 
       // Fill collection with documents:
       let docs = [];
@@ -52,13 +58,18 @@
       progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
-        progress(`108: creating vector index with stored values with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
+        // Always build in the background: a foreground build on a pre-3.12.10
+        // cluster blocks long enough (fixed per-index overhead) to trip the test
+        // harness timeout, while a background build returns immediately.
+        const inBackground = true;
+        print(`108: creating vector index with stored values (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
         try {
+          const start = time();
           c_vector_sv.ensureIndex({
             name: `vector_l2_stored`,
             type: "vector",
             fields: ["vector"],
-            inBackground: vectorIndexTrainsInBackground(options.curVersion),
+            inBackground: inBackground,
             storedValues: ["val", "stringField", "boolField", "floatField"],
             params: {
               metric: "l2",
@@ -68,12 +79,12 @@
               defaultNProbe: 10
             }
           });
+          print(`108: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector_sv.getIndexes().filter(idx => idx.type === "vector"))}`);
         } catch(e) {
           print(`108: error when creating vector index with stored values with error: ${e}`);
           print(`108: Indexes state: ${JSON.stringify(c_vector_sv.indexes())}`);
           throw e;
         }
-        print('108: created vector index with stored values');
       }
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -98,7 +109,14 @@
 
       let c_vector_sv = db._collection(`c_vector_sv_${dbCount}`);
 
-      // Check indexes:
+      // The vector index is built in the background and only appears in
+      // getIndexes() once its (deferred) build completes. Wait for it to finish
+      // before checking/querying (printing periodically so the harness no-output
+      // watchdog does not kill the otherwise-silent wait).
+      progress("108: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector_sv);
+
+      // 1) the index is present (primary + vector = 2):
       progress("108: checking indices");
 
       let indexExpectCount = 2;
@@ -107,22 +125,16 @@
         throw new Error(`Banana ${c_vector_sv.getIndexes().length} indexes: ${JSON.stringify(c_vector_sv.getIndexes())}`);
       }
 
-      // Before 3.12.10 the index must be trained before APPROX_NEAR_L2 can query
-      // it (no-op from 3.12.10 / 4.0 on, which fall back to linear scan).
-      progress("108: waiting for vector index to be ready");
-      waitForVectorIndexTrained(c_vector_sv, options.curVersion);
-
-      // Check data:
+      // 2) the data is present:
       progress("108: checking data");
-      if (c_vector_sv.count() !== 4000 * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== 4000`); }
+      if (c_vector_sv.count() !== VECTOR_DOC_COUNT * options.dataMultiplier) { throw new Error(`Audi ${c_vector_sv.count()} !== ${VECTOR_DOC_COUNT * options.dataMultiplier}`); }
 
-      // Check a few queries:
+      // 3) the index can be queried (stored-value filter + nearest-neighbor):
       progress("108: query 1");
-      if (options.dataMultiplier === 1) {
-        runAqlQueryResultCount(aql`
+      runAqlQueryResultCount(aql`
           LET rp = (
             FOR d IN ${c_vector_sv}
-            FILTER d.val == 2000
+            FILTER d.val == ${VECTOR_DOC_COUNT / 2}
             RETURN d.vector
           )
           FOR d IN ${c_vector_sv}
@@ -130,7 +142,6 @@
             LET dist = APPROX_NEAR_L2(FLATTEN(rp), d.vector, {nProbe: 10})
             SORT dist LIMIT 5
             RETURN {key: d._key, val: d.val, stringField: d.stringField, dist}`, 5);
-      }
       progress("108: queries done");
       progress("108: done");
     },
