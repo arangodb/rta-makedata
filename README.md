@@ -17,6 +17,7 @@ It consists of these files in test_data:
    - `560_smartgraph_edge_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `561_smartgraph_vertex_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `570_enterprise_graph.js` creates an enterprise patent graph
+   - `580_empty_graphs.js` creates empty smart / enterprise / satellite / disjoint graphs (no edge definitions, no orphan collections) as well as smart / enterprise / satellite / disjoint graphs that own their collections but store no documents, and verifies their sharding properties and emptiness.
    - `900_oneshard.js` creates oneshard database and does stuff with it.
    - `607_analyzers.js` creates suported analyzers for 3.7.x version and check it's functionality.
       Added Analyzers: (documentation link: https://www.arangodb.com/docs/3.7/analyzers.html)
