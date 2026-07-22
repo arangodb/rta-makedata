@@ -10,6 +10,8 @@ It consists of these files in test_data:
    - `020_foxx.js` Installs foxx, checks it. 
    - `050_database.js` creates databases for the test data.
    - `100_collections.js` creates a set of collections / indices
+   - `120_key_generators-noncluster.js` (single server) creates a collection using the `autoincrement` key generator and verifies that its key options and the generated keys.
+   - `121_key_generators-cluster.js` creates collections using the `padded` and `uuid` key generators (both work on single server and cluster) and verifies that their key options and the generated keys.
    - `400_views.js` creates some views
    - `402_views.js` create views and links with 'cache' properties. It checks proper normalization, memory usage and presence of cached columns after updates. This feature was introduced in 3.9.5
    - `500_community_graph.js` creates a community patent graph
