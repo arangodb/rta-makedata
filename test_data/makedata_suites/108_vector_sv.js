@@ -58,10 +58,12 @@
       progress('108: createIndex');
       let c_vector_sv = db[`c_vector_sv_${dbCount}`];
       if (c_vector_sv.indexes().length === 1) {
-        // Always build in the background: a foreground build on a pre-3.12.10
-        // cluster blocks long enough (fixed per-index overhead) to trip the test
-        // harness timeout, while a background build returns immediately.
-        const inBackground = true;
+        // Build in the foreground (inBackground:false) so ensureIndex only
+        // returns once the vector index is fully trained. With inBackground:true
+        // ensureIndex returns immediately and the following dump can race the
+        // asynchronous build, snapshotting the index mid-construction and
+        // dropping it from the dump entirely.
+        const inBackground = false;
         print(`108: creating vector index with stored values (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector_sv.count(true))}`);
         try {
           const start = time();
@@ -80,6 +82,9 @@
             }
           });
           print(`108: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector_sv.getIndexes().filter(idx => idx.type === "vector"))}`);
+          // Always wait until the vector index is fully trained before moving
+          // on to the dump phase, so the dump never snapshots it mid-build.
+          waitForVectorIndexTrained(c_vector_sv);
         } catch(e) {
           print(`108: error when creating vector index with stored values with error: ${e}`);
           print(`108: Indexes state: ${JSON.stringify(c_vector_sv.indexes())}`);

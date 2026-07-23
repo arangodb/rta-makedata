@@ -41,10 +41,12 @@
       let c_vector = db[`c_vector_${dbCount}`];
       // Create indexes after data is written (vector indexes need documents for training)
       if (c_vector.indexes().length === 1) {
-        // Always build in the background: a foreground build on a pre-3.12.10
-        // cluster blocks long enough (fixed per-index overhead) to trip the test
-        // harness timeout, while a background build returns immediately.
-        const inBackground = true;
+        // Build in the foreground (inBackground:false) so ensureIndex only
+        // returns once the vector index is fully trained. With inBackground:true
+        // ensureIndex returns immediately and the following dump can race the
+        // asynchronous build, snapshotting the index mid-construction and
+        // dropping it from the dump entirely.
+        const inBackground = false;
         print(`107: creating vector index (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector.count(true))}`);
         try {
           const start = time();
@@ -62,6 +64,9 @@
           print(`107: vector index created in ${time() - start}s, state: ${JSON.stringify(c_vector.getIndexes().filter(idx => idx.type === "vector"))}`);
           print('107: creating persistent index');
           createIndexSafe({col: c_vector, type: "persistent", fields: ["a"], unique: false});
+          // Always wait until the vector index is fully trained before moving
+          // on to the dump phase, so the dump never snapshots it mid-build.
+          waitForVectorIndexTrained(c_vector);
         } catch(e) {
           print(`107: error when creating vector index: ${e}`);
           print(`107: Indexes state: ${JSON.stringify(c_vector.indexes())}`);

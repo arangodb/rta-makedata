@@ -64,6 +64,7 @@ let {
   resetRCount,
   getIndexTypes,
   getValue,
+  waitForVectorIndexTrained,
 } = require(fs.join(PWD, 'common'));
 
 const {
