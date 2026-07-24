@@ -19,6 +19,15 @@
       // All items created must contain dbCount
       print(`${Date()} 000: finalizing making data ${dbCount}`);
     },
+    waitDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
+      return 0;
+    },
+    waitData: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      print(`${Date()} 000: checking data ${dbCount} ${loopCount}`);
+    },
+    waitDataFinalize: function (options, isCluster, isEnterprise, dbCount, loopCount, readOnly) {
+      print(`${Date()} 000: checking data ${dbCount} ${loopCount}`);
+    },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       // check per DB
       return 0;

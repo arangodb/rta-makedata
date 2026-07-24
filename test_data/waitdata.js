@@ -40,7 +40,7 @@ let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 let databaseName;
 
-const wantFunctions = ['waitDataDB', 'waitData'];
+const wantFunctions = ['waitDataDB', 'waitData', 'waitDataFinalize'];
 
 let {
   options,
@@ -159,7 +159,7 @@ function getReplicationFactor (defaultReplicationFactor) {
   return defaultReplicationFactor;
 }
 
-const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'checkData', false);
+const fns = scanMakeDataPaths(opts, PWD, dbVersion, opts.oldVersion, wantFunctions, 'waitkData', false);
 mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
   if (opts.printTimeMeasurement) {
     opts.error(timeLine.join());
