@@ -7,7 +7,7 @@
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
       return (options.disabledDbserverUUID !== "");
     },
-    checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
+    waitDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`${Date()} 010: checking data ${dbCount}`);
       let count = 0;
       db._useDatabase('_system');

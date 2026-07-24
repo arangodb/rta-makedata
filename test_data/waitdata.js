@@ -1,7 +1,7 @@
 /* global print, ARGUMENTS, arango */
 //
 // Use like this:
-//   arangosh USUAL_OPTIONS_INCLUDING_AUTHENTICATION --javascript.execute checkdata.js [DATABASENAME]
+//   arangosh USUAL_OPTIONS_INCLUDING_AUTHENTICATION --javascript.execute waitdata.js [DATABASENAME]
 // where DATABASENAME is optional and defaults to "_system". The database
 // in question is created (if it is not "_system").
 // `--minReplicationFactor [1]  don't create collections with smaller replication factor than this.
@@ -14,6 +14,7 @@
 // `--collectionCountOffset [0] number offset at which to start the database count
 // `--singleShard [false]       whether this should only be a single shard instance
 // `--progress [false]          whether to output a keepalive indicator to signal the invoker that work is ongoing
+// `--disabledDbserverUUID      this server is offline, wait for shards on it to be moved
 // `--readonly                  the SUT is readonly. fail if writing is successfull.
 // `--test                      comma separated list of testcases to filter for
 // `--skip                              comma separated list of testcases to filter out
@@ -32,14 +33,14 @@ let v = db._version(true);
 let enterprise = v.license === "enterprise";
 const dbVersion = db._version();
 
-let PWDRE = /.*at (.*)checkdata.js.*/;
+let PWDRE = /.*at (.*)waitdata.js.*/;
 let stack = new Error().stack;
 let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 let databaseName;
 
-const wantFunctions = ['checkDataDB', 'checkData', 'checkDataFinalize'];
+const wantFunctions = ['waitDataDB', 'waitData'];
 
 let {
   options,
@@ -57,6 +58,7 @@ let {
   assertCollectionCount,
   assertIndexType,
   assertIndexCount,
+  waitForVectorIndexTrained,
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -73,6 +75,7 @@ const {
 
 const optionsDefaults = {
   curVersion: dbVersion,
+  disabledDbserverUUID: "",
   minReplicationFactor: 1,
   maxReplicationFactor: 2,
   readOnly: false,

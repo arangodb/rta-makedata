@@ -87,6 +87,16 @@
         }
       }
     },
+    waitDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      let c_vector_sv = db._collection(`c_vector_sv_${dbCount}`);
+      // The vector index is built in the background and only appears in
+      // getIndexes() once its (deferred) build completes. Wait for it to finish
+      // before checking/querying (printing periodically so the harness no-output
+      // watchdog does not kill the otherwise-silent wait).
+      progress("108: waiting for vector index to be trained");
+      waitForVectorIndexTrained(c_vector_sv);
+    },
+
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       print(`${Date()} 108: checking data ${dbCount}`);
       let cols = db._collections();
@@ -108,13 +118,6 @@
       }
 
       let c_vector_sv = db._collection(`c_vector_sv_${dbCount}`);
-
-      // The vector index is built in the background and only appears in
-      // getIndexes() once its (deferred) build completes. Wait for it to finish
-      // before checking/querying (printing periodically so the harness no-output
-      // watchdog does not kill the otherwise-silent wait).
-      progress("108: waiting for vector index to be trained");
-      waitForVectorIndexTrained(c_vector_sv);
 
       // 1) the index is present (primary + vector = 2):
       progress("108: checking indices");

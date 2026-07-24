@@ -10,7 +10,7 @@
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
      return (options.disabledDbserverUUID !== "" && cluster);
     },
-    checkDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
+    waitDataDB: function (options, isCluster, isEnterprise, dbCount, readOnly) {
       print(`${Date()} 015: checking data ${dbCount}`);
       let count = 0;
       let collections = [];
