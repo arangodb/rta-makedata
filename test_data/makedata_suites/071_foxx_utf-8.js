@@ -9,42 +9,6 @@
     'accept': 'application/json',
     'accept-content-type': 'application/json'
   };
-  let testFoxxRoutingReady = function() {
-    for (let i = 0; i < 200; i++) {
-      try {
-        let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
-        if (reply.code === 404) {
-          print(`${Date()} 071: selfHeal was already executed - Foxx is ready!`);
-          return 0;
-        }
-        print(`${Date()} 071: Not yet ready, retrying: ${reply.parsedBody}`);
-      } catch (e) {
-        print(`${Date()} 071: Caught - need to retry. ${JSON.stringify(e)}`);
-      }
-      internal.sleep(3);
-    }
-    throw new Error(`${Date()} 071: foxx routeing not ready on time!`);
-  };
-  let testFoxxReady = function(route) {
-    for (let i = 0; i < 200; i++) {
-      try {
-        let reply = arango.GET_RAW(route, onlyJson);
-        if (reply.code === 200) {
-          print(`${Date()} 071: ${route} OK`);
-          return 0;
-        }
-        let msg = JSON.stringify(reply);
-        if (reply.hasOwnProperty('parsedBody')) {
-          msg = " '" + reply.parsedBody.errorNum + "' - " + reply.parsedBody.errorMessage;
-        }
-        print(`${Date()} 071: ${route} Not yet ready, retrying: ${msg}`);
-      } catch (e) {
-        print(`${Date()} 071: ${route} Caught - need to retry. ${JSON.stringify(e)}`);
-      }
-      internal.sleep(3);
-    }
-    throw new Error("071: foxx route '" + route + "' not ready on time!");
-  };    
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
       let currentVersionSemver = semver.parse(semver.coerce(currentVersion));
@@ -63,10 +27,10 @@
       testFoxxReady(aardvarkRoute);
       print(`${Date()} 071: making per database data ${dbCount}`);
       print(`${Date()} 071: installing Itzpapalotl`);
-      // installFoxx('/itz', itzpapalotlZip, "install", options);
+      // installFoxx('071', '/itz', itzpapalotlZip, "install", options);
       const itzpapalotlZip = loadFoxxIntoZip(itzpapalotlPath);
 
-      installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
+      installFoxx('071', database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
       print(`${Date()} 071: installing crud`);
       const minimalWorkingZip = loadFoxxIntoZip(minimalWorkingServicePath);
@@ -75,7 +39,7 @@
         devmode: true,
         type: minimalWorkingZip.type
       };
-      installFoxx(database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
+      installFoxx('071', database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
       db._useDatabase('_system');
       return 0;
     },
@@ -138,6 +102,15 @@
         assertEqual(reply.code, "204", JSON.stringify(reply));
       }
       return 0;
+    },
+    waitDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      database = `${extendedNames[0]}FoxxTest${extendedNames[3]}_${dbCount}`;
+      testFoxxRoutingReady();
+      [
+        aardvarkRoute,
+        `/_db/${database}/itz_${dbCount}/index`,
+        `/_db/${database}/crud_${dbCount}/xxx`
+      ].forEach(route => testFoxxReady(route, '071'));
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       print(`${Date()} 071: clearing foxx services ${dbCount}`);

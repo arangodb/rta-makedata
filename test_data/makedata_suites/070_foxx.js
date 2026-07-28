@@ -5,6 +5,11 @@
 const download = internal.download;
 const path = require('path');
 
+const onlyJson = {
+  'accept': 'application/json',
+  'accept-content-type': 'application/json'
+};
+
 function loadFoxxIntoZip (path) {
   const utils = require('@arangodb/foxx/manager-utils');
   let zip = utils.zipDirectory(path);
@@ -16,8 +21,8 @@ function loadFoxxIntoZip (path) {
   };
 }
 
-function installFoxx (database, mountpoint, which, mode, options) {
-  print(`${Date()} 070: Installing Foxx  to ${mountpoint}`);
+function installFoxx (nr, database, mountpoint, which, mode, options) {
+  print(`${Date()} ${nr}: Installing Foxx  to ${mountpoint}`);
   let headers = {};
   let content;
   if (which.type === 'js') {
@@ -61,7 +66,7 @@ function installFoxx (database, mountpoint, which, mode, options) {
       assertEqual(reply.code, 201, "Reply was: " + JSON.stringify(reply));
       crudResp = JSON.parse(reply.body);
     } catch (ex) {
-      print(`${Date()} 070: installing foxx service threw an exception: ${ex}`);
+      print(`${Date()} ${nr}: installing foxx service threw an exception: ${ex}`);
       throw ex;
     }
   }
@@ -76,6 +81,44 @@ function deleteFoxx (database, mountpoint) {
   assertFalse(deleteResp.error, "Reply was: " + JSON.stringify(deleteResp));
 }
 
+function testFoxxRoutingReady () {
+  for (let i = 0; i < 200; i++) {
+    try {
+      let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
+      if (reply.code === 404) {
+        print(`${Date()} 070: selfHeal was already executed - Foxx is ready!`);
+        return 0;
+      }
+      print(`${Date()} 070: Not yet ready, retrying: ${JSON.stringify(reply.parsedBody)}`);
+    } catch (e) {
+      print(`${Date()} 070: Caught - need to retry. ${JSON.stringify(e)}`);
+    }
+    internal.sleep(3);
+  }
+  throw new Error("070: foxx routing not ready on time!");
+};
+
+let testFoxxReady = function(route, nr) {
+  for (let i = 0; i < 200; i++) {
+    try {
+      let reply = arango.GET_RAW(route, onlyJson);
+      if (reply.code === 200) {
+        print(`${Date()} ${nr}: ${route} OK`);
+        return 0;
+      }
+      let msg = JSON.stringify(reply);
+      if (reply.hasOwnProperty('parsedBody')) {
+        msg = " '" + reply.parsedBody.errorNum + "' - " + reply.parsedBody.errorMessage;
+      }
+      print(`${Date()} ${nr}: ${route} Not yet ready, retrying: ${msg}`);
+    } catch (e) {
+      print(`${Date()} ${nr}: ${route} Caught - need to retry. ${JSON.stringify(e)}`);
+    }
+    internal.sleep(3);
+  }
+  throw new Error(`${nr}: foxx route '${route}' not ready on time!`);
+};    
+
 const itzpapalotlPath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'itzpapalotl');
 
 const minimalWorkingServicePath = path.resolve(internal.pathForTesting('common'), 'test-data', 'apps', 'crud');
@@ -88,46 +131,6 @@ const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test
 (function () {
   let aardvarkRoute = '/_db/_system/_admin/aardvark/index.html';
   let shouldValidateFoxx;
-  const onlyJson = {
-    'accept': 'application/json',
-    'accept-content-type': 'application/json'
-  };
-  let testFoxxRoutingReady = function() {
-    for (let i = 0; i < 200; i++) {
-      try {
-        let reply = arango.GET_RAW('/this_route_is_not_here', onlyJson);
-        if (reply.code === 404) {
-          print(`${Date()} 070: selfHeal was already executed - Foxx is ready!`);
-          return 0;
-        }
-        print(`${Date()} 070: Not yet ready, retrying: ${JSON.stringify(reply.parsedBody)}`);
-      } catch (e) {
-        print(`${Date()} 070: Caught - need to retry. ${JSON.stringify(e)}`);
-      }
-      internal.sleep(3);
-    }
-    throw new Error("070: foxx routing not ready on time!");
-  };
-  let testFoxxReady = function(route) {
-    for (let i = 0; i < 200; i++) {
-      try {
-        let reply = arango.GET_RAW(route, onlyJson);
-        if (reply.code === 200) {
-          print(`${Date()} 070: ${route} OK`);
-          return 0;
-        }
-        let msg = JSON.stringify(reply);
-        if (reply.hasOwnProperty('parsedBody')) {
-          msg = " '" + reply.parsedBody.errorNum + "' - " + reply.parsedBody.errorMessage;
-        }
-        print(`${Date()} 070: ${route} Not yet ready, retrying: ${msg}`);
-      } catch (e) {
-        print(`${Date()} 070: ${route}Caught - need to retry. ${JSON.stringify(e)}`);
-      }
-      internal.sleep(3);
-    }
-    throw new Error("070: foxx route '" + route + "' not ready on time!");
-  };    
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
       return options.testFoxx;
@@ -135,13 +138,13 @@ const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
       testFoxxRoutingReady();
-      testFoxxReady(aardvarkRoute);
+      testFoxxReady(aardvarkRoute, '070');
       print(`${Date()} 070: making per database data ${database}`);
       print(`${Date()} 070: installing Itzpapalotl`);
       // installFoxx('/itz', itzpapalotlZip, "install", options);
       const itzpapalotlZip = loadFoxxIntoZip(itzpapalotlPath);
 
-      installFoxx(database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
+      installFoxx('070', database, `/itz_${dbCount}`, itzpapalotlZip, "install", options);
 
       print(`${Date()} 070: installing crud`);
       const minimalWorkingZip = loadFoxxIntoZip(minimalWorkingServicePath);
@@ -150,7 +153,7 @@ const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test
         devmode: true,
         type: minimalWorkingZip.type
       };
-      installFoxx(database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
+      installFoxx('070', database, `/crud_${dbCount}`, minimalWorkingZip, "install", options);
       return 0;
     },
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
@@ -161,7 +164,7 @@ const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test
         aardvarkRoute,
         `/_db/${database}/itz_${dbCount}/index`,
         `/_db/${database}/crud_${dbCount}/xxx`
-      ].forEach(route => testFoxxReady(route));
+      ].forEach(route => testFoxxReady(route, '070'));
 
       print(`${Date()} 070: Foxx: Itzpapalotl GETting the root of the gods`);
       reply = arango.GET_RAW(`/_db/${database}/itz_${dbCount}`);
@@ -212,6 +215,14 @@ const serviceServicePath = path.resolve(internal.pathForTesting('common'), 'test
         assertEqual(reply.code, "204", JSON.stringify(reply));
       }
       return 0;
+    },
+    waitDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
+      testFoxxRoutingReady();
+      [
+        aardvarkRoute,
+        `/_db/${database}/itz_${dbCount}/index`,
+        `/_db/${database}/crud_${dbCount}/xxx`
+      ].forEach(route => testFoxxReady(route, '070'));
     },
     clearDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
       // All items created must contain dbCount
