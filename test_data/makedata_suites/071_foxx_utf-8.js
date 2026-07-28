@@ -1,5 +1,5 @@
 /* global print, fs, db, internal, arango, assertTrue */
-/* global loadFoxxIntoZip, installFoxx, deleteFoxx, itzpapalotlZip, itzpapalotlPath, minimalWorkingServicePath, minimalWorkingZip, assertEqual, semver */
+/* global loadFoxxIntoZip, installFoxx, deleteFoxx, itzpapalotlZip, itzpapalotlPath, minimalWorkingServicePath, minimalWorkingZip, assertEqual, semver, testFoxxRoutingReady, testFoxxReady */
 
 (function () {
   let extendedNames = ["ᇤ፼ᢟ⚥㑸ন", "に楽しい新習慣", "うっとりとろける", "זַרקוֹר", "ስፖትላይት", "بقعة ضوء", "ուշադրության կենտրոնում", "🌸🌲🌵 🍃💔"];
