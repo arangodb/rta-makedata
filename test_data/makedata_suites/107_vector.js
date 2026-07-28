@@ -44,7 +44,7 @@
         // Always build in the background: a foreground build on a pre-3.12.10
         // cluster blocks long enough (fixed per-index overhead) to trip the test
         // harness timeout, while a background build returns immediately.
-        const inBackground = true;
+        const inBackground = false;
         print(`107: creating vector index (version=${options.curVersion}, isCluster=${isCluster}, inBackground=${inBackground}) with data distribution ${JSON.stringify(c_vector.count(true))}`);
         try {
           const start = time();
@@ -72,10 +72,10 @@
 
     waitDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       let c_vector = db._collection(`c_vector_${dbCount}`);
-      // The vector index is built in the background and only appears in
-      // getIndexes() once its (deferred) build completes. Wait for it to finish
-      // before checking/querying (printing periodically so the harness no-output
-      // watchdog does not kill the otherwise-silent wait).
+      // The index is created in the foreground (inBackground: false), so
+      // ensureIndex only returns once it is present. Still wait for training to
+      // finish before checking/querying (printing periodically so the harness
+      // no-output watchdog does not kill the otherwise-silent wait).
       progress("107: waiting for vector index to be trained");
       waitForVectorIndexTrained(c_vector);
     },
