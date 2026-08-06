@@ -10,13 +10,18 @@ It consists of these files in test_data:
    - `020_foxx.js` Installs foxx, checks it. 
    - `050_database.js` creates databases for the test data.
    - `100_collections.js` creates a set of collections / indices
+   - `120_key_generators-noncluster.js` (single server) creates a collection using the `autoincrement` key generator and verifies that its key options and the generated keys.
+   - `121_key_generators-cluster.js` creates collections using the `padded` and `uuid` key generators (both work on single server and cluster) and verifies that their key options and the generated keys.
    - `400_views.js` creates some views
    - `402_views.js` create views and links with 'cache' properties. It checks proper normalization, memory usage and presence of cached columns after updates. This feature was introduced in 3.9.5
+   - `410_smart_search-noncluster.js` (single server, Enterprise only) creates an arangosearch view over a SmartGraph edge collection and verifies that on a single server the view is only linked to the smart edge collection itself (no hidden `_from_`/`_to_`/`_local_` shadow collections).
+   - `411_smart_search-cluster.js` (cluster, Enterprise only) creates an arangosearch view over a SmartGraph edge collection and verifies that in a cluster the view is linked to the smart edge collection as well as to its `_from_` and `_local_` shadow collections, but never to `_to_`.
    - `500_community_graph.js` creates a community patent graph
    - `550_smart_graph.js` creates a smart patent graph
    - `560_smartgraph_edge_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `561_smartgraph_vertex_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `570_enterprise_graph.js` creates an enterprise patent graph
+   - `580_empty_graphs.js` creates empty smart / enterprise / satellite / disjoint graphs (no edge definitions, no orphan collections) as well as smart / enterprise / satellite / disjoint graphs that own their collections but store no documents, and verifies their sharding properties and emptiness.
    - `900_oneshard.js` creates oneshard database and does stuff with it.
    - `607_analyzers.js` creates suported analyzers for 3.7.x version and check it's functionality.
       Added Analyzers: (documentation link: https://www.arangodb.com/docs/3.7/analyzers.html)
@@ -48,6 +53,7 @@ It consists of these files in test_data:
       - classifierDouble: An Analyzer capable of classifying tokens in the input text.
       - nearestNeighborsSingle: An Analyzer capable of finding nearest neighbors of single tokens in the input.
       - nearestNeighborsDouble: An Analyzer capable of finding nearest neighbors of double tokens in the input.
+   - `700_create_users.js` creates a user, grants it read/write permissions on the database and its collections, and verifies the user, its permissions and credentials.
 
 It should be considered to provide a set of hooks (000_dummy.js can be considered being a template for this):
 
