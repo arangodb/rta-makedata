@@ -26,7 +26,11 @@ function versionHas(attribute) {
   }
 };
 
-const isInstrumented = (versionHas('tsan') || versionHas('asan'));
+let isInstrumented = (versionHas('tsan') || versionHas('asan'));
+// we may be in an instrumneted run, even if this verry launch has non instrumented binaries:
+["TSAN_OPTIONS", "UBSAN_OPTIONS", "LSAN_OPTIONS", "ASAN_OPTIONS"].forEach(varname => {
+  isInstrumented = isInstrumented || (process.env.hasOwnProperty(varname) && process.env[varname].length > 0);
+});
 function getValue(defVal) {
   if (isInstrumented) {
     return Math.trunc(defVal / 10);
