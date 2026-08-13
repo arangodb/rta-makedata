@@ -97,25 +97,41 @@
         assertEqual(coll.indexes()[0].type, "primary", "padded primary index");
         assertEqual(coll.count(), numDocs + 1, "padded document count");
 
-        // padded keys are monotonically increasing in insertion order.
+        // The padded keys increase within a single shard - across multiple shards each has its own counter.
+        const numberOfShards = p.numberOfShards || 1;
+
         let allDocs = {};
+        let allKeys = {};
         coll.toArray().forEach(doc => {
           if (doc.hasOwnProperty('value')) {
             allDocs[doc.value] = doc;
           }
+          // Padded keys are fixed-width, zero-padded, 16-character lowercase hex.
+          assertTrue(/^[0-9a-f]{16}$/.test(doc._key), `padded key '${doc._key}' is not a valid padded key`);
+          assertFalse(allKeys.hasOwnProperty(doc._key), `duplicate padded key '${doc._key}'`);
+          allKeys[doc._key] = true;
         });
+
         let lastKey = "";
         for (let i = 0; i < numDocs; ++i) {
           const doc = allDocs[i];
-          assertTrue(doc._key > lastKey, `padded key '${doc._key}' should be greater than '${lastKey}'`);
+          if (numberOfShards === 1) {
+            // Keys are monotonically increasing in insertion order on a single shard.
+            assertTrue(doc._key > lastKey, `padded key '${doc._key}' should be greater than '${lastKey}'`);
+            lastKey = doc._key;
+          }
           assertEqual(doc.value, i, "padded document value");
           assertEqual(doc.more, { value: [i, i] }, "padded nested value");
-          lastKey = doc._key;
         }
 
         if (!readOnly) {
           const doc = coll.save({});
-          assertTrue(doc._key > lastKey, `padded key '${doc._key}' should be greater than '${lastKey}'`);
+          assertTrue(/^[0-9a-f]{16}$/.test(doc._key), `padded key '${doc._key}' is not a valid padded key`);
+          assertFalse(allKeys.hasOwnProperty(doc._key), `newly generated padded key '${doc._key}' collides with an existing key`);
+          if (numberOfShards === 1) {
+            // On a single shard the freshly generated key must continue the sequence.
+            assertTrue(doc._key > lastKey, `padded key '${doc._key}' should be greater than '${lastKey}'`);
+          }
           coll.remove(doc);
         }
         progress(`121: checked padded collection ${paddedName(dbCount)}`);
