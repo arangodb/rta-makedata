@@ -9,19 +9,27 @@ It consists of these files in test_data:
    - `010_disabled_uuid_check.js` If you're running a cluster setup in failover mode, this checks and waits for all shards have an available leader.
    - `020_foxx.js` Installs foxx, checks it. 
    - `050_database.js` creates databases for the test data.
+   - `052_database_write_concern.js` (cluster) creates a database with a non-default `writeConcern` next to its `replicationFactor` and verifies both.
    - `100_collections.js` creates a set of collections / indices
    - `120_key_generators-noncluster.js` (single server) creates a collection using the `autoincrement` key generator and verifies that its key options and the generated keys.
    - `121_key_generators-cluster.js` creates collections using the `padded` and `uuid` key generators (both work on single server and cluster) and verifies that their key options and the generated keys.
+   - `130_transactions.js` (before 4.0) creates and verifies the payload of three transactions: one that only inserts documents and commits, one that updates pre-existing documents and commits, and one that removes and inserts documents but is rolled back - the latter must not leave any trace behind.
+   - `131_js_transactions.js` (before 4.0) the JS transaction counterpart of `130_transactions.js`: the same three transactions - commit, update-and-commit, rollback - but driven through `db._executeTransaction()`, i.e. a single request carrying a server side JS `action`, instead of the streaming transaction API. The rollback leg throws out of its action and must not leave any trace behind.
+   - `140_truncate.js` creates a collection, fills it and truncates it again; the check verifies that the collection is still there with its properties and its primary index intact, but empty.
    - `400_views.js` creates some views
    - `402_views.js` create views and links with 'cache' properties. It checks proper normalization, memory usage and presence of cached columns after updates. This feature was introduced in 3.9.5
    - `410_smart_search-noncluster.js` (single server, Enterprise only) creates an arangosearch view over a SmartGraph edge collection and verifies that on a single server the view is only linked to the smart edge collection itself (no hidden `_from_`/`_to_`/`_local_` shadow collections).
    - `411_smart_search-cluster.js` (cluster, Enterprise only) creates an arangosearch view over a SmartGraph edge collection and verifies that in a cluster the view is linked to the smart edge collection as well as to its `_from_` and `_local_` shadow collections, but never to `_to_`.
    - `500_community_graph.js` creates a community patent graph
    - `550_smart_graph.js` creates a smart patent graph
+   - `551_smart_graph_3_11_compat.js` (Enterprise only) creates a SmartGraph whose `_graphs` entry carries the `initialCid` attribute that 3.11 and older wrote for every SmartGraph. Current versions don't write it anymore, but they still have to be able to restore - and extend the edge definitions of - a graph definition that has it.
    - `560_smartgraph_edge_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `561_smartgraph_vertex_validator.js` on top of the enterprise graph, this will check the integrity check of the server.
    - `570_enterprise_graph.js` creates an enterprise patent graph
+   - `575_satellite_graph.js` (cluster, Enterprise only) creates a standalone collection with `replicationFactor: "satellite"` that is not part of any graph, plus a SatelliteGraph over two vertex, two edge and one orphan collection holding a cycle of 100 vertices. It verifies the graph definition, the satellite replication factor and `distributeShardsLike` group of all its collections, the collection contents and a traversal along the full cycle.
    - `580_empty_graphs.js` creates empty smart / enterprise / satellite / disjoint graphs (no edge definitions, no orphan collections) as well as smart / enterprise / satellite / disjoint graphs that own their collections but store no documents, and verifies their sharding properties and emptiness.
+   - `585_smart_graph_sharding.js` (cluster, Enterprise only) creates a SmartGraph with a vertex, an edge and an orphan collection and records which of them was elected to lead the shard distribution. Which one leads is not deterministic - the vertex or the orphan collection may be picked, only the edge collection never is - so the election result is stored in a collection of its own at creation time. The check verifies that the collections still form a consistent `distributeShardsLike` group and that the very same collection is still leading it.
+   - `590_hybrid_smart_graphs.js` (Enterprise only) creates the two hybrid SmartGraph flavours that mix vertex collections: a plain hybrid SmartGraph with one satellite and one smart vertex collection connected by one edge relation, and a disjoint hybrid SmartGraph with one satellite and two smart vertex collections connected by two edge relations. It verifies the graph definitions, the smart / satellite / disjoint properties and sharding of every collection, and the document counts.
    - `900_oneshard.js` creates oneshard database and does stuff with it.
    - `607_analyzers.js` creates suported analyzers for 3.7.x version and check it's functionality.
       Added Analyzers: (documentation link: https://www.arangodb.com/docs/3.7/analyzers.html)
@@ -54,6 +62,7 @@ It consists of these files in test_data:
       - nearestNeighborsSingle: An Analyzer capable of finding nearest neighbors of single tokens in the input.
       - nearestNeighborsDouble: An Analyzer capable of finding nearest neighbors of double tokens in the input.
    - `700_create_users.js` creates a user, grants it read/write permissions on the database and its collections, and verifies the user, its permissions and credentials.
+   - `710_jobs_queues.js` (before 4.0) writes an entry into the `_jobs` and the `_queues` system collection and verifies both.
 
 It should be considered to provide a set of hooks (000_dummy.js can be considered being a template for this):
 
