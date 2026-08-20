@@ -83,6 +83,7 @@ const optionsDefaults = {
   test: undefined,
   skip: undefined,
   forceOneShard: false,
+  createOneShardDatabase: false,
   isInstrumented: false,
 };
 
