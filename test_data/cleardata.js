@@ -84,6 +84,7 @@ const optionsDefaults = {
   skip: undefined,
   forceOneShard: false,
   isInstrumented: false,
+  rbac: false,
 };
 
 let args = _.clone(ARGUMENTS);
