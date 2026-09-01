@@ -2,7 +2,6 @@
 
 // inspired by shell-foxx-api-spec.js
 
-const download = internal.download;
 const path = require('path');
 
 const onlyJson = {
@@ -53,18 +52,11 @@ function installFoxx (nr, database, mountpoint, which, mode, options) {
     crudResp = arango.PUT(`/_db/${database}/_api/foxx/service?mount=${mountpoint}${devmode}`, content, headers);
   } else {
     try {
-      let reply = download(arango.getEndpoint().replace(/^tcp:/, 'http:').replace(/^ssl:/, 'https:') +
-                           `/_db/${database}/_api/foxx?mount=${mountpoint}${devmode}`,
-                           content,
-                           {
-                             method: 'POST',
-                             headers: headers,
-                             timeout: 300,
-                             username: 'root',
-                             password: options.passvoid
-                           });
+      let reply = arango.POST_RAW(
+        `/_db/${database}/_api/foxx?mount=${mountpoint}${devmode}`,
+        content);
       assertEqual(reply.code, 201, "Reply was: " + JSON.stringify(reply));
-      crudResp = JSON.parse(reply.body);
+      crudResp = reply.parsedBody;
     } catch (ex) {
       print(`${Date()} ${nr}: installing foxx service threw an exception: ${ex}`);
       throw ex;
