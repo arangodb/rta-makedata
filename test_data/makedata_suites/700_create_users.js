@@ -12,6 +12,9 @@
 
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if (options.rbac) {
+        return false;
+      }
       // User management is available in all deployments.
       return true;
     },

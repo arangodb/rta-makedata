@@ -3,6 +3,9 @@
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
+      if (options.rbac) {
+        return false;
+      }
       return true; // Support all versions to handle both cases within the test
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {

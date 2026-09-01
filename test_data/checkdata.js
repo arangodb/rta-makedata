@@ -95,6 +95,7 @@ const optionsDefaults = {
   printTimeMeasurement: false,
   forceOneShard: false,
   isInstrumented: false,
+  rbac: false,
 };
 
 let args = _.clone(ARGUMENTS);

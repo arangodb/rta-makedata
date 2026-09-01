@@ -3,6 +3,9 @@
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
+      if (options.rbac) {
+        return false;
+      }
       return true; // Assuming ICU is supported in all environments
     },
     makeDataDB: function (options, isCluster, isEnterprise, database, dbCount) {
