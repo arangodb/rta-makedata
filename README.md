@@ -120,3 +120,17 @@ Hence a PR on RTA Makedata has to be sidelined by two PRs.
 Hints:
   - for a PR that is used within `Embeddings` consider to rebase and use the latest commit of a dependent `rta-makedata` PR
   - use "merge" commit instead of "squash" for such an rta-makedata PR to allow for an `Embeddings` PR to be merged without an additional "forward" action
+
+# multiple executions / loops
+Makedata and all of its modules create resources in a way that it can be executed several times.
+Thus all identifiers created on the database have counters in their names.
+
+`--dataMultiplier` whether documents (payload) created will be n-times
+`--numberOfDBs` the final count of databases to be created - starting with `--countOffset` - Thus several instances can be launched in parallel each creating its own partition of data
+`--collectionCountOffset` for the inner loop - more collections are created.
+
+``` bash
+./scripts/unittest rta_makedata --makedata_args:dataMultiplier 5 --makedata_args:numberOfDBs 6 --makedata_args:collectionCountOffset 2
+```
+-> 5 times the number of documents each round will be created
+-> 6 databases will be created, starting with numeric identifiers 2-8.
