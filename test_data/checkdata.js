@@ -60,6 +60,7 @@ let {
   assertCollectionCount,
   assertIndexType,
   assertIndexCount,
+  checkMakeDataCompleted,
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -114,6 +115,8 @@ setOptions(opts);
 if (opts.collectionCountOffset !== 0 && database === '_system') {
   throw new Error("must not specify count without different database.");
 }
+// abort before producing a bunch of follow up failures if makedata aborted
+checkMakeDataCompleted(database);
 
 if (opts.mixed) {
   print("Disabling enterprise in mixed environment");
