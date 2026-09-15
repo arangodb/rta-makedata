@@ -13,6 +13,9 @@
 // `--collectionMultiplier [1]  how many times to create the collections / index / view / graph set?
 // `--collectionCountOffset [0] number offset at which to start the database count
 // `--singleShard [false]       whether this should only be a single shard instance
+// `--createOneShardDatabase    whether makedata created the database with sharding=single.
+//                              Suites that cannot run in a one shard database use it to
+//                              skip themselves the same way makedata did. Default: false.
 // `--progress [false]          whether to output a keepalive indicator to signal the invoker that work is ongoing
 // `--readonly                  the SUT is readonly. fail if writing is successfull.
 // `--test                      comma separated list of testcases to filter for
@@ -57,6 +60,7 @@ let {
   assertCollectionCount,
   assertIndexType,
   assertIndexCount,
+  checkMakeDataCompleted,
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -94,6 +98,7 @@ const optionsDefaults = {
   printTimeTableMeasurement: false,
   printTimeMeasurement: false,
   forceOneShard: false,
+  createOneShardDatabase: false,
   isInstrumented: false,
 };
 
@@ -110,6 +115,8 @@ setOptions(opts);
 if (opts.collectionCountOffset !== 0 && database === '_system') {
   throw new Error("must not specify count without different database.");
 }
+// abort before producing a bunch of follow up failures if makedata aborted
+checkMakeDataCompleted(database);
 
 if (opts.mixed) {
   print("Disabling enterprise in mixed environment");

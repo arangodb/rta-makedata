@@ -64,6 +64,7 @@ let {
   resetRCount,
   getIndexTypes,
   getValue,
+  writeMakeDataState,
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -124,6 +125,7 @@ var numberLength = Math.log(opts.numberOfDBs + opts.countOffset) * Math.LOG10E +
 const zeroPad = (num) => String(num).padStart(numberLength, '0');
 
 const fns = scanMakeDataPaths(opts, PWD, dbVersion, dbVersion, wantFunctions, 'makeData', opts.excludePreviouslyExecutedTests);
+writeMakeDataState(database, "running");
 mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
   try {
     db._useDatabase("_system");
@@ -133,3 +135,4 @@ mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
     });
   } catch (err) {}
 });
+writeMakeDataState(database, "completed");

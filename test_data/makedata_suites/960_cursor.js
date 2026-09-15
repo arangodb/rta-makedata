@@ -92,15 +92,27 @@ class testCursor {
     checkDataDB: function (options, isCluster, isEnterprise, database, dbCount, readOnly) {
       const divisor = isInstrumented ? 3:1;
 
+      // This suite tests the retry semantics of the cursor API, not the
+      // completeness of the data - it never asserts how many documents came
+      // back, only that re-POSTing a batch id returns the very same batch. The
+      // batch sizes below are deliberately tiny (2..11), so walking whole
+      // collections would cost ~2 * count/batchSize round trips per cursor -
+      // thousands of them, and growing with `--dataMultiplier`. Capping the
+      // result set keeps every batch boundary that is worth testing while
+      // bounding the round trips; with 120 even the largest batch size still
+      // yields eleven batches to interleave.
+      const resultLimit = 120;
+
       // check per DB
       let cursors = [];
       try {
         let i=0;
         for (; i < 10/divisor; i++) {
           let collName = `citations_naive_${dbCount}`;
-          let cur = new testCursor("FOR k IN @@coll RETURN k",
+          let cur = new testCursor("FOR k IN @@coll LIMIT @limit RETURN k",
                                    {
-                                     "@coll": collName
+                                     "@coll": collName,
+                                     "limit": resultLimit
                                    },
                                    i+2);
 
@@ -115,9 +127,10 @@ class testCursor {
           let filteredViews = db._views().filter(view => view.name() === viewName);
           if (filteredViews.length > 0) {
             for (; i < 20/divisor; i++) {
-              let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') OPTIONS { waitForSync: true } return doc",
+              let cur = new testCursor("for doc in @@view search doc.cv_field == SOUNDEX('sky') OPTIONS { waitForSync: true } LIMIT @limit return doc",
                                        {
-                                         "@view": viewName
+                                         "@view": viewName,
+                                         "limit": resultLimit
                                        },
                                        i - offset);
 
@@ -130,9 +143,10 @@ class testCursor {
           if (isCluster) {
             for (;i < 30/divisor; i++) {
               let collName = `citations_smart_${dbCount}`;
-              let cur = new testCursor("FOR k IN @@coll RETURN k",
+              let cur = new testCursor("FOR k IN @@coll LIMIT @limit RETURN k",
                                        {
-                                         "@coll": collName
+                                         "@coll": collName,
+                                         "limit": resultLimit
                                        },
                                        i - offset);
 

@@ -1,4 +1,4 @@
-/* global print, ARGUMENTS, */
+/* global print, ARGUMENTS, arango */
 // these come from makedata.js / checkdata.js / cleardata.js:
 /* global _, fs, enterprise, db, database, isCluster, progress, time, zeroPad */
 // these are our state variables, we need to write them:
@@ -229,6 +229,66 @@ function assertCollectionCount(collection, expectCount) {
       return;
     }
     throw new Error(`${Date()} Collection ${collection.name()} Count was expected to be ${expectCount} but is ${actualCount}`);
+  }
+}
+
+function makeDataStateFile(database) {
+  let tempPath = '/tmp';
+  if (process.env.hasOwnProperty('TMPDIR') && (process.env.TMPDIR !== '')) {
+    tempPath = process.env.TMPDIR;
+  }
+  let endpoint = '';
+  try {
+    endpoint = arango.getEndpoint();
+  } catch (ex) { }
+  const tag = `${database}_${endpoint}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+  return fs.join(tempPath, `rta_makedata_state_${tag}.json`);
+}
+
+function writeMakeDataState(database, state) {
+  const stateFile = makeDataStateFile(database);
+  try {
+    fs.write(stateFile, JSON.stringify({
+      state: state,
+      database: database,
+      date: Date()
+    }));
+  } catch (ex) {
+    print(`${Date()} failed to write the makedata state file ${stateFile}: ${ex}`);
+  }
+}
+
+function removeMakeDataState(database) {
+  const stateFile = makeDataStateFile(database);
+  try {
+    if (fs.exists(stateFile)) {
+      fs.remove(stateFile);
+    }
+  } catch (ex) {
+    print(`${Date()} failed to remove the makedata state file ${stateFile}: ${ex}`);
+  }
+}
+
+function checkMakeDataCompleted(database) {
+  const stateFile = makeDataStateFile(database);
+  if (!fs.exists(stateFile)) {
+    return;
+  }
+  let state;
+  try {
+    state = JSON.parse(fs.read(stateFile));
+  } catch (ex) {
+    print(`${Date()} ignoring the unreadable makedata state file ${stateFile}: ${ex}`);
+    return;
+  }
+  if (!state.hasOwnProperty('state')) {
+    return;
+  }
+  if (state.state !== "completed") {
+    throw new Error(
+      `makedata did not run to completion for '${database}' - it is '${state.state}' since ` +
+      `${state.date}. Refusing to check data that was never created; fix the makedata ` +
+      `failure first. (state file: ${stateFile})`);
   }
 }
 
@@ -561,6 +621,9 @@ exports.makeRandomDoc = makeRandomDoc;
 exports.resetRCount = resetRCount;
 exports.writeData = writeData;
 exports.scanMakeDataPaths = scanMakeDataPaths;
+exports.writeMakeDataState = writeMakeDataState;
+exports.removeMakeDataState = removeMakeDataState;
+exports.checkMakeDataCompleted = checkMakeDataCompleted;
 exports.mainTestLoop = mainTestLoop;
 exports.getMetricValue = getMetricValue;
 exports.createSafe = createSafe;

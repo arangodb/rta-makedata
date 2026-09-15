@@ -46,7 +46,8 @@ let {
   options,
   setOptions,
   scanMakeDataPaths,
-  mainTestLoop
+  mainTestLoop,
+  removeMakeDataState
 } = require(fs.join(PWD, 'common'));
 
 const {
@@ -83,6 +84,7 @@ const optionsDefaults = {
   test: undefined,
   skip: undefined,
   forceOneShard: false,
+  createOneShardDatabase: false,
   isInstrumented: false,
 };
 
@@ -158,3 +160,6 @@ mainTestLoop(opts, database, isCluster, enterprise, fns, function(database) {
     progress("mainTestLoop");
   }
 });
+
+// the data is gone - dispose of the state file describing it
+removeMakeDataState(database);
