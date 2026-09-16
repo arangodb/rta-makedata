@@ -82,6 +82,9 @@ class testCursor {
 (function () {
   return {
     isSupported: function (version, oldVersion, options, enterprise, cluster) {
+      if (options.rbac) {
+        return false;
+      }
       if (oldVersion === "") {
         oldVersion = version;
       }

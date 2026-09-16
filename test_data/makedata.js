@@ -104,6 +104,7 @@ const optionsDefaults = {
   forceOneShard: false,
   createOneShardDatabase: false,
   isInstrumented: false,
+  rbac: false,
 };
 
 let args = _.clone(ARGUMENTS);
