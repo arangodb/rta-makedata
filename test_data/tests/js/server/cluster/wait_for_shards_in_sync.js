@@ -18,7 +18,9 @@ function SyncCheckSuite() {
       let firstExec = true;
       let collectionsInSync = true;
       let attempts = 100;
+      let notInSync = [];
       do {
+        notInSync = [];
         collectionsInSync = true;
         let countInSync = 0;
         let countStillWaiting = 0;
@@ -32,6 +34,7 @@ function SyncCheckSuite() {
         cols.forEach(col => {
           collectionsInSync &= col.allInSync;
           if (!col.allInSync) {
+            notInSync.push(col.name());
             countStillWaiting += 1;
           } else {
             countInSync+= 1;
@@ -53,7 +56,7 @@ function SyncCheckSuite() {
         }
         attempts -= 1;
       } while (!collectionsInSync && (attempts > 0));
-      assertTrue(attempts > 0);
+      assertTrue(attempts > 0, JSON.stringify(notInSync));
     }
   };
 }
