@@ -34,7 +34,7 @@ function SyncCheckSuite() {
         cols.forEach(col => {
           collectionsInSync &= col.allInSync;
           if (!col.allInSync) {
-            notInSync.push(col.name());
+            notInSync.push(col.name);
             countStillWaiting += 1;
           } else {
             countInSync+= 1;
