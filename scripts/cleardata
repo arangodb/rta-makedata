@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# run test_data/cleardata.js in arangosh, see rta_common.sh or --help for options
+# resolve symlinks to find rta_common.sh next to the real script (no readlink -f on macOS)
+self="${BASH_SOURCE[0]}"
+while [ -L "$self" ]; do
+    target="$(readlink "$self")"
+    case "$target" in
+        /*) self="$target";;
+        *) self="$(dirname "$self")/$target";;
+    esac
+done
+. "$(dirname "$self")/rta_common.sh"
+rta_main cleardata "${BASH_SOURCE[0]}" "$@"

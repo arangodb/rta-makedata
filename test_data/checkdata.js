@@ -17,9 +17,20 @@
 //                              Suites that cannot run in a one shard database use it to
 //                              skip themselves the same way makedata did. Default: false.
 // `--progress [false]          whether to output a keepalive indicator to signal the invoker that work is ongoing
-// `--readonly                  the SUT is readonly. fail if writing is successfull.
+// `--readOnly                  the SUT is readonly. fail if writing is successfull.
 // `--test                      comma separated list of testcases to filter for
 // `--skip                              comma separated list of testcases to filter out
+// `--curVersion                        version of the server under test. Default: the version reported by the server.
+// `--mixed                             mixed environment: disable the enterprise suites.
+// `--testFoxx                          run the Foxx and UDF suites.
+// `--testVector                        run the vector index suites.
+// `--oldVersion                        version makedata ran against; suites use it to decide whether they are supported.
+// `--passvoid                          password of the root user, for suites that open their own connection.
+// `--printTimeTableMeasurement         print a table of the time spent per suite, database and loop.
+// `--printTimeMeasurement              add timestamps to the --progress output.
+// `--forceOneShard                     create all databases with sharding=single.
+// `--isInstrumented                    unused; sanitizer runs are detected from the server version and the *SAN_OPTIONS variables.
+// `--rbac                              the SUT restricts permissions; skip suites that need full admin rights.
 'use strict';
 const fs = require('fs');
 const _ = require('lodash');
@@ -31,13 +42,18 @@ const db = internal.db;
 const time = internal.time;
 const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
+let PWDRE = /.*at (.*)checkdata.js.*/;
+let stack = new Error().stack;
+let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
+// --help must not touch the server, so it is handled before the first request
+const help = require(fs.join(PWD, 'help'));
+if (help.wantsHelp(ARGUMENTS)) {
+  help.printHelpAndExit(fs.join(PWD, 'checkdata.js'));
+}
 let v = db._version(true);
 let enterprise = v.license === "enterprise";
 const dbVersion = db._version();
 
-let PWDRE = /.*at (.*)checkdata.js.*/;
-let stack = new Error().stack;
-let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 let databaseName;
@@ -100,6 +116,7 @@ const optionsDefaults = {
   forceOneShard: false,
   createOneShardDatabase: false,
   isInstrumented: false,
+  rbac: false,
 };
 
 let args = _.clone(ARGUMENTS);
