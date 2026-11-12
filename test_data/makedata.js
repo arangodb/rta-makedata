@@ -14,12 +14,22 @@
 // `--collectionCountOffset [0]            number offset at which to start the database count
 // `--singleShard [false]                  whether this should only be a single shard instance
 // `--progress [false]                     whether to output a keepalive indicator to signal the invoker that work is ongoing
-// `--bigDoc                               Increase size of the graph documents
 // `--test                                 comma separated list of testcases to filter for
 // `--skip                              comma separated list of testcases to filter out
 // `--tempDataDir                          directory to store temporary data
 // `--excludePreviouslyExecutedTests       If enabled, information about which tests were ran will be saved in the temporary directory. These tests will be skipped during next run. Default: false.
 // `--createOneShardDatabase               When running in a custom database(not _system) whether this database must be created with sharding=single option. Default: false.
+// `--curVersion                           version of the server under test. Default: the version reported by the server.
+// `--readOnly                             the SUT is readonly. fail if writing is successfull.
+// `--testFoxx                             run the Foxx and UDF suites.
+// `--testVector                           run the vector index suites.
+// `--newVersion                           unused.
+// `--passvoid                             password of the root user, for suites that open their own connection.
+// `--printTimeTableMeasurement            print a table of the time spent per suite, database and loop.
+// `--printTimeMeasurement                 add timestamps to the --progress output.
+// `--forceOneShard                        create all databases with sharding=single.
+// `--isInstrumented                       unused; sanitizer runs are detected from the server version and the *SAN_OPTIONS variables.
+// `--rbac                                 the SUT restricts permissions; skip suites that need full admin rights.
 'use strict';
 const fs = require('fs');
 const pth = require('path');
@@ -31,13 +41,18 @@ const db = internal.db;
 const time = internal.time;
 const sleep = internal.sleep;
 const ERRORS = arangodb.errors;
+let PWDRE = /.*at (.*)makedata.js.*/;
+let stack = new Error().stack;
+let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
+// --help must not touch the server, so it is handled before the first request
+const help = require(fs.join(PWD, 'help'));
+if (help.wantsHelp(ARGUMENTS)) {
+  help.printHelpAndExit(fs.join(PWD, 'makedata.js'));
+}
 let v = db._version(true);
 const enterprise = v.license === "enterprise";
 const dbVersion = db._version();
 
-let PWDRE = /.*at (.*)makedata.js.*/;
-let stack = new Error().stack;
-let PWD = fs.makeAbsolute(PWDRE.exec(stack)[1]);
 let isCluster = arango.GET("/_admin/server/role").role === "COORDINATOR";
 let database = "_system";
 const wantFunctions = ['makeDataDB', 'makeData', 'makeDataFinalize'];
@@ -104,6 +119,7 @@ const optionsDefaults = {
   forceOneShard: false,
   createOneShardDatabase: false,
   isInstrumented: false,
+  rbac: false,
 };
 
 let args = _.clone(ARGUMENTS);

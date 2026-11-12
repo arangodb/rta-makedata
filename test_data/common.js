@@ -292,6 +292,36 @@ function checkMakeDataCompleted(database) {
   }
 }
 
+// internal.parseArgv() runs parseInt() on every numeric looking value, so
+// '--test 100' arrives as a number (no .split()), '--test 020' as 20 which
+// also matches 120_*, 620_*..., and a repeated option becomes an array.
+// Recover the comma separated filter list verbatim from the command line.
+function getFilterList(options, name) {
+  let raw = [];
+  if (typeof ARGUMENTS !== 'undefined') {
+    for (let i = 0; i < ARGUMENTS.length; i++) {
+      const arg = String(ARGUMENTS[i]);
+      if (arg === `--${name}` && i + 1 < ARGUMENTS.length) {
+        raw.push(String(ARGUMENTS[++i]));
+      } else if (arg.startsWith(`--${name}=`)) {
+        raw.push(arg.slice(name.length + 3));
+      }
+    }
+  }
+  if (raw.length === 0 && options.hasOwnProperty(name) && (typeof (options[name]) !== 'undefined')) {
+    raw = Array.isArray(options[name]) ? options[name] : [options[name]];
+  }
+  let filters = [];
+  raw.forEach(value => {
+    String(value).split(',').forEach(flt => {
+      if (flt !== '') {
+        filters.push(flt);
+      }
+    });
+  });
+  return filters;
+}
+
 function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, nameString, excludePreviouslyExecuted) {
   var EXECUTED_TEST_SUITES_FILE = "";
   var previously_executed_suites = [];
@@ -314,14 +344,8 @@ function scanMakeDataPaths(options, PWD, oldVersion, newVersion, wantFunctions, 
 
   let fns = Array.from(wantFunctions, () => []);
   const FNChars = ['D', 'L', 'F'];
-  let filters = [];
-  if (options.hasOwnProperty('test') && (typeof (options.test) !== 'undefined')) {
-    filters = options.test.split(',');
-  }
-  let negFilters = [];
-  if (options.hasOwnProperty('skip') && (typeof (options.skip) !== 'undefined')) {
-    negFilters = String(options.skip).split(',');
-  }
+  let filters = getFilterList(options, 'test');
+  let negFilters = getFilterList(options, 'skip');
   let testDir = fs.join(PWD, 'makedata_suites');
   let suites = _.filter(
     fs.list(testDir),
