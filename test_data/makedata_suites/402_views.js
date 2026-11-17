@@ -775,7 +775,7 @@ function deleteAnalyzer_400(testgroup, analyzerName){
       return;
     }
     let headers = 'Content-Type: application/json';
-    let content = `{"username": "root","password": "${options.passvoid}" }`;
+    let content = `{"username": "${options.rbac ? 'admin' : 'root'}","password": "${options.passvoid}" }`;
     let reply = arango.POST_RAW("/_open/auth", content, headers);
     let obj = reply["parsedBody"];
     jwt_key = obj["jwt"];
