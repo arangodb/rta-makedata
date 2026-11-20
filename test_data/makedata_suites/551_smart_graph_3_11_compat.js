@@ -23,6 +23,9 @@
 
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      if (options.rbac && options.singleShard && cluster) {
+        return false;
+      }
       let ver = semver.parse(oldVersion.split('-')[0]);
       return enterprise && semver.gt(ver, "3.12.10");
     },
