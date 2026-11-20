@@ -65,6 +65,9 @@ function getShardCount(defaultShardCount) {
 }
 
 function getReplicationFactor(defaultReplicationFactor) {
+  if(!isCluster && options.singleShard) {
+    return 2;
+  }
   if (defaultReplicationFactor > options.maxReplicationFactor) {
     return options.maxReplicationFactor;
   }
