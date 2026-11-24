@@ -23,6 +23,7 @@
 
   return {
     isSupported: function (currentVersion, oldVersion, options, enterprise, cluster) {
+      // BTS-2578 - test suite is disabled for One Shard Cluster in RBAC mode
       if (options.rbac && options.singleShard && cluster) {
         return false;
       }
