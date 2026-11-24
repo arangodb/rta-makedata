@@ -65,6 +65,10 @@ function getShardCount(defaultShardCount) {
 }
 
 function getReplicationFactor(defaultReplicationFactor) {
+  // BTS-2564 - single server with one shard db has to have replication factor of 2
+  if(!isCluster && options.singleShard) {
+    return 2;
+  }
   if (defaultReplicationFactor > options.maxReplicationFactor) {
     return options.maxReplicationFactor;
   }
